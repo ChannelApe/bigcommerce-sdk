@@ -11,7 +11,7 @@ Java SDK for BigCommerce V3 REST APIs
 	<dependency>
 	    <groupId>com.github.rjdavis3</groupId>
 	    <artifactId>bigcommerce-sdk</artifactId>
-	    <version>1.3.1</version>
+	    <version>1.0.0</version>
 	</dependency>
 ```
 
@@ -19,8 +19,8 @@ Java SDK for BigCommerce V3 REST APIs
 Creating SDK with refresh token then making a sample call:
 
 ```java
-	final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(storeHash).withClientId(clientId)
-			.withAccessToken(accessToken).build();
+	final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(storeHash)
+			.withClientId(clientId).withAccessToken(accessToken).build();
 	final CatalogSummary catalogSummary = bigcommerceSdk.getCatalogSummary();
 ```
 
