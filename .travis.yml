@@ -1,0 +1,16 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+script: mvn --settings .travis/settings.xml clean  verify
+
+deploy:
+  -
+    provider: script
+    script: .travis/deploy.sh
+    skip_cleanup: true
+    on:
+      repo: rjdavis3/bigcommerce-sdk
+      tags: true
+      jdk: oraclejdk8
