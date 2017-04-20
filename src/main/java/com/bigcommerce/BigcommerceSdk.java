@@ -1,6 +1,26 @@
 package com.bigcommerce;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
+import org.glassfish.jersey.client.ClientProperties;
+
+import com.bigcommerce.catalog.models.CatalogSummary;
+import com.bigcommerce.catalog.models.CatalogSummaryResponse;
+import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
+
 public class BigcommerceSdk {
+
+	private static final Client CLIENT = ClientBuilder.newClient().property(ClientProperties.CONNECT_TIMEOUT, 60000)
+			.property(ClientProperties.READ_TIMEOUT, 600000);
+	private static final String API_URL_PREFIX = "https://api.bigcommerce.com/stores";
+	private static final String API_VERSION = "v3";
+	private static final String CATALOG = "catalog";
+	private static final String SUMMARY = "summary";
+	private static final String CLIENT_ID_HEADER = "X-Auth-Client";
+	private static final String ACESS_TOKEN_HEADER = "X-Auth-Token";
 
 	private final String storeHash;
 	private final String clientId;
@@ -36,6 +56,17 @@ public class BigcommerceSdk {
 
 	public String getAccessToken() {
 		return accessToken;
+	}
+
+	public CatalogSummary getCatalogSummary() {
+		final Response response = CLIENT.target(API_URL_PREFIX).path(getStoreHash()).path(API_VERSION).path(CATALOG)
+				.path(SUMMARY).request().header(CLIENT_ID_HEADER, getClientId())
+				.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
+		if (Status.OK.getStatusCode() == response.getStatus()) {
+			final CatalogSummaryResponse catalogSummaryResponse = response.readEntity(CatalogSummaryResponse.class);
+			return catalogSummaryResponse.getData();
+		}
+		throw new BigcommerceErrorResponseException(response);
 	}
 
 	private BigcommerceSdk(final Steps steps) {
