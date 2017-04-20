@@ -16,7 +16,7 @@ Java SDK for BigCommerce V3 REST APIs
 ```
 
 ## Quickstart
-Creating SDK with refresh token then making a sample call:
+Creating SDK with store hash, client ID, and access token then making a sample call:
 
 ```java
 	final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(storeHash)
