@@ -7,6 +7,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Variant {
@@ -75,6 +78,27 @@ public class Variant {
 
 	public void setInventoryLevel(int inventoryLevel) {
 		this.inventoryLevel = inventoryLevel;
+	}
+
+	@Override
+	public boolean equals(final Object object) {
+		if (object == this) {
+			return true;
+		}
+		if (!(object instanceof Variant)) {
+			return false;
+		}
+		final Variant Variant = (Variant) object;
+		return new EqualsBuilder().append(getId(), Variant.getId()).append(getProductId(), Variant.getProductId())
+				.append(getSku(), Variant.getSku()).append(getPrice(), Variant.getPrice())
+				.append(getUpc(), Variant.getUpc()).append(getMpn(), Variant.getMpn())
+				.append(getInventoryLevel(), Variant.getInventoryLevel()).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getPrice())
+				.append(getUpc()).append(getMpn()).append(getInventoryLevel()).toHashCode();
 	}
 
 }
