@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -23,12 +24,10 @@ import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
 
 public class BigcommerceSdk {
 
-	private static final Client CLIENT = ClientBuilder.newClient().property(ClientProperties.CONNECT_TIMEOUT, 60000)
-			.property(ClientProperties.READ_TIMEOUT, 600000);
-	private static final String API_URL_PREFIX = "https://api.bigcommerce.com/stores";
-	private static final String API_VERSION = "v3";
-	private static final String CLIENT_ID_HEADER = "X-Auth-Client";
-	private static final String ACESS_TOKEN_HEADER = "X-Auth-Token";
+	static final String API_VERSION = "v3";
+	static final String CLIENT_ID_HEADER = "X-Auth-Client";
+	static final String ACESS_TOKEN_HEADER = "X-Auth-Token";
+
 	private static final String CATALOG = "catalog";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
@@ -39,9 +38,17 @@ public class BigcommerceSdk {
 	private static final int MAX_LIMIT = 250;
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 
+	private static final Client CLIENT = ClientBuilder.newClient().property(ClientProperties.CONNECT_TIMEOUT, 60000)
+			.property(ClientProperties.READ_TIMEOUT, 600000);
+
+	private final WebTarget baseWebTarget;
 	private final String storeHash;
 	private final String clientId;
 	private final String accessToken;
+
+	public static interface ApiUrlStep {
+		StoreHashStep withApiUrl(final String apiUrl);
+	}
 
 	public static interface StoreHashStep {
 		ClientIdStep withStoreHash(final String storeHash);
@@ -63,6 +70,10 @@ public class BigcommerceSdk {
 		return new Steps();
 	}
 
+	static ApiUrlStep newSandboxBuilder() {
+		return new Steps();
+	}
+
 	public String getStoreHash() {
 		return storeHash;
 	}
@@ -76,9 +87,8 @@ public class BigcommerceSdk {
 	}
 
 	public CatalogSummary getCatalogSummary() {
-		final Response response = CLIENT.target(API_URL_PREFIX).path(getStoreHash()).path(API_VERSION).path(CATALOG)
-				.path(SUMMARY).request().header(CLIENT_ID_HEADER, getClientId())
-				.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
+		final Response response = baseWebTarget.path(CATALOG).path(SUMMARY).request()
+				.header(CLIENT_ID_HEADER, getClientId()).header(ACESS_TOKEN_HEADER, getAccessToken()).get();
 		if (Status.OK.getStatusCode() == response.getStatus()) {
 			final CatalogSummaryResponse catalogSummaryResponse = response.readEntity(CatalogSummaryResponse.class);
 			return catalogSummaryResponse.getData();
@@ -91,9 +101,9 @@ public class BigcommerceSdk {
 	}
 
 	public Products getProducts(final int page, final int limit) {
-		final Response response = CLIENT.target(API_URL_PREFIX).path(getStoreHash()).path(API_VERSION).path(CATALOG)
-				.path(PRODUCTS).queryParam(INCLUDE, VARIANTS).queryParam(LIMIT, limit).queryParam(PAGE, page).request()
-				.header(CLIENT_ID_HEADER, getClientId()).header(ACESS_TOKEN_HEADER, getAccessToken()).get();
+		final Response response = baseWebTarget.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
+				.queryParam(LIMIT, limit).queryParam(PAGE, page).request().header(CLIENT_ID_HEADER, getClientId())
+				.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
 		if (Status.OK.getStatusCode() == response.getStatus()) {
 			final ProductsResponse productsResponse = response.readEntity(ProductsResponse.class);
 			final List<Product> products = productsResponse.getData();
@@ -105,10 +115,9 @@ public class BigcommerceSdk {
 
 	public void updateVariant(Variant variant) {
 		final Entity<Variant> variantEntity = Entity.entity(variant, MEDIA_TYPE);
-		final Response response = CLIENT.target(API_URL_PREFIX).path(getStoreHash()).path(API_VERSION).path(CATALOG)
-				.path(PRODUCTS).path(variant.getProductId()).path(VARIANTS).path(variant.getId()).request()
-				.header(CLIENT_ID_HEADER, getClientId()).header(ACESS_TOKEN_HEADER, getAccessToken())
-				.put(variantEntity);
+		final Response response = baseWebTarget.path(CATALOG).path(PRODUCTS).path(variant.getProductId()).path(VARIANTS)
+				.path(variant.getId()).request().header(CLIENT_ID_HEADER, getClientId())
+				.header(ACESS_TOKEN_HEADER, getAccessToken()).put(variantEntity);
 		if (Status.OK.getStatusCode() == response.getStatus()) {
 			final VariantResponse variantResponse = response.readEntity(VariantResponse.class);
 			variant = variantResponse.getData();
@@ -118,16 +127,24 @@ public class BigcommerceSdk {
 	}
 
 	private BigcommerceSdk(final Steps steps) {
+		this.baseWebTarget = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION);
 		this.storeHash = steps.storeHash;
 		this.clientId = steps.clientId;
 		this.accessToken = steps.accessToken;
 	}
 
-	private static class Steps implements StoreHashStep, ClientIdStep, AccessTokenStep, BuildStep {
+	private static class Steps implements ApiUrlStep, StoreHashStep, ClientIdStep, AccessTokenStep, BuildStep {
 
+		private String apiUrl = "https://api.bigcommerce.com/stores";
 		private String storeHash;
 		private String clientId;
 		private String accessToken;
+
+		@Override
+		public StoreHashStep withApiUrl(final String apiUrl) {
+			this.apiUrl = apiUrl;
+			return this;
+		}
 
 		@Override
 		public BuildStep withAccessToken(final String accessToken) {

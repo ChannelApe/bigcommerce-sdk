@@ -117,6 +117,12 @@
 			<version>${slf4j.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.moxy</artifactId>
+			<version>2.6.4</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -132,7 +138,7 @@
 							<goal>mutationCoverage</goal>
 						</goals>
 						<configuration>
-							<mutationThreshold>33</mutationThreshold>
+							<mutationThreshold>40</mutationThreshold>
 							<targetClasses>
 								<param>com.bigcommerce.*</param>
 							</targetClasses>
