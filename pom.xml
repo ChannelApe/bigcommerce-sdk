@@ -138,7 +138,7 @@
 							<goal>mutationCoverage</goal>
 						</goals>
 						<configuration>
-							<mutationThreshold>40</mutationThreshold>
+							<mutationThreshold>76</mutationThreshold>
 							<targetClasses>
 								<param>com.bigcommerce.*</param>
 							</targetClasses>

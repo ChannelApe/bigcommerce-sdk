@@ -113,17 +113,16 @@ public class BigcommerceSdk {
 		throw new BigcommerceErrorResponseException(response);
 	}
 
-	public void updateVariant(Variant variant) {
+	public Variant updateVariant(final Variant variant) {
 		final Entity<Variant> variantEntity = Entity.entity(variant, MEDIA_TYPE);
 		final Response response = baseWebTarget.path(CATALOG).path(PRODUCTS).path(variant.getProductId()).path(VARIANTS)
 				.path(variant.getId()).request().header(CLIENT_ID_HEADER, getClientId())
 				.header(ACESS_TOKEN_HEADER, getAccessToken()).put(variantEntity);
 		if (Status.OK.getStatusCode() == response.getStatus()) {
 			final VariantResponse variantResponse = response.readEntity(VariantResponse.class);
-			variant = variantResponse.getData();
-		} else {
-			throw new BigcommerceErrorResponseException(response);
+			return variantResponse.getData();
 		}
+		throw new BigcommerceErrorResponseException(response);
 	}
 
 	private BigcommerceSdk(final Steps steps) {
