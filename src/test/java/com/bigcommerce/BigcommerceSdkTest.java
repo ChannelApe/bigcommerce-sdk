@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -30,6 +31,7 @@ import com.bigcommerce.catalog.models.ProductsResponse;
 import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
+import com.bigcommerce.exceptions.BigcommerceException;
 import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.github.restdriver.clientdriver.capture.JsonBodyCapture;
@@ -172,8 +174,8 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedPagination.getTotalPages(), actualProducts.getPagination().getTotalPages());
 	}
 
-	@Test(expected = BigcommerceErrorResponseException.class)
-	public void givenSomePageAndBigCommerceReturnsInternalServerErrorWhenRetrievingProductsThenThrowNewBigcommerceErrorResponseException() {
+	@Test(expected = BigcommerceException.class)
+	public void givenSomePageAndBigCommerceReturnsInternalServerErrorWhenRetrievingProductsThenRetryAndEventuallyThrowNewBigcommerceException() {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
@@ -185,7 +187,26 @@ public class BigcommerceSdkTest {
 		driver.addExpectation(onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
 				.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
 				.withParam("page", 1).withParam("limit", 250).withMethod(Method.GET),
-				giveEmptyResponse().withStatus(expectedStatusCode));
+				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
+
+		bigcommerceSdk.getProducts(1);
+	}
+
+	@Test(expected = BigcommerceException.class)
+	public void givenSomePageAndBigCommerceReturnsTooManyRequestsWhenRetrievingProductsThenRetryAndEventuallyThrowNewBigcommerceException() {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append("catalog/products").toString();
+
+		final int expectedStatusCode = BigcommerceSdk.TOO_MANY_REQUESTS_STATUS_CODE;
+		driver.addExpectation(onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+				.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
+				.withParam("page", 1).withParam("limit", 250).withMethod(Method.GET),
+				giveEmptyResponse().withStatus(expectedStatusCode)
+						.withHeader(BigcommerceSdk.RATE_LIMIT_TIME_RESET_HEADER, "5"))
+				.anyTimes();
 
 		bigcommerceSdk.getProducts(1);
 	}
@@ -273,7 +294,7 @@ public class BigcommerceSdkTest {
 
 	private BigcommerceSdk buildBigcommerceSdk() {
 		final String apiUrl = driver.getBaseUrl();
-		return BigcommerceSdk.newSandboxBuilder().withApiUrl(apiUrl).withStoreHash(SOME_STORE_HASH)
-				.withClientId(SOME_CLIENT_ID).withAccessToken(SOME_ACCESS_TOKEN).build();
+		return BigcommerceSdk.newSandboxBuilder().withApiUrl(apiUrl).withRequestRetryTimeout(20, TimeUnit.MILLISECONDS)
+				.withStoreHash(SOME_STORE_HASH).withClientId(SOME_CLIENT_ID).withAccessToken(SOME_ACCESS_TOKEN).build();
 	}
 }
