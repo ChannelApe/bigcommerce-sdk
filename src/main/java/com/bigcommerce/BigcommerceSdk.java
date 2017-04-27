@@ -87,13 +87,10 @@ public class BigcommerceSdk {
 	}
 
 	public CatalogSummary getCatalogSummary() {
-		final Response response = baseWebTarget.path(CATALOG).path(SUMMARY).request()
-				.header(CLIENT_ID_HEADER, getClientId()).header(ACESS_TOKEN_HEADER, getAccessToken()).get();
-		if (Status.OK.getStatusCode() == response.getStatus()) {
-			final CatalogSummaryResponse catalogSummaryResponse = response.readEntity(CatalogSummaryResponse.class);
-			return catalogSummaryResponse.getData();
-		}
-		throw new BigcommerceErrorResponseException(response);
+		final WebTarget webTarget = baseWebTarget.path(CATALOG).path(SUMMARY);
+		final CatalogSummaryResponse catalogSummaryResponse = get(webTarget, CatalogSummaryResponse.class);
+		return catalogSummaryResponse.getData();
+
 	}
 
 	public Products getProducts(final int page) {
@@ -101,28 +98,19 @@ public class BigcommerceSdk {
 	}
 
 	public Products getProducts(final int page, final int limit) {
-		final Response response = baseWebTarget.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
-				.queryParam(LIMIT, limit).queryParam(PAGE, page).request().header(CLIENT_ID_HEADER, getClientId())
-				.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
-		if (Status.OK.getStatusCode() == response.getStatus()) {
-			final ProductsResponse productsResponse = response.readEntity(ProductsResponse.class);
-			final List<Product> products = productsResponse.getData();
-			final Pagination pagination = productsResponse.getMeta().getPagination();
-			return new Products(products, pagination);
-		}
-		throw new BigcommerceErrorResponseException(response);
+		final WebTarget webTarget = baseWebTarget.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
+				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		final ProductsResponse productsResponse = get(webTarget, ProductsResponse.class);
+		final List<Product> products = productsResponse.getData();
+		final Pagination pagination = productsResponse.getMeta().getPagination();
+		return new Products(products, pagination);
 	}
 
 	public Variant updateVariant(final Variant variant) {
-		final Entity<Variant> variantEntity = Entity.entity(variant, MEDIA_TYPE);
-		final Response response = baseWebTarget.path(CATALOG).path(PRODUCTS).path(variant.getProductId()).path(VARIANTS)
-				.path(variant.getId()).request().header(CLIENT_ID_HEADER, getClientId())
-				.header(ACESS_TOKEN_HEADER, getAccessToken()).put(variantEntity);
-		if (Status.OK.getStatusCode() == response.getStatus()) {
-			final VariantResponse variantResponse = response.readEntity(VariantResponse.class);
-			return variantResponse.getData();
-		}
-		throw new BigcommerceErrorResponseException(response);
+		final WebTarget webTarget = baseWebTarget.path(CATALOG).path(PRODUCTS).path(variant.getProductId())
+				.path(VARIANTS).path(variant.getId());
+		final VariantResponse variantResponse = put(webTarget, variant, VariantResponse.class);
+		return variantResponse.getData();
 	}
 
 	private BigcommerceSdk(final Steps steps) {
@@ -168,5 +156,24 @@ public class BigcommerceSdk {
 			return new BigcommerceSdk(this);
 		}
 
+	}
+
+	private <T> T get(final WebTarget webTarget, final Class<T> entityType) {
+		final Response response = webTarget.request().header(CLIENT_ID_HEADER, getClientId())
+				.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
+		if (Status.OK.getStatusCode() == response.getStatus()) {
+			return response.readEntity(entityType);
+		}
+		throw new BigcommerceErrorResponseException(response);
+	}
+
+	private <T, V> V put(final WebTarget webTarget, final T object, final Class<V> entityType) {
+		final Entity<T> entity = Entity.entity(object, MEDIA_TYPE);
+		final Response response = webTarget.request().header(CLIENT_ID_HEADER, getClientId())
+				.header(ACESS_TOKEN_HEADER, getAccessToken()).put(entity);
+		if (Status.OK.getStatusCode() == response.getStatus()) {
+			return response.readEntity(entityType);
+		}
+		throw new BigcommerceErrorResponseException(response);
 	}
 }
