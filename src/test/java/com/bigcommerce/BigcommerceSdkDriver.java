@@ -35,7 +35,6 @@ public class BigcommerceSdkDriver {
 	}
 
 	@Test
-	@Ignore
 	public void givenPage1WhenRetrievingProductsThenReturnProducts() {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
@@ -49,6 +48,7 @@ public class BigcommerceSdkDriver {
 	}
 
 	@Test
+	@Ignore
 	public void givenVariantWhenUpdatingVariantThenUpdateVariant() {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();

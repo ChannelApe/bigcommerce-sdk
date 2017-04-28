@@ -3,6 +3,9 @@ package com.bigcommerce.catalog.models;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Product {
 
 	private String id;

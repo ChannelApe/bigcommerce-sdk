@@ -28,6 +28,8 @@ import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
 import com.bigcommerce.exceptions.BigcommerceException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
@@ -57,7 +59,8 @@ public class BigcommerceSdk {
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
 
 	private static final Client CLIENT = ClientBuilder.newClient().property(ClientProperties.CONNECT_TIMEOUT, 60000)
-			.property(ClientProperties.READ_TIMEOUT, 600000);
+			.property(ClientProperties.READ_TIMEOUT, 600000).register(
+					new JacksonJaxbJsonProvider().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BigcommerceSdk.class);
 
