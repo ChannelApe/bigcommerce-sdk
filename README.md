@@ -1,6 +1,6 @@
 # BigCommerce SDK
 
-Java SDK for BigCommerce V3 REST APIs
+Java SDK for BigCommerce REST APIs
 
 | Service   | Develop | Master |
 |-----------|---------|--------|

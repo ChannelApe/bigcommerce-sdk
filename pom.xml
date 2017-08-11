@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.rjdavis3</groupId>
 	<artifactId>bigcommerce-sdk</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 
 	<name>BigCommerce SDK</name>
-	<description>Java SDK for BigCommerce V3 REST APIs</description>
-	<url>https://github.com/rjdavis3/bigcommerce-sdk</url>
+	<description>Java SDK for BigCommerce REST APIs</description>
+	<url>https://github.com/channelape/bigcommerce-sdk</url>
 
 	<licenses>
 		<license>
@@ -17,22 +17,22 @@
 	</licenses>
 
 	<issueManagement>
-		<url>https://github.com/rjdavis3/bigcommerce-sdk/issues</url>
+		<url>https://github.com/channelape/bigcommerce-sdk/issues</url>
 		<system>GitHub</system>
 	</issueManagement>
 
 	<developers>
 		<developer>
 			<name>R.J. Davis</name>
-			<email>rjdavis3@me.com</email>
-			<organizationUrl>https://github.com/rjdavis3</organizationUrl>
+			<email>rjdavis@channelape.com</email>
+			<organizationUrl>https://channelape.com</organizationUrl>
 		</developer>
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/rjdavis3/bigcommerce-sdk.git</connection>
-		<developerConnection>scm:git:ssh://github.com:rjdavis3/bigcommerce-sdk.git</developerConnection>
-		<url>https://github.com/rjdavis3/bigcommerce-sdk/tree/master</url>
+		<connection>scm:git:git://github.com/channelape/bigcommerce-sdk.git</connection>
+		<developerConnection>scm:git:ssh://github.com:channelape/bigcommerce-sdk.git</developerConnection>
+		<url>https://github.com/channelape/bigcommerce-sdk/tree/master</url>
 	</scm>
 
 	<distributionManagement>
