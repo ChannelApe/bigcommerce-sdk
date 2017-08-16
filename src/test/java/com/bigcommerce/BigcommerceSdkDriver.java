@@ -5,12 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bigcommerce.catalog.models.CatalogSummary;
+import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.Variant;
 
@@ -65,6 +67,18 @@ public class BigcommerceSdkDriver {
 		assertEquals(3, variant.getInventoryLevel());
 		System.out.println("---- Updated Variant ----");
 		System.out.println(new JSONObject(variant).toString());
+	}
+
+	@Test
+	public void givenPage1WhenRetrievingOrdersThenReturnOrders() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final List<Order> actualOrders = bigcommerceSdk.getOrders(1);
+
+		assertNotNull(actualOrders);
+		assertFalse(actualOrders.isEmpty());
+
 	}
 
 }

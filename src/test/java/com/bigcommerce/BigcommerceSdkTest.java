@@ -5,6 +5,7 @@ import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -18,12 +19,16 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.eclipse.persistence.jaxb.MarshallerProperties;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
 import com.bigcommerce.catalog.models.Meta;
+import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
@@ -32,6 +37,8 @@ import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
 import com.bigcommerce.exceptions.BigcommerceException;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.github.restdriver.clientdriver.capture.JsonBodyCapture;
@@ -290,6 +297,74 @@ public class BigcommerceSdkTest {
 				giveEmptyResponse().withStatus(expectedStatusCode));
 
 		bigcommerceSdk.updateVariant(variant);
+	}
+
+	@Test
+	public void givenSomePageWhenRetrievingOrdersThenReturnOrders()
+			throws JAXBException, JsonGenerationException, JsonMappingException, IOException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("orders")
+				.toString();
+
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(BigcommerceSdk.RFC_822_DATE_FORMAT);
+		final Order firstExpectedOrder = new Order();
+		firstExpectedOrder.setId(100);
+		firstExpectedOrder.setDateCreated(formatter.parseDateTime(("Tue, 30 May 2017 17:14:57 +0000")));
+
+		firstExpectedOrder.setSubtotalExTax("0.0200");
+		final List<Order> expectedOrders = Arrays.asList(firstExpectedOrder);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Order[].class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(expectedOrders, stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withParam("limit", 250).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final List<Order> actualOrders = bigcommerceSdk.getOrders(1);
+
+		assertEquals(firstExpectedOrder.getId(), actualOrders.get(0).getId());
+
+		assertEqualDates(firstExpectedOrder.getDateCreated(), actualOrders.get(0).getDateCreated());
+		assertEquals(firstExpectedOrder.getDateModified(), actualOrders.get(0).getDateModified());
+
+	}
+
+	@Test(expected = BigcommerceErrorResponseException.class)
+	public void givenInvalidCredentialsWhenRetrievingOrdersThrowBigCommerceException() {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("orders")
+				.toString();
+
+		final Status expectedStatus = Status.UNAUTHORIZED;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withParam("limit", 250).withMethod(Method.GET),
+				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
+
+		bigcommerceSdk.getOrders(1);
+	}
+
+	private void assertEqualDates(final DateTime firstDate, final DateTime secondDate) {
+		assertEquals(firstDate.compareTo(secondDate), 0);
 	}
 
 	private BigcommerceSdk buildBigcommerceSdk() {

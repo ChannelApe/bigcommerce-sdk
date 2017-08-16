@@ -1,5 +1,7 @@
 package com.bigcommerce;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -10,6 +12,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
+import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
@@ -41,6 +45,7 @@ import com.github.rholder.retry.WaitStrategy;
 
 public class BigcommerceSdk {
 
+	static final String API_VERSION_V2 = "v2";
 	static final String API_VERSION = "v3";
 	static final String CLIENT_ID_HEADER = "X-Auth-Client";
 	static final String ACESS_TOKEN_HEADER = "X-Auth-Token";
@@ -51,6 +56,7 @@ public class BigcommerceSdk {
 	private static final String CATALOG = "catalog";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
+	private static final String ORDERS = "orders";
 	private static final String LIMIT = "limit";
 	private static final String PAGE = "page";
 	private static final String INCLUDE = "include";
@@ -66,11 +72,17 @@ public class BigcommerceSdk {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BigcommerceSdk.class);
 
 	private final WebTarget baseWebTarget;
+	/*
+	 * Bigcommerce API has some differences between V2 & V3 and currently some
+	 * API endpoints only exist in V2. The SDK uses V2 where applicable.
+	 */
+	private final WebTarget baseWebTargetV2;
 	private final String storeHash;
 	private final String clientId;
 	private final String accessToken;
 	private final long requestRetryTimeoutDuration;
 	private final TimeUnit requestRetryTimeoutUnit;
+	public static final String RFC_822_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss Z";
 
 	public static interface ApiUrlStep {
 		RequestRetryTimeoutStep withApiUrl(final String apiUrl);
@@ -137,6 +149,17 @@ public class BigcommerceSdk {
 		return new Products(products, pagination);
 	}
 
+	public List<Order> getOrders(final int page) {
+		return getOrders(page, MAX_LIMIT);
+	}
+
+	public List<Order> getOrders(final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).queryParam(LIMIT, limit).queryParam(PAGE, page);
+
+		final List<Order> orders = getList(webTarget, Order.class);
+		return orders;
+	}
+
 	public Variant updateVariant(final Variant variant) {
 		final WebTarget webTarget = baseWebTarget.path(CATALOG).path(PRODUCTS).path(variant.getProductId())
 				.path(VARIANTS).path(variant.getId());
@@ -146,6 +169,7 @@ public class BigcommerceSdk {
 
 	private BigcommerceSdk(final Steps steps) {
 		this.baseWebTarget = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION);
+		this.baseWebTargetV2 = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION_V2);
 		this.storeHash = steps.storeHash;
 		this.clientId = steps.clientId;
 		this.accessToken = steps.accessToken;
@@ -207,11 +231,25 @@ public class BigcommerceSdk {
 			@Override
 			public Response call() throws Exception {
 				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
-						.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
+						.header(ACESS_TOKEN_HEADER, getAccessToken()).header("Accept", "application/json").get();
 			}
 		};
 		final Response response = invokeResponseCallable(responseCallable);
 		return handleResponse(response, entityType, Status.OK);
+	}
+
+	private <T> List<T> getList(final WebTarget webTarget, final Class<T> entityType) {
+		final Callable<Response> responseCallable = new Callable<Response>() {
+			@Override
+			public Response call() throws Exception {
+				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
+						.header(ACESS_TOKEN_HEADER, getAccessToken()).header("Accept", "application/json")
+						.get(Response.class);
+			}
+		};
+		final Response response = invokeResponseCallable(responseCallable);
+		return handleResponseGeneric(response, entityType, Status.OK);
+
 	}
 
 	private <T, V> V put(final WebTarget webTarget, final T object, final Class<V> entityType) {
@@ -237,7 +275,7 @@ public class BigcommerceSdk {
 	}
 
 	private Retryer<Response> buildResponseRetyer() {
-		return RetryerBuilder.<Response> newBuilder().retryIfResult(this::shouldRetryResponse)
+		return RetryerBuilder.<Response>newBuilder().retryIfResult(this::shouldRetryResponse)
 				.withWaitStrategy(new ResponseWaitStrategy())
 				.withStopStrategy(StopStrategies.stopAfterDelay(requestRetryTimeoutDuration, requestRetryTimeoutUnit))
 				.build();
@@ -252,6 +290,36 @@ public class BigcommerceSdk {
 		if (expectedStatus.getStatusCode() == response.getStatus()) {
 			return response.readEntity(entityType);
 		}
+		throw new BigcommerceErrorResponseException(response);
+	}
+
+	private <T> List<T> handleResponseGeneric(final Response response, final Class<T> entityType,
+			final Status expectedStatus) {
+
+		if (expectedStatus.getStatusCode() == response.getStatus()) {
+			ParameterizedType parameterizedGenericType = new ParameterizedType() {
+				@Override
+				public Type[] getActualTypeArguments() {
+					return new Type[] { entityType };
+				}
+
+				@Override
+				public Type getRawType() {
+					return List.class;
+				}
+
+				@Override
+				public Type getOwnerType() {
+					return List.class;
+				}
+			};
+			GenericType<List<T>> genericType = new GenericType<List<T>>(parameterizedGenericType) {
+			};
+
+			List<T> list = response.readEntity(genericType);
+			return list;
+		}
+
 		throw new BigcommerceErrorResponseException(response);
 	}
 
