@@ -25,7 +25,9 @@ public class DateTimeAdapter extends XmlAdapter<String, DateTime> {
 		if (dateTime == null) {
 			return null;
 		}
-		return dateTime.toString();
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(RFC_822_DATE_FORMAT);
+		return formatter.print(dateTime);
+
 	}
 
 }
