@@ -2,6 +2,7 @@ package com.bigcommerce.catalog.models;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -9,15 +10,17 @@ import org.joda.time.DateTime;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Order {
+public class BigcommerceOrder {
 
 	private int id;
 	private String status;
 
 	@XmlJavaTypeAdapter(DateTimeAdapter.class)
+	@XmlElement(name = "date_created")
 	private DateTime dateCreated;
 
 	@XmlJavaTypeAdapter(DateTimeAdapter.class)
+	@XmlElement(name = "date_modified")
 	private DateTime dateModified;
 
 	private String subtotalExTax;

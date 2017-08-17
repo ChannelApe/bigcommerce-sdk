@@ -27,8 +27,9 @@ import org.junit.Test;
 
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
+import com.bigcommerce.catalog.models.DateTimeAdapter;
 import com.bigcommerce.catalog.models.Meta;
-import com.bigcommerce.catalog.models.Order;
+import com.bigcommerce.catalog.models.BigcommerceOrder;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
@@ -308,16 +309,16 @@ public class BigcommerceSdkTest {
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("orders")
 				.toString();
 
-		DateTimeFormatter formatter = DateTimeFormat.forPattern(BigcommerceSdk.RFC_822_DATE_FORMAT);
-		final Order firstExpectedOrder = new Order();
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeAdapter.RFC_822_DATE_FORMAT);
+		final BigcommerceOrder firstExpectedOrder = new BigcommerceOrder();
 		firstExpectedOrder.setId(100);
 		firstExpectedOrder.setDateCreated(formatter.parseDateTime(("Tue, 30 May 2017 17:14:57 +0000")));
 
 		firstExpectedOrder.setSubtotalExTax("0.0200");
-		final List<Order> expectedOrders = Arrays.asList(firstExpectedOrder);
+		final List<BigcommerceOrder> expectedOrders = Arrays.asList(firstExpectedOrder);
 
 		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
-				.createContext(new Class[] { Order[].class }, null);
+				.createContext(new Class[] { BigcommerceOrder[].class }, null);
 		final Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
 		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
@@ -335,7 +336,7 @@ public class BigcommerceSdkTest {
 						.withParam("limit", 250).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		final List<Order> actualOrders = bigcommerceSdk.getOrders(1);
+		final List<BigcommerceOrder> actualOrders = bigcommerceSdk.getOrders(1);
 
 		assertEquals(firstExpectedOrder.getId(), actualOrders.get(0).getId());
 

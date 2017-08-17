@@ -3,6 +3,7 @@ package com.bigcommerce;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
-import com.bigcommerce.catalog.models.Order;
+import com.bigcommerce.catalog.models.BigcommerceOrder;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
@@ -82,8 +83,6 @@ public class BigcommerceSdk {
 	private final String accessToken;
 	private final long requestRetryTimeoutDuration;
 	private final TimeUnit requestRetryTimeoutUnit;
-	public static final String RFC_822_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss Z";
-
 	public static interface ApiUrlStep {
 		RequestRetryTimeoutStep withApiUrl(final String apiUrl);
 	}
@@ -149,14 +148,14 @@ public class BigcommerceSdk {
 		return new Products(products, pagination);
 	}
 
-	public List<Order> getOrders(final int page) {
+	public List<BigcommerceOrder> getOrders(final int page) {
 		return getOrders(page, MAX_LIMIT);
 	}
 
-	public List<Order> getOrders(final int page, final int limit) {
+	public List<BigcommerceOrder> getOrders(final int page, final int limit) {
 		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).queryParam(LIMIT, limit).queryParam(PAGE, page);
 
-		final List<Order> orders = getList(webTarget, Order.class);
+		final List<BigcommerceOrder> orders = getList(webTarget, BigcommerceOrder.class, false);
 		return orders;
 	}
 
@@ -238,7 +237,8 @@ public class BigcommerceSdk {
 		return handleResponse(response, entityType, Status.OK);
 	}
 
-	private <T> List<T> getList(final WebTarget webTarget, final Class<T> entityType) {
+	private <T> List<T> getList(final WebTarget webTarget, final Class<T> entityType,
+			boolean throwExceptionOnNoContent) {
 		final Callable<Response> responseCallable = new Callable<Response>() {
 			@Override
 			public Response call() throws Exception {
@@ -248,7 +248,7 @@ public class BigcommerceSdk {
 			}
 		};
 		final Response response = invokeResponseCallable(responseCallable);
-		return handleResponseGeneric(response, entityType, Status.OK);
+		return handleResponseGeneric(response, entityType, Status.OK, throwExceptionOnNoContent);
 
 	}
 
@@ -294,7 +294,7 @@ public class BigcommerceSdk {
 	}
 
 	private <T> List<T> handleResponseGeneric(final Response response, final Class<T> entityType,
-			final Status expectedStatus) {
+			final Status expectedStatus, boolean throwExceptionOnNoContent) {
 
 		if (expectedStatus.getStatusCode() == response.getStatus()) {
 			ParameterizedType parameterizedGenericType = new ParameterizedType() {
@@ -320,6 +320,9 @@ public class BigcommerceSdk {
 			return list;
 		}
 
+		if (!throwExceptionOnNoContent && Status.NO_CONTENT.getStatusCode() == response.getStatus()) {
+			return Collections.emptyList();
+		}
 		throw new BigcommerceErrorResponseException(response);
 	}
 

@@ -12,7 +12,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bigcommerce.catalog.models.CatalogSummary;
-import com.bigcommerce.catalog.models.Order;
+import com.bigcommerce.catalog.models.BigcommerceOrder;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.Variant;
 
@@ -74,7 +74,7 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		final List<Order> actualOrders = bigcommerceSdk.getOrders(1);
+		final List<BigcommerceOrder> actualOrders = bigcommerceSdk.getOrders(1);
 
 		assertNotNull(actualOrders);
 		assertFalse(actualOrders.isEmpty());
