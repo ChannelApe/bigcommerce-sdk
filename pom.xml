@@ -77,6 +77,11 @@
 			<version>3.5</version>
 		</dependency>
 		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-collections4</artifactId>
+		    <version>4.1</version>
+		</dependency>
+		<dependency>
 		    <groupId>joda-time</groupId>
 		    <artifactId>joda-time</artifactId>
 		    <version>2.9.9</version>
@@ -143,7 +148,7 @@
 							<goal>mutationCoverage</goal>
 						</goals>
 						<configuration>
-							<mutationThreshold>71</mutationThreshold>
+							<mutationThreshold>35</mutationThreshold>
 							<targetClasses>
 								<param>com.bigcommerce.*</param>
 							</targetClasses>

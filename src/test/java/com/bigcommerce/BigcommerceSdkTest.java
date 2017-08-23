@@ -4,11 +4,13 @@ import static com.github.restdriver.clientdriver.RestClientDriver.giveEmptyRespo
 import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -20,20 +22,28 @@ import javax.xml.bind.Marshaller;
 
 import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.bigcommerce.catalog.models.Address;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
+import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.DateTimeAdapter;
+import com.bigcommerce.catalog.models.LineItem;
+import com.bigcommerce.catalog.models.LineItemsResponse;
 import com.bigcommerce.catalog.models.Meta;
-import com.bigcommerce.catalog.models.BigcommerceOrder;
+import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.ProductsResponse;
+import com.bigcommerce.catalog.models.Shipment;
+import com.bigcommerce.catalog.models.ShipmentLineItem;
+import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
@@ -46,6 +56,19 @@ import com.github.restdriver.clientdriver.capture.JsonBodyCapture;
 
 public class BigcommerceSdkTest {
 
+	private static final String SOME_BIN_PICKING_NUMBER = "12345";
+	private static final int SOME_QUANTITY = 10;
+	private static final String SOME_NAME = "SOME NAME";
+	private static final String SOME_LAST_NAME = "Kazokas";
+	private static final String SOME_FIRST_NAME = "Ryan";
+	private static final String SOME_EMAIL = "rkazokas@channelape.com";
+	private static final int SOME_ID = 1;
+	private static final String SOME_CURRENCY_EXCHANGE = "Currency Exchange";
+	private static final String SOME_CURRENCY_CODE = "USD";
+	private static final String SOME_CREDIT_CARD_TYPE = "VISA";
+	private static final String SOME_COUPON_DISCOUNT = "Coupon Discount";
+	private static final String SOME_DATE_STRING = "Tue, 30 May 2017 17:14:57 +0000";
+	private static final BigDecimal SOME_PRICE = new BigDecimal(0.0200);
 	private static final String SOME_STORE_HASH = "adf242xsfw";
 	private static final String SOME_CLIENT_ID = "asdf2423425235090141";
 	private static final String SOME_ACCESS_TOKEN = "31165465441dafsdf";
@@ -309,40 +332,84 @@ public class BigcommerceSdkTest {
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("orders")
 				.toString();
 
-		DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeAdapter.RFC_822_DATE_FORMAT);
-		final BigcommerceOrder firstExpectedOrder = new BigcommerceOrder();
-		firstExpectedOrder.setId(100);
-		firstExpectedOrder.setDateCreated(formatter.parseDateTime(("Tue, 30 May 2017 17:14:57 +0000")));
+		final DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeAdapter.RFC_822_DATE_FORMAT);
+		final Order firstExpectedOrder = buildOrder(formatter);
 
-		firstExpectedOrder.setSubtotalExTax("0.0200");
-		final List<BigcommerceOrder> expectedOrders = Arrays.asList(firstExpectedOrder);
+		final Order secondExpectedOrder = buildOrder(formatter);
 
-		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
-				.createContext(new Class[] { BigcommerceOrder[].class }, null);
-		final Marshaller marshaller = jaxbContext.createMarshaller();
-		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
-		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+		final List<Order> expectedOrders = Arrays.asList(firstExpectedOrder, secondExpectedOrder);
 
-		final StringWriter stringWriter = new StringWriter();
-		marshaller.marshal(expectedOrders, stringWriter);
+		final JAXBContext jaxbContextOrder = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Order[].class }, null);
+		final Marshaller marshallerOrders = jaxbContextOrder.createMarshaller();
+		marshallerOrders.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshallerOrders.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
 
-		final String expectedResponseBodyString = stringWriter.toString();
+		final StringWriter ordersStringWriter = new StringWriter();
+		marshallerOrders.marshal(expectedOrders, ordersStringWriter);
+
+		final String expectedOrdersResponseBodyString = ordersStringWriter.toString();
 
 		final Status expectedStatus = Status.OK;
 		final int expectedStatusCode = expectedStatus.getStatusCode();
+
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
 						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
 						.withParam("limit", 250).withMethod(Method.GET),
-				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+				giveResponse(expectedOrdersResponseBodyString, MediaType.APPLICATION_JSON)
+						.withStatus(expectedStatusCode));
 
-		final List<BigcommerceOrder> actualOrders = bigcommerceSdk.getOrders(1);
+		final List<Order> actualOrders = bigcommerceSdk.getOrders(1);
 
-		assertEquals(firstExpectedOrder.getId(), actualOrders.get(0).getId());
+		assertNotNull(actualOrders);
+		assertEquals(expectedOrders.size(), actualOrders.size());
+		assertEquals(expectedOrders.get(0).getId(), actualOrders.get(0).getId());
+		assertEqualDates(expectedOrders.get(0).getDateCreated(), actualOrders.get(0).getDateCreated());
+		assertEquals(expectedOrders.get(0).getDateModified(), actualOrders.get(0).getDateModified());
+		assertEquals(expectedOrders.get(0).getSubtotalExTax(), actualOrders.get(0).getSubtotalExTax());
+		assertEquals(expectedOrders.get(0).getBaseHandlingCost(), actualOrders.get(0).getBaseHandlingCost());
+		assertEquals(expectedOrders.get(0).getBaseShippingCost(), actualOrders.get(0).getBaseShippingCost());
+		assertEquals(expectedOrders.get(0).getBaseWrappingCost(), actualOrders.get(0).getBaseWrappingCost());
+		assertEquals(expectedOrders.get(0).getCouponDiscount(), actualOrders.get(0).getCouponDiscount());
+		assertEquals(expectedOrders.get(0).getCreditCardType(), actualOrders.get(0).getCreditCardType());
+		assertEquals(expectedOrders.get(0).getCurrencyCode(), actualOrders.get(0).getCurrencyCode());
+		assertEquals(expectedOrders.get(0).getCurrencyExchangeRate(), actualOrders.get(0).getCurrencyExchangeRate());
+		assertEquals(expectedOrders.get(0).getCurrencyId(), actualOrders.get(0).getCurrencyId());
 
-		assertEqualDates(firstExpectedOrder.getDateCreated(), actualOrders.get(0).getDateCreated());
-		assertEquals(firstExpectedOrder.getDateModified(), actualOrders.get(0).getDateModified());
+		assertEquals(expectedOrders.get(1).getId(), actualOrders.get(1).getId());
+		assertEqualDates(expectedOrders.get(1).getDateCreated(), actualOrders.get(1).getDateCreated());
+		assertEquals(expectedOrders.get(1).getDateModified(), actualOrders.get(1).getDateModified());
+		assertEquals(expectedOrders.get(1).getSubtotalExTax(), actualOrders.get(1).getSubtotalExTax());
+		assertEquals(expectedOrders.get(1).getBaseHandlingCost(), actualOrders.get(1).getBaseHandlingCost());
+		assertEquals(expectedOrders.get(1).getBaseShippingCost(), actualOrders.get(1).getBaseShippingCost());
+		assertEquals(expectedOrders.get(1).getBaseWrappingCost(), actualOrders.get(1).getBaseWrappingCost());
+		assertEquals(expectedOrders.get(1).getCouponDiscount(), actualOrders.get(1).getCouponDiscount());
+		assertEquals(expectedOrders.get(1).getCreditCardType(), actualOrders.get(1).getCreditCardType());
+		assertEquals(expectedOrders.get(1).getCurrencyCode(), actualOrders.get(1).getCurrencyCode());
+		assertEquals(expectedOrders.get(1).getCurrencyExchangeRate(), actualOrders.get(1).getCurrencyExchangeRate());
+		assertEquals(expectedOrders.get(1).getCurrencyId(), actualOrders.get(1).getCurrencyId());
 
+	}
+
+	@Test
+	public void givenSomePageWhenRetrievingOrdersAndDateInTheFutureThenReturnNoContent() {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("orders")
+				.toString();
+
+		final Status expectedStatus = Status.NO_CONTENT;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final DateTime futureDate = DateTime.parse("2018-07-18T00:00:00.000Z").toDateTime(DateTimeZone.UTC);
+		driver.addExpectation(onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+				.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+				.withParam("limit", 250).withParam("min_date_created", futureDate.toString()).withMethod(Method.GET),
+				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
+
+		List<Order> actualOrders = bigcommerceSdk.getOrders(1, futureDate);
+		assertEquals(actualOrders, Collections.emptyList());
 	}
 
 	@Test(expected = BigcommerceErrorResponseException.class)
@@ -362,6 +429,282 @@ public class BigcommerceSdkTest {
 				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
 
 		bigcommerceSdk.getOrders(1);
+	}
+
+	@Test
+	public void givenValidCustomerIdThenReturnValidCustomer() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("customers/1")
+				.toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Customer.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final Customer expectedCustomer = new Customer();
+		expectedCustomer.setEmail(SOME_EMAIL);
+		expectedCustomer.setFirstName(SOME_FIRST_NAME);
+		expectedCustomer.setLastName(SOME_LAST_NAME);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(expectedCustomer, stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Customer actualCustomer = bigcommerceSdk.getCustomer(1);
+		assertEquals(actualCustomer.getFirstName(), expectedCustomer.getFirstName());
+		assertEquals(actualCustomer.getLastName(), expectedCustomer.getLastName());
+		assertEquals(actualCustomer.getEmail(), expectedCustomer.getEmail());
+	}
+
+	@Test
+	public void givenValidOrderThenReturnFirstShippingAddress() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("orders/100/shipping_addresses").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Address[].class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final String street1 = "1 Main Street";
+		final String street2 = "Apt 2";
+		final String city = "Scranton";
+		final String state = "PA";
+		final String zip = "18503";
+		final Address expectedShippingAddress = new Address();
+
+		expectedShippingAddress.setStreet1(street1);
+		expectedShippingAddress.setStreet2(street2);
+		expectedShippingAddress.setCity(city);
+		expectedShippingAddress.setState(state);
+		expectedShippingAddress.setZip(zip);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(Arrays.asList(expectedShippingAddress), stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		Address actualShippingAddress = bigcommerceSdk.getShippingAddress(100);
+		assertEquals(actualShippingAddress.getStreet1(), expectedShippingAddress.getStreet1());
+		assertEquals(actualShippingAddress.getStreet2(), expectedShippingAddress.getStreet2());
+		assertEquals(actualShippingAddress.getCity(), expectedShippingAddress.getCity());
+		assertEquals(actualShippingAddress.getState(), expectedShippingAddress.getState());
+		assertEquals(actualShippingAddress.getZip(), expectedShippingAddress.getZip());
+
+	}
+
+	@Test
+	public void givenOrderWithShipmentsThenReturnShipments() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("orders/100/shipments").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Shipment[].class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final Shipment firstExpectedShipment = buildShipment();
+		final Shipment secondExpectedShipment = buildShipment();
+		final Shipment thirdExpectedShipment = buildShipment();
+
+		List<Shipment> expectedShipments = Arrays.asList(firstExpectedShipment, secondExpectedShipment,
+				thirdExpectedShipment);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(expectedShipments, stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withParam("limit", 250).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		List<Shipment> actualShipments = bigcommerceSdk.getShipments(100, 1);
+		assertEquals(expectedShipments.get(0).getShippingMethod(), actualShipments.get(0).getShippingMethod());
+		assertEquals(expectedShipments.get(0).getShippingProvider(), actualShipments.get(0).getShippingProvider());
+		assertEquals(expectedShipments.get(0).getTrackingNumber(), actualShipments.get(0).getTrackingNumber());
+
+		assertEquals(expectedShipments.get(1).getShippingMethod(), actualShipments.get(1).getShippingMethod());
+		assertEquals(expectedShipments.get(1).getShippingProvider(), actualShipments.get(1).getShippingProvider());
+		assertEquals(expectedShipments.get(1).getTrackingNumber(), actualShipments.get(1).getTrackingNumber());
+
+		assertEquals(expectedShipments.get(0).getShippingMethod(), actualShipments.get(2).getShippingMethod());
+		assertEquals(expectedShipments.get(0).getShippingProvider(), actualShipments.get(2).getShippingProvider());
+		assertEquals(expectedShipments.get(0).getTrackingNumber(), actualShipments.get(2).getTrackingNumber());
+
+		assertEquals(expectedShipments.get(0).getItems().get(0).getOrderProductId(),
+				actualShipments.get(0).getItems().get(0).getOrderProductId());
+		assertEquals(expectedShipments.get(0).getItems().get(0).getProductId(),
+				actualShipments.get(0).getItems().get(0).getProductId());
+		assertEquals(expectedShipments.get(0).getItems().get(0).getQuantity(),
+				actualShipments.get(0).getItems().get(0).getQuantity());
+
+	}
+
+	@Test
+	public void givenValidOrderIdThenReturnLineItemsForOrder() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("orders/100/products").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { LineItem[].class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final LineItem lineItem1 = buildLineItem();
+		final LineItem lineItem2 = buildLineItem();
+		final LineItem lineItem3 = buildLineItem();
+
+		LineItemsResponse expectedLineItems = new LineItemsResponse();
+		expectedLineItems.add(lineItem1);
+		expectedLineItems.add(lineItem2);
+		expectedLineItems.add(lineItem3);
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(expectedLineItems, stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withParam("limit", 250).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		List<LineItem> actualLineItems = bigcommerceSdk.getLineItems(100, 1);
+		assertEquals(actualLineItems.size(), expectedLineItems.size());
+		assertNotNull(actualLineItems);
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getBaseCostPrice());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getBaseTotal());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getCostPriceExTax());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getTotalExTax());
+		assertEquals(SOME_NAME, actualLineItems.get(0).getName());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getBasePrice());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getBaseWrappingCost());
+		assertEquals(SOME_BIN_PICKING_NUMBER, actualLineItems.get(0).getBinPickingNumber());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getCostPriceExTax());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getCostPriceIncTax());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getCostPriceTax());
+		assertEquals(SOME_PRICE, actualLineItems.get(0).getCostPriceExTax());
+		assertEquals(SOME_QUANTITY, actualLineItems.get(0).getQuantity());
+
+	}
+
+	@Test
+	public void givenCorrectlyConfiguredBigcommerceSdkReturnStore() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("store")
+				.toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Store.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		Store expectedStore = new Store();
+		expectedStore.setWeightUnits("Ounces");
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(expectedStore, stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		Store actualStore = bigcommerceSdk.getStore();
+		assertEquals(actualStore.getWeightUnits(), expectedStore.getWeightUnits());
+
+	}
+
+	private Shipment buildShipment() {
+		Shipment firstExpectedShipment = new Shipment();
+		ShipmentLineItem shipmentLineItem1 = new ShipmentLineItem();
+		shipmentLineItem1.setProductId(SOME_ID);
+		shipmentLineItem1.setQuantity(12);
+		shipmentLineItem1.setOrderProductId(SOME_ID);
+
+		firstExpectedShipment.setItems(Arrays.asList(shipmentLineItem1));
+		return firstExpectedShipment;
+	}
+
+	private Order buildOrder(DateTimeFormatter formatter) {
+		final Order order = new Order();
+		order.setId(100);
+		order.setDateCreated(formatter.parseDateTime(SOME_DATE_STRING));
+		order.setSubtotalExTax(SOME_PRICE);
+		order.setBaseHandlingCost(SOME_PRICE);
+		order.setBaseShippingCost(SOME_PRICE);
+		order.setBaseWrappingCost(SOME_PRICE);
+		order.setCouponDiscount(SOME_COUPON_DISCOUNT);
+		order.setCreditCardType(SOME_CREDIT_CARD_TYPE);
+		order.setCurrencyCode(SOME_CURRENCY_CODE);
+		order.setCurrencyExchangeRate(SOME_CURRENCY_EXCHANGE);
+		order.setCurrencyId(SOME_ID);
+
+		return order;
+	}
+
+	private LineItem buildLineItem() {
+		LineItem lineItem = new LineItem();
+		lineItem.setName(SOME_NAME);
+		lineItem.setBaseCostPrice(SOME_PRICE);
+		lineItem.setBaseTotal(SOME_PRICE);
+		lineItem.setCostPriceExTax(SOME_PRICE);
+		lineItem.setTotalExTax(SOME_PRICE);
+		lineItem.setBasePrice(SOME_PRICE);
+		lineItem.setBaseWrappingCost(SOME_PRICE);
+		lineItem.setBinPickingNumber(SOME_BIN_PICKING_NUMBER);
+		lineItem.setCostPriceExTax(SOME_PRICE);
+		lineItem.setCostPriceIncTax(SOME_PRICE);
+		lineItem.setCostPriceTax(SOME_PRICE);
+		lineItem.setCostPriceExTax(SOME_PRICE);
+		lineItem.setQuantity(SOME_QUANTITY);
+
+		return lineItem;
 	}
 
 	private void assertEqualDates(final DateTime firstDate, final DateTime secondDate) {

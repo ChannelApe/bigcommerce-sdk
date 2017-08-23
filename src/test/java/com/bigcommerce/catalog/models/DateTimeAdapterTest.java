@@ -2,7 +2,7 @@ package com.bigcommerce.catalog.models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -12,27 +12,15 @@ import org.junit.Test;
 public class DateTimeAdapterTest {
 
 	@Test
-	public void givenRFC822DateFormatStringThenUnmarshalToDateTime() throws Exception {
+	public void givenRFC822DateFormatStringWhenUnmarshalingThenReturnDateTime() throws Exception {
 		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
-		DateTime dateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
-		assertNotNull(dateTime);
+		DateTime actualDateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
+		assertNotNull(actualDateTime);
+		assertEquals(DateTime.parse("2012-11-20T00:00:00.000Z"), actualDateTime);
 	}
 
 	@Test
-	public void givenNonRFC822DateFormatStringThenTryUnmarshalAndThrowException() {
-		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
-
-		try {
-			dateTimeAdapter.unmarshal("Tu0:00 +0000");
-			fail();
-		} catch (Exception e) {
-			assertNotNull(e.getMessage());
-		}
-
-	}
-
-	@Test
-	public void givenDateTimeObjectMarshalIntoRFC822DateTimeString() throws Exception {
+	public void givenDateTimeObjectWhenUnmarshalingReturnDateTimeString() throws Exception {
 		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeAdapter.RFC_822_DATE_FORMAT);
 		DateTime dateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
@@ -42,6 +30,22 @@ public class DateTimeAdapterTest {
 
 		assertNotNull(dateTimeString);
 		assertEquals(dateTimeParsedFromString.compareTo(dateTime), 0);
+
+	}
+
+	@Test
+	public void givenNullDateStringToUnmarshalThenReturnNullValue() throws Exception {
+		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
+		DateTime dateTime = dateTimeAdapter.unmarshal(null);
+		assertNull(dateTime);
+
+	}
+
+	@Test
+	public void givenNullDateToMarshalThenReturnNullValue() throws Exception {
+		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
+		String dateTime = dateTimeAdapter.marshal(null);
+		assertNull(dateTime);
 
 	}
 

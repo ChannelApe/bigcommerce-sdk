@@ -1,35 +1,44 @@
 package com.bigcommerce;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bigcommerce.catalog.models.Address;
+import com.bigcommerce.catalog.models.AddressResponse;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
-import com.bigcommerce.catalog.models.BigcommerceOrder;
+import com.bigcommerce.catalog.models.Customer;
+import com.bigcommerce.catalog.models.LineItem;
+import com.bigcommerce.catalog.models.LineItemsResponse;
+import com.bigcommerce.catalog.models.Order;
+import com.bigcommerce.catalog.models.OrdersResponse;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.ProductsResponse;
+import com.bigcommerce.catalog.models.Shipment;
+import com.bigcommerce.catalog.models.ShipmentResponse;
+import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
@@ -58,10 +67,15 @@ public class BigcommerceSdk {
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
 	private static final String ORDERS = "orders";
+	private static final String CUSTOMERS = "customers";
 	private static final String LIMIT = "limit";
 	private static final String PAGE = "page";
 	private static final String INCLUDE = "include";
 	private static final String VARIANTS = "variants";
+	private static final String SHIPPINGADDRESSES = "shipping_addresses";
+	private static final String SHIPMENTS = "shipments";
+	private static final String MIN_DATE_CREATED = "min_date_created";
+	private static final String STORE = "store";
 	private static final int MAX_LIMIT = 250;
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
@@ -83,6 +97,7 @@ public class BigcommerceSdk {
 	private final String accessToken;
 	private final long requestRetryTimeoutDuration;
 	private final TimeUnit requestRetryTimeoutUnit;
+
 	public static interface ApiUrlStep {
 		RequestRetryTimeoutStep withApiUrl(final String apiUrl);
 	}
@@ -148,15 +163,60 @@ public class BigcommerceSdk {
 		return new Products(products, pagination);
 	}
 
-	public List<BigcommerceOrder> getOrders(final int page) {
-		return getOrders(page, MAX_LIMIT);
+	public List<Order> getOrders(final int page, DateTime earliestDate) {
+		return getOrders(page, MAX_LIMIT, earliestDate);
 	}
 
-	public List<BigcommerceOrder> getOrders(final int page, final int limit) {
-		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).queryParam(LIMIT, limit).queryParam(PAGE, page);
+	public List<Order> getOrders(final int page) {
+		return getOrders(page, MAX_LIMIT, null);
+	}
 
-		final List<BigcommerceOrder> orders = getList(webTarget, BigcommerceOrder.class, false);
-		return orders;
+	public List<Order> getOrders(final int page, final int limit, final DateTime earliestDate) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).queryParam(LIMIT, limit).queryParam(PAGE, page)
+				.queryParam(MIN_DATE_CREATED, earliestDate);
+		final OrdersResponse ordersResponse = get(webTarget, OrdersResponse.class);
+
+		return (ordersResponse == null) ? Collections.emptyList() : ordersResponse;
+	}
+
+	public List<LineItem> getLineItems(final int orderId, final int page) {
+		return getLineItems(orderId, page, MAX_LIMIT);
+	}
+
+	public List<LineItem> getLineItems(final int orderId, final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId)).path(PRODUCTS)
+				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		final LineItemsResponse lineItems = get(webTarget, LineItemsResponse.class);
+		return (lineItems == null) ? Collections.emptyList() : lineItems;
+	}
+
+	public Address getShippingAddress(final int orderId) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId)).path(SHIPPINGADDRESSES);
+		final AddressResponse addressResponse = get(webTarget, AddressResponse.class);
+		return (addressResponse == null) ? null : addressResponse.get(0);
+	}
+
+	public List<Shipment> getShipments(final int orderId, final int page) {
+		return getShipments(orderId, page, MAX_LIMIT);
+	}
+
+	public List<Shipment> getShipments(final int orderId, final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId)).path(SHIPMENTS)
+				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		final ShipmentResponse shipments = get(webTarget, ShipmentResponse.class);
+		return (shipments == null) ? Collections.emptyList() : shipments;
+	}
+
+	public Store getStore() {
+		final WebTarget webTarget = baseWebTargetV2.path(STORE);
+
+		final Store store = get(webTarget, Store.class);
+		return store;
+	}
+
+	public Customer getCustomer(final int customerId) {
+		final WebTarget webTarget = baseWebTargetV2.path(CUSTOMERS).path(String.valueOf(customerId));
+		return get(webTarget, Customer.class);
 	}
 
 	public Variant updateVariant(final Variant variant) {
@@ -229,27 +289,12 @@ public class BigcommerceSdk {
 		final Callable<Response> responseCallable = new Callable<Response>() {
 			@Override
 			public Response call() throws Exception {
-				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
-						.header(ACESS_TOKEN_HEADER, getAccessToken()).header("Accept", "application/json").get();
+				return webTarget.request(MediaType.APPLICATION_JSON).header(CLIENT_ID_HEADER, getClientId())
+						.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
 			}
 		};
 		final Response response = invokeResponseCallable(responseCallable);
-		return handleResponse(response, entityType, Status.OK);
-	}
-
-	private <T> List<T> getList(final WebTarget webTarget, final Class<T> entityType,
-			boolean throwExceptionOnNoContent) {
-		final Callable<Response> responseCallable = new Callable<Response>() {
-			@Override
-			public Response call() throws Exception {
-				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
-						.header(ACESS_TOKEN_HEADER, getAccessToken()).header("Accept", "application/json")
-						.get(Response.class);
-			}
-		};
-		final Response response = invokeResponseCallable(responseCallable);
-		return handleResponseGeneric(response, entityType, Status.OK, throwExceptionOnNoContent);
-
+		return handleResponse(response, entityType, Status.OK, Status.NO_CONTENT);
 	}
 
 	private <T, V> V put(final WebTarget webTarget, final T object, final Class<V> entityType) {
@@ -286,42 +331,11 @@ public class BigcommerceSdk {
 				|| (TOO_MANY_REQUESTS_STATUS_CODE == response.getStatus());
 	}
 
-	private <T> T handleResponse(final Response response, final Class<T> entityType, final Status expectedStatus) {
-		if (expectedStatus.getStatusCode() == response.getStatus()) {
+	private <T> T handleResponse(final Response response, final Class<T> entityType, final Status... expectedStatuses) {
+		final List<Integer> expectedStatusCodes = Arrays.asList(expectedStatuses).stream().map(Status::getStatusCode)
+				.collect(Collectors.toList());
+		if (expectedStatusCodes.contains(response.getStatus())) {
 			return response.readEntity(entityType);
-		}
-		throw new BigcommerceErrorResponseException(response);
-	}
-
-	private <T> List<T> handleResponseGeneric(final Response response, final Class<T> entityType,
-			final Status expectedStatus, boolean throwExceptionOnNoContent) {
-
-		if (expectedStatus.getStatusCode() == response.getStatus()) {
-			ParameterizedType parameterizedGenericType = new ParameterizedType() {
-				@Override
-				public Type[] getActualTypeArguments() {
-					return new Type[] { entityType };
-				}
-
-				@Override
-				public Type getRawType() {
-					return List.class;
-				}
-
-				@Override
-				public Type getOwnerType() {
-					return List.class;
-				}
-			};
-			GenericType<List<T>> genericType = new GenericType<List<T>>(parameterizedGenericType) {
-			};
-
-			List<T> list = response.readEntity(genericType);
-			return list;
-		}
-
-		if (!throwExceptionOnNoContent && Status.NO_CONTENT.getStatusCode() == response.getStatus()) {
-			return Collections.emptyList();
 		}
 		throw new BigcommerceErrorResponseException(response);
 	}
@@ -354,4 +368,5 @@ public class BigcommerceSdk {
 			return 0;
 		}
 	}
+
 }

@@ -3,6 +3,7 @@ package com.bigcommerce;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,9 +12,13 @@ import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.bigcommerce.catalog.models.Address;
 import com.bigcommerce.catalog.models.CatalogSummary;
-import com.bigcommerce.catalog.models.BigcommerceOrder;
+import com.bigcommerce.catalog.models.Customer;
+import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.Products;
+import com.bigcommerce.catalog.models.Shipment;
+import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 
 public class BigcommerceSdkDriver {
@@ -74,10 +79,56 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		final List<BigcommerceOrder> actualOrders = bigcommerceSdk.getOrders(1);
+		final List<Order> actualOrders = bigcommerceSdk.getOrders(1);
 
 		assertNotNull(actualOrders);
 		assertFalse(actualOrders.isEmpty());
+
+	}
+
+	@Test
+	public void givenNonZeroIdWhenRetrievingCustomerThenReturnCustomer() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Customer actualCustomer = bigcommerceSdk.getCustomer(1);
+
+		assertNotNull(actualCustomer);
+
+	}
+
+	@Test
+	public void givenValidOrderIdWhenRetrievingShippingAddressThenReturnAtLeastOneShippingAddress() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Address address = bigcommerceSdk.getShippingAddress(114);
+
+		assertNotNull(address);
+
+	}
+
+	@Test
+	public void givenValidOrderIdWhenRetrievingShipmentsThenReturnShipmentInformation() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final List<Shipment> shipments = bigcommerceSdk.getShipments(122, 1);
+
+		assertNotNull(shipments);
+		assertTrue(shipments.size() > 0);
+
+	}
+
+	@Test
+	public void givenValidStoreIdThenReturnStore() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Store store = bigcommerceSdk.getStore();
+
+		assertNotNull(store);
+		assertNotNull(store.getWeightUnits());
 
 	}
 
