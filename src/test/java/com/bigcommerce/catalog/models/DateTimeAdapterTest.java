@@ -20,7 +20,7 @@ public class DateTimeAdapterTest {
 	}
 
 	@Test
-	public void givenDateTimeObjectWhenUnmarshalingReturnDateTimeString() throws Exception {
+	public void givenDateTimeObjectWhenUnmarshalingThenReturnDateTimeString() throws Exception {
 		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeAdapter.RFC_822_DATE_FORMAT);
 		DateTime dateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
@@ -34,7 +34,7 @@ public class DateTimeAdapterTest {
 	}
 
 	@Test
-	public void givenNullDateStringToUnmarshalThenReturnNullValue() throws Exception {
+	public void givenNullDateStringWhenUnmarshalingThenReturnNullValue() throws Exception {
 		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
 		DateTime dateTime = dateTimeAdapter.unmarshal(null);
 		assertNull(dateTime);
@@ -42,7 +42,7 @@ public class DateTimeAdapterTest {
 	}
 
 	@Test
-	public void givenNullDateToMarshalThenReturnNullValue() throws Exception {
+	public void givenNullDateWhenMarshalingThenReturnNullValue() throws Exception {
 		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
 		String dateTime = dateTimeAdapter.marshal(null);
 		assertNull(dateTime);

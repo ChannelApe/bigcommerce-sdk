@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -16,13 +17,18 @@ import com.bigcommerce.catalog.models.Address;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.Order;
+import com.bigcommerce.catalog.models.OrderStatus;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.Shipment;
+import com.bigcommerce.catalog.models.ShipmentCreationRequest;
+import com.bigcommerce.catalog.models.ShipmentLineItem;
+import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
 import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 
 public class BigcommerceSdkDriver {
 
+	private static final String COMPLETED = "Completed";
 	private static final String STORE_HASH = System.getenv("BIGCOMMERCE_STORE_HASH");
 	private static final String CLIENT_ID = System.getenv("BIGCOMMERCE_CLIENT_ID");
 	private static final String ACCESS_TOKEN = System.getenv("BIGCOMMERCE_ACCESS_TOKEN");
@@ -129,6 +135,65 @@ public class BigcommerceSdkDriver {
 
 		assertNotNull(store);
 		assertNotNull(store.getWeightUnits());
+
+	}
+
+	@Test
+	public void givenShipmentRequestThenCreateShipment() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		ShipmentLineItem lineItem = new ShipmentLineItem();
+		lineItem.setOrderProductId(1);
+		lineItem.setQuantity(1);
+
+		ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
+				.withTrackingNumber("1Z0398842038").withComments("This is a fulfillment from channel ape")
+				.withOrderAddressId(1).withShippingProvider("UPS").withTrackingCarrier("")
+				.withShipmentLineItems(Arrays.asList(lineItem)).build();
+
+		final Shipment shipment = bigcommerceSdk.createShipment(shipmentCreationRequest, 100);
+
+		assertNotNull(shipment);
+		assertEquals(shipment.getTrackingNumber(), shipmentCreationRequest.getRequest().getTrackingNumber());
+		assertEquals(shipment.getComments(), shipmentCreationRequest.getRequest().getComments());
+
+	}
+
+	@Test
+	public void givenShipmentRequestThenUpdateShipment() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
+				.withTrackingNumber("1Z0398842038").withComments("This is a fulfillment from channel ape")
+				.withOrderAddressId(1).withShippingProvider("upsonline").withTrackingCarrier("").build();
+
+		final Shipment shipment = bigcommerceSdk.updateShipment(shipmentUpdateRequest, 100, 36);
+
+		assertNotNull(shipment);
+		assertEquals(shipment.getTrackingNumber(), shipmentUpdateRequest.getRequest().getTrackingNumber());
+		assertEquals(shipment.getComments(), shipmentUpdateRequest.getRequest().getComments());
+	}
+
+	@Test
+	public void givenAnOrderIdThenCloseOrder() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		Order order = bigcommerceSdk.completeOrder(100);
+		assertNotNull(order);
+		assertEquals(order.getStatus(), COMPLETED);
+	}
+
+	@Test
+	public void givenStatusNameThenGetOrderStatus() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		OrderStatus orderStatus = bigcommerceSdk.getStatus(COMPLETED);
+		assertNotNull(orderStatus);
+		assertEquals(COMPLETED, orderStatus.getName());
 
 	}
 

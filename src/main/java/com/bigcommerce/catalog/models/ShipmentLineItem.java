@@ -5,24 +5,27 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShipmentLineItem {
 
 	@XmlElement(name = "order_product_id")
-	private int orderProductId;
+	private Integer orderProductId;
 
 	@XmlElement(name = "product_id")
-	private int productId;
+	private Integer productId;
 
 	@XmlElement(name = "quantity")
 	private int quantity;
 
-	public int getOrderProductId() {
+	public Integer getOrderProductId() {
 		return orderProductId;
 	}
 
-	public void setOrderProductId(int orderProductId) {
+	public void setOrderProductId(Integer orderProductId) {
 		this.orderProductId = orderProductId;
 	}
 

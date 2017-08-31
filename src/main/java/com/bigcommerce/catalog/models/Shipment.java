@@ -10,8 +10,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(Include.NON_NULL)
 public class Shipment {
 
 	@XmlElement(name = "id")
@@ -30,7 +34,7 @@ public class Shipment {
 	private List<ShipmentLineItem> items;
 
 	@XmlElement(name = "order_address_id")
-	private int orderAddressId;
+	private Integer orderAddressId;
 
 	@XmlJavaTypeAdapter(DateTimeAdapter.class)
 	@XmlElement(name = "date_created")
@@ -82,11 +86,11 @@ public class Shipment {
 		this.items = items;
 	}
 
-	public int getOrderAddressId() {
+	public Integer getOrderAddressId() {
 		return orderAddressId;
 	}
 
-	public void setOrderAddressId(int orderAddressId) {
+	public void setOrderAddressId(Integer orderAddressId) {
 		this.orderAddressId = orderAddressId;
 	}
 

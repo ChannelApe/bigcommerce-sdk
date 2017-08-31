@@ -4,6 +4,7 @@ import static com.github.restdriver.clientdriver.RestClientDriver.giveEmptyRespo
 import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -37,12 +38,15 @@ import com.bigcommerce.catalog.models.LineItem;
 import com.bigcommerce.catalog.models.LineItemsResponse;
 import com.bigcommerce.catalog.models.Meta;
 import com.bigcommerce.catalog.models.Order;
+import com.bigcommerce.catalog.models.OrderStatus;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.ProductsResponse;
 import com.bigcommerce.catalog.models.Shipment;
+import com.bigcommerce.catalog.models.ShipmentCreationRequest;
 import com.bigcommerce.catalog.models.ShipmentLineItem;
+import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
 import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
@@ -56,6 +60,12 @@ import com.github.restdriver.clientdriver.capture.JsonBodyCapture;
 
 public class BigcommerceSdkTest {
 
+	private static final String COMPLETE_STATUS = "Completed";
+	private static final String SOME_ORDER_ID = "100";
+	private static final String SOME_TRACKING_CARRIER = "123";
+	private static final String SOME_COMMENTS = "This is a fulfillment from channel ape";
+	private static final String SOME_TRACKING_NUMBER = "1Z0398842038";
+	private static final String SOME_SHIPPING_PROVIDER = "UPS";
 	private static final String SOME_BIN_PICKING_NUMBER = "12345";
 	private static final int SOME_QUANTITY = 10;
 	private static final String SOME_NAME = "SOME NAME";
@@ -118,7 +128,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
 		final CatalogSummary actualCatalogSummary = bigcommerceSdk.getCatalogSummary();
@@ -142,7 +152,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveEmptyResponse().withStatus(expectedStatusCode));
 
 		bigcommerceSdk.getCatalogSummary();
@@ -187,7 +197,7 @@ public class BigcommerceSdkTest {
 		final Status expectedStatus = Status.OK;
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-				.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
+				.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
 				.withParam("page", 1).withParam("limit", 250).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
@@ -216,7 +226,7 @@ public class BigcommerceSdkTest {
 		final Status expectedStatus = Status.INTERNAL_SERVER_ERROR;
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-				.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
+				.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
 				.withParam("page", 1).withParam("limit", 250).withMethod(Method.GET),
 				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
 
@@ -233,7 +243,7 @@ public class BigcommerceSdkTest {
 
 		final int expectedStatusCode = BigcommerceSdk.TOO_MANY_REQUESTS_STATUS_CODE;
 		driver.addExpectation(onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-				.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
+				.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("include", "variants")
 				.withParam("page", 1).withParam("limit", 250).withMethod(Method.GET),
 				giveEmptyResponse().withStatus(expectedStatusCode)
 						.withHeader(BigcommerceSdk.RATE_LIMIT_TIME_RESET_HEADER, "5"))
@@ -282,7 +292,7 @@ public class BigcommerceSdkTest {
 		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT)
 						.capturingBodyIn(actualRequestBody),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
@@ -317,7 +327,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT),
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT),
 				giveEmptyResponse().withStatus(expectedStatusCode));
 
 		bigcommerceSdk.updateVariant(variant);
@@ -355,7 +365,7 @@ public class BigcommerceSdkTest {
 
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
 						.withParam("limit", 250).withMethod(Method.GET),
 				giveResponse(expectedOrdersResponseBodyString, MediaType.APPLICATION_JSON)
 						.withStatus(expectedStatusCode));
@@ -404,7 +414,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		final DateTime futureDate = DateTime.parse("2018-07-18T00:00:00.000Z").toDateTime(DateTimeZone.UTC);
 		driver.addExpectation(onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-				.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+				.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
 				.withParam("limit", 250).withParam("min_date_created", futureDate.toString()).withMethod(Method.GET),
 				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
 
@@ -424,7 +434,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
 						.withParam("limit", 250).withMethod(Method.GET),
 				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
 
@@ -459,7 +469,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
 		final Customer actualCustomer = bigcommerceSdk.getCustomer(1);
@@ -504,7 +514,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
 		Address actualShippingAddress = bigcommerceSdk.getShippingAddress(100);
@@ -546,7 +556,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
 						.withParam("limit", 250).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
@@ -603,7 +613,7 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
 						.withParam("limit", 250).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
@@ -627,7 +637,107 @@ public class BigcommerceSdkTest {
 	}
 
 	@Test
-	public void givenCorrectlyConfiguredBigcommerceSdkReturnStore() throws JAXBException {
+	public void givenAShipmentThenCreateAShipment() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		ShipmentLineItem expectedShipmentLineItem1 = new ShipmentLineItem();
+		expectedShipmentLineItem1.setOrderProductId(1);
+		expectedShipmentLineItem1.setQuantity(2);
+		List<ShipmentLineItem> expectedShipmentLineItems = Arrays.asList(expectedShipmentLineItem1);
+
+		ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
+				.withTrackingNumber(SOME_TRACKING_NUMBER).withComments(SOME_COMMENTS).withOrderAddressId(1)
+				.withShippingProvider(SOME_SHIPPING_PROVIDER).withTrackingCarrier(SOME_TRACKING_CARRIER)
+				.withShipmentLineItems(expectedShipmentLineItems).build();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("orders/100/shipments").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Shipment.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(shipmentCreationRequest.getRequest(), stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.POST)
+						.capturingBodyIn(actualRequestBody),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		Shipment actualShipment = bigcommerceSdk.createShipment(shipmentCreationRequest, 100);
+		assertEquals(actualShipment.getComments(), shipmentCreationRequest.getRequest().getComments());
+		assertEquals(actualShipment.getTrackingCarrier(), shipmentCreationRequest.getRequest().getTrackingCarrier());
+		assertEquals(actualShipment.getShippingProvider(), shipmentCreationRequest.getRequest().getShippingProvider());
+		assertEquals(actualShipment.getOrderAddressId(), shipmentCreationRequest.getRequest().getOrderAddressId());
+		assertEquals(actualShipment.getItems().get(0).getOrderProductId(),
+				shipmentCreationRequest.getRequest().getOrderAddressId());
+
+		assertEquals(shipmentCreationRequest.getRequest().getComments(),
+				actualRequestBody.getContent().get("comments").asText());
+		assertEquals(shipmentCreationRequest.getRequest().getShippingProvider(),
+				actualRequestBody.getContent().get("shipping_provider").asText());
+		assertEquals(shipmentCreationRequest.getRequest().getTrackingCarrier(),
+				actualRequestBody.getContent().get("tracking_carrier").asText());
+
+	}
+
+	@Test
+	public void givenAShipmentThenUpdateAShipment() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
+				.withTrackingNumber(SOME_TRACKING_NUMBER).withComments(SOME_COMMENTS).withOrderAddressId(1)
+				.withShippingProvider(SOME_SHIPPING_PROVIDER).withTrackingCarrier(SOME_TRACKING_CARRIER).build();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("orders/100/shipments/35").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Shipment.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(shipmentUpdateRequest.getRequest(), stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT)
+						.capturingBodyIn(actualRequestBody),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		Shipment actualShipment = bigcommerceSdk.updateShipment(shipmentUpdateRequest, 100, 35);
+		assertEquals(actualShipment.getComments(), shipmentUpdateRequest.getRequest().getComments());
+		assertEquals(actualShipment.getTrackingCarrier(), shipmentUpdateRequest.getRequest().getTrackingCarrier());
+		assertEquals(actualShipment.getShippingProvider(), shipmentUpdateRequest.getRequest().getShippingProvider());
+		assertEquals(actualShipment.getOrderAddressId(), shipmentUpdateRequest.getRequest().getOrderAddressId());
+
+		assertEquals(shipmentUpdateRequest.getRequest().getComments(),
+				actualRequestBody.getContent().get("comments").asText());
+		assertEquals(shipmentUpdateRequest.getRequest().getShippingProvider(),
+				actualRequestBody.getContent().get("shipping_provider").asText());
+		assertEquals(shipmentUpdateRequest.getRequest().getTrackingCarrier(),
+				actualRequestBody.getContent().get("tracking_carrier").asText());
+
+	}
+
+	@Test
+	public void givenCorrectlyConfiguredBigcommerceSdkThenReturnStore() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
@@ -652,12 +762,123 @@ public class BigcommerceSdkTest {
 		final int expectedStatusCode = expectedStatus.getStatusCode();
 		driver.addExpectation(
 				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
-						.withHeader(BigcommerceSdk.ACESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
 		Store actualStore = bigcommerceSdk.getStore();
 		assertEquals(actualStore.getWeightUnits(), expectedStore.getWeightUnits());
 
+	}
+
+	@Test
+	public void givenBigcommerceSdkAndStatusNameThenReturnOrderStatus() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("order_statuses").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { OrderStatus[].class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		OrderStatus expectedOrderStatus1 = new OrderStatus();
+		expectedOrderStatus1.setName("Pending");
+		expectedOrderStatus1.setId(1);
+		expectedOrderStatus1.setOrder(1);
+
+		OrderStatus expectedOrderStatus2 = new OrderStatus();
+		expectedOrderStatus2.setName("Completed");
+		expectedOrderStatus2.setId(2);
+		expectedOrderStatus2.setOrder(2);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(Arrays.asList(expectedOrderStatus1, expectedOrderStatus2), stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		OrderStatus actualOrderStatus = bigcommerceSdk.getStatus("Completed");
+		assertEquals(expectedOrderStatus2.getName(), actualOrderStatus.getName());
+		assertEquals(expectedOrderStatus2.getId(), actualOrderStatus.getId());
+
+		assertFalse(expectedOrderStatus1.getName().equals(actualOrderStatus.getName()));
+		assertFalse(expectedOrderStatus1.getId().equals(actualOrderStatus.getId()));
+	}
+
+	@Test
+	public void givenAnOrderWhenCompletingOrderThenSetOrderStatusToComplete() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+		final String expectedPathCompleteOrder = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("orders")
+				.append(FORWARD_SLASH).append(SOME_ORDER_ID).toString();
+
+		final String expectedPathOrderStatuses = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("order_statuses").toString();
+
+		final JAXBContext jaxbContextOrderStatus = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { OrderStatus[].class }, null);
+		final Marshaller orderStatusMarshaller = jaxbContextOrderStatus.createMarshaller();
+		orderStatusMarshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		orderStatusMarshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final OrderStatus completeOrderStatus = new OrderStatus();
+		completeOrderStatus.setName(COMPLETE_STATUS);
+		completeOrderStatus.setId(10);
+
+		final List<OrderStatus> orderStatuses = Arrays.asList(completeOrderStatus);
+
+		final StringWriter stringWriter = new StringWriter();
+		orderStatusMarshaller.marshal(orderStatuses, stringWriter);
+
+		final String expectedOrderStatusResponseBodyString = stringWriter.toString();
+
+		final Status expectedOrderStatus = Status.OK;
+		final int expectedCompleteOrderStatusCode = expectedOrderStatus.getStatusCode();
+
+		driver.addExpectation(
+				onRequestTo(expectedPathOrderStatuses).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+				giveResponse(expectedOrderStatusResponseBodyString, MediaType.APPLICATION_JSON)
+						.withStatus(expectedCompleteOrderStatusCode));
+
+		final JAXBContext jaxbContextCompleteOrder = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Order.class }, null);
+		final Marshaller completeOrderMarshaller = jaxbContextCompleteOrder.createMarshaller();
+		completeOrderMarshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		completeOrderMarshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final Order expectedOrder = new Order();
+		expectedOrder.setId(Integer.valueOf(SOME_ORDER_ID));
+		expectedOrder.setStatus(COMPLETE_STATUS);
+		expectedOrder.setStatusId(10);
+
+		final StringWriter completeOrderStringWriter = new StringWriter();
+		completeOrderMarshaller.marshal(expectedOrder, completeOrderStringWriter);
+
+		final String expectedCompleteOrderResponseBodyString = completeOrderStringWriter.toString();
+
+		final int expectedCompleteStatusCode = Status.OK.getStatusCode();
+
+		driver.addExpectation(
+				onRequestTo(expectedPathCompleteOrder).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT),
+				giveResponse(expectedCompleteOrderResponseBodyString, MediaType.APPLICATION_JSON)
+						.withStatus(expectedCompleteStatusCode));
+
+		Order actualOrder = bigcommerceSdk.completeOrder(Integer.valueOf(SOME_ORDER_ID));
+
+		assertEquals(String.valueOf(actualOrder.getId()), SOME_ORDER_ID);
+		assertEquals(actualOrder.getStatus(), COMPLETE_STATUS);
 	}
 
 	private Shipment buildShipment() {

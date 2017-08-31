@@ -10,11 +10,15 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(Include.NON_NULL)
 public class Order {
 
-	private int id;
+	private Integer id;
 	private String status;
 
 	@XmlJavaTypeAdapter(DateTimeAdapter.class)
@@ -50,14 +54,14 @@ public class Order {
 	private String currencyCode;
 
 	@XmlElement(name = "customer_id")
-	private int customerId;
+	private Integer customerId;
 
 	@XmlJavaTypeAdapter(DateTimeAdapter.class)
 	@XmlElement(name = "date_shipped")
 	private DateTime dateShipped;
 
 	@XmlElement(name = "status_id")
-	private int statusId;
+	private Integer statusId;
 
 	@XmlElement(name = "base_shipping_cost")
 	private BigDecimal baseShippingCost;
@@ -66,7 +70,7 @@ public class Order {
 	private BigDecimal shippingCostExTax;
 
 	@XmlElement(name = "shipping_cost_tax_class_id")
-	private int shippingCostTaxClassId;
+	private Integer shippingCostTaxClassId;
 
 	@XmlElement(name = "base_handling_cost")
 	private BigDecimal baseHandlingCost;
@@ -84,7 +88,7 @@ public class Order {
 	private BigDecimal baseWrappingCost;
 
 	@XmlElement(name = "handling_cost_tax_class_id")
-	private int handlingCostTaxClassId;
+	private Integer handlingCostTaxClassId;
 
 	@XmlElement(name = "wrapping_cost_ex_tax")
 	private BigDecimal wrappingCostExTax;
@@ -96,13 +100,13 @@ public class Order {
 	private BigDecimal wrappingCostTax;
 
 	@XmlElement(name = "wrapping_cost_tax_class_id")
-	private int wrappingCostTaxClassId;
+	private Integer wrappingCostTaxClassId;
 
 	@XmlElement(name = "total_ex_tax")
 	private BigDecimal totalExTax;
 
 	@XmlElement(name = "items_total")
-	private int itemsTotal;
+	private Integer itemsTotal;
 
 	@XmlElement(name = "items_shipped")
 	private String itemsShipped;
@@ -138,7 +142,7 @@ public class Order {
 	private String geoipCountryIso2;
 
 	@XmlElement(name = "currency_id")
-	private int currencyId;
+	private Integer currencyId;
 
 	@XmlElement(name = "currency_exchange_rate")
 	private String currencyExchangeRate;
@@ -199,11 +203,11 @@ public class Order {
 	@XmlElement(name = "billing_address")
 	private Address billingAddress;
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -295,11 +299,11 @@ public class Order {
 		this.currencyCode = currencyCode;
 	}
 
-	public int getCustomerId() {
+	public Integer getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(Integer customerId) {
 		this.customerId = customerId;
 	}
 
@@ -311,11 +315,11 @@ public class Order {
 		this.dateShipped = dateShipped;
 	}
 
-	public int getStatusId() {
+	public Integer getStatusId() {
 		return statusId;
 	}
 
-	public void setStatusId(int statusId) {
+	public void setStatusId(Integer statusId) {
 		this.statusId = statusId;
 	}
 
@@ -335,11 +339,11 @@ public class Order {
 		this.shippingCostExTax = shippingCostExTax;
 	}
 
-	public int getShippingCostTaxClassId() {
+	public Integer getShippingCostTaxClassId() {
 		return shippingCostTaxClassId;
 	}
 
-	public void setShippingCostTaxClassId(int shippingCostTaxClassId) {
+	public void setShippingCostTaxClassId(Integer shippingCostTaxClassId) {
 		this.shippingCostTaxClassId = shippingCostTaxClassId;
 	}
 
@@ -375,11 +379,11 @@ public class Order {
 		this.handlingCostTax = handlingCostTax;
 	}
 
-	public int getHandlingCostTaxClassId() {
+	public Integer getHandlingCostTaxClassId() {
 		return handlingCostTaxClassId;
 	}
 
-	public void setHandlingCostTaxClassId(int handlingCostTaxClassId) {
+	public void setHandlingCostTaxClassId(Integer handlingCostTaxClassId) {
 		this.handlingCostTaxClassId = handlingCostTaxClassId;
 	}
 
@@ -415,11 +419,11 @@ public class Order {
 		this.wrappingCostTax = wrappingCostTax;
 	}
 
-	public int getWrappingCostTaxClassId() {
+	public Integer getWrappingCostTaxClassId() {
 		return wrappingCostTaxClassId;
 	}
 
-	public void setWrappingCostTaxClassId(int wrappingCostTaxClassId) {
+	public void setWrappingCostTaxClassId(Integer wrappingCostTaxClassId) {
 		this.wrappingCostTaxClassId = wrappingCostTaxClassId;
 	}
 
@@ -431,11 +435,11 @@ public class Order {
 		this.totalExTax = totalExTax;
 	}
 
-	public int getItemsTotal() {
+	public Integer getItemsTotal() {
 		return itemsTotal;
 	}
 
-	public void setItemsTotal(int itemsTotal) {
+	public void setItemsTotal(Integer itemsTotal) {
 		this.itemsTotal = itemsTotal;
 	}
 
@@ -527,11 +531,11 @@ public class Order {
 		this.geoipCountryIso2 = geoipCountryIso2;
 	}
 
-	public int getCurrencyId() {
+	public Integer getCurrencyId() {
 		return currencyId;
 	}
 
-	public void setCurrencyId(int currencyId) {
+	public void setCurrencyId(Integer currencyId) {
 		this.currencyId = currencyId;
 	}
 

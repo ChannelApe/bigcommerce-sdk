@@ -31,13 +31,17 @@ import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.LineItem;
 import com.bigcommerce.catalog.models.LineItemsResponse;
 import com.bigcommerce.catalog.models.Order;
+import com.bigcommerce.catalog.models.OrderStatus;
+import com.bigcommerce.catalog.models.OrderStatusResponse;
 import com.bigcommerce.catalog.models.OrdersResponse;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.ProductsResponse;
 import com.bigcommerce.catalog.models.Shipment;
+import com.bigcommerce.catalog.models.ShipmentCreationRequest;
 import com.bigcommerce.catalog.models.ShipmentResponse;
+import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
 import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
@@ -55,10 +59,11 @@ import com.github.rholder.retry.WaitStrategy;
 
 public class BigcommerceSdk {
 
+	private static final String COMPLETED = "Completed";
 	static final String API_VERSION_V2 = "v2";
 	static final String API_VERSION = "v3";
 	static final String CLIENT_ID_HEADER = "X-Auth-Client";
-	static final String ACESS_TOKEN_HEADER = "X-Auth-Token";
+	static final String ACCESS_TOKEN_HEADER = "X-Auth-Token";
 	static final String RATE_LIMIT_TIME_RESET_HEADER = "X-Rate-Limit-Time-Reset-Ms";
 
 	static final int TOO_MANY_REQUESTS_STATUS_CODE = 429;
@@ -179,6 +184,30 @@ public class BigcommerceSdk {
 		return (ordersResponse == null) ? Collections.emptyList() : ordersResponse;
 	}
 
+	public Order getOrder(int orderId) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId));
+		final Order order = get(webTarget, Order.class);
+
+		return order;
+	}
+
+	public Order completeOrder(final int orderId) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId));
+
+		Order order = new Order();
+
+		order.setStatusId(getStatus(COMPLETED).getId());
+		return put(webTarget, order, Order.class);
+
+	}
+
+	public OrderStatus getStatus(final String statusName) {
+		final WebTarget webTarget = baseWebTargetV2.path("order_statuses");
+
+		final OrderStatusResponse statusResponse = get(webTarget, OrderStatusResponse.class);
+		return statusResponse.stream().filter(status -> status.getName().equals(statusName)).findFirst().get();
+	}
+
 	public List<LineItem> getLineItems(final int orderId, final int page) {
 		return getLineItems(orderId, page, MAX_LIMIT);
 	}
@@ -224,6 +253,22 @@ public class BigcommerceSdk {
 				.path(VARIANTS).path(variant.getId());
 		final VariantResponse variantResponse = put(webTarget, variant, VariantResponse.class);
 		return variantResponse.getData();
+	}
+
+	public Shipment createShipment(final ShipmentCreationRequest shipmentCreationRequest, final int orderId) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId)).path(SHIPMENTS);
+
+		final Shipment shipment = post(webTarget, shipmentCreationRequest.getRequest(), Shipment.class);
+		return shipment;
+	}
+
+	public Shipment updateShipment(final ShipmentUpdateRequest shipmentUpdateRequest, final int orderId,
+			final int shipmentId) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId)).path(SHIPMENTS)
+				.path(String.valueOf(shipmentId));
+
+		final Shipment shipment = put(webTarget, shipmentUpdateRequest.getRequest(), Shipment.class);
+		return shipment;
 	}
 
 	private BigcommerceSdk(final Steps steps) {
@@ -290,7 +335,7 @@ public class BigcommerceSdk {
 			@Override
 			public Response call() throws Exception {
 				return webTarget.request(MediaType.APPLICATION_JSON).header(CLIENT_ID_HEADER, getClientId())
-						.header(ACESS_TOKEN_HEADER, getAccessToken()).get();
+						.header(ACCESS_TOKEN_HEADER, getAccessToken()).get();
 			}
 		};
 		final Response response = invokeResponseCallable(responseCallable);
@@ -303,11 +348,24 @@ public class BigcommerceSdk {
 			public Response call() throws Exception {
 				final Entity<T> entity = Entity.entity(object, MEDIA_TYPE);
 				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
-						.header(ACESS_TOKEN_HEADER, getAccessToken()).put(entity);
+						.header(ACCESS_TOKEN_HEADER, getAccessToken()).put(entity);
 			}
 		};
 		final Response response = invokeResponseCallable(responseCallable);
 		return handleResponse(response, entityType, Status.OK);
+	}
+
+	private <T, V> V post(final WebTarget webTarget, final T object, final Class<V> entityType) {
+		final Callable<Response> responseCallable = new Callable<Response>() {
+			@Override
+			public Response call() throws Exception {
+				final Entity<T> entity = Entity.entity(object, MEDIA_TYPE);
+				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
+						.header(ACCESS_TOKEN_HEADER, getAccessToken()).post(entity);
+			}
+		};
+		final Response response = invokeResponseCallable(responseCallable);
+		return handleResponse(response, entityType, Status.OK, Status.CREATED);
 	}
 
 	private Response invokeResponseCallable(final Callable<Response> responseCallable) {
