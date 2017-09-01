@@ -60,6 +60,7 @@ import com.github.restdriver.clientdriver.capture.JsonBodyCapture;
 
 public class BigcommerceSdkTest {
 
+	private static final String CANCELLATION_STATUS = "Cancelled";
 	private static final String COMPLETE_STATUS = "Completed";
 	private static final String SOME_ORDER_ID = "100";
 	private static final String SOME_TRACKING_CARRIER = "123";
@@ -879,6 +880,74 @@ public class BigcommerceSdkTest {
 
 		assertEquals(String.valueOf(actualOrder.getId()), SOME_ORDER_ID);
 		assertEquals(actualOrder.getStatus(), COMPLETE_STATUS);
+	}
+
+	@Test
+	public void givenAnOrderWhenCancellingAnOrderThenSetOrderStatusToCancel() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+		final String expectedPathCancelOrder = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH).append("orders")
+				.append(FORWARD_SLASH).append(SOME_ORDER_ID).toString();
+
+		final String expectedPathOrderStatuses = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V2).append(FORWARD_SLASH)
+				.append("order_statuses").toString();
+
+		final JAXBContext jaxbContextOrderStatus = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { OrderStatus[].class }, null);
+		final Marshaller orderStatusMarshaller = jaxbContextOrderStatus.createMarshaller();
+		orderStatusMarshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		orderStatusMarshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final OrderStatus cancelledOrderStatus = new OrderStatus();
+		cancelledOrderStatus.setName(CANCELLATION_STATUS);
+		cancelledOrderStatus.setId(10);
+
+		final List<OrderStatus> orderStatuses = Arrays.asList(cancelledOrderStatus);
+
+		final StringWriter stringWriter = new StringWriter();
+		orderStatusMarshaller.marshal(orderStatuses, stringWriter);
+
+		final String expectedOrderStatusResponseBodyString = stringWriter.toString();
+
+		final Status expectedOrderStatus = Status.OK;
+		final int expectedCancelledOrderStatusCode = expectedOrderStatus.getStatusCode();
+
+		driver.addExpectation(
+				onRequestTo(expectedPathOrderStatuses).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+				giveResponse(expectedOrderStatusResponseBodyString, MediaType.APPLICATION_JSON)
+						.withStatus(expectedCancelledOrderStatusCode));
+
+		final JAXBContext jaxbContextCompleteOrder = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { Order.class }, null);
+		final Marshaller cancelOrderMarshaller = jaxbContextCompleteOrder.createMarshaller();
+		cancelOrderMarshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		cancelOrderMarshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final Order expectedOrder = new Order();
+		expectedOrder.setId(Integer.valueOf(SOME_ORDER_ID));
+		expectedOrder.setStatus(CANCELLATION_STATUS);
+		expectedOrder.setStatusId(10);
+
+		final StringWriter cancelledOrderStringWriter = new StringWriter();
+		cancelOrderMarshaller.marshal(expectedOrder, cancelledOrderStringWriter);
+
+		final String expectedCompleteOrderResponseBodyString = cancelledOrderStringWriter.toString();
+
+		final int expectedCancelledStatusCode = Status.OK.getStatusCode();
+
+		driver.addExpectation(
+				onRequestTo(expectedPathCancelOrder).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT),
+				giveResponse(expectedCompleteOrderResponseBodyString, MediaType.APPLICATION_JSON)
+						.withStatus(expectedCancelledStatusCode));
+
+		Order actualOrder = bigcommerceSdk.cancelOrder(Integer.valueOf(SOME_ORDER_ID));
+
+		assertEquals(String.valueOf(actualOrder.getId()), SOME_ORDER_ID);
+		assertEquals(actualOrder.getStatus(), CANCELLATION_STATUS);
+
 	}
 
 	private Shipment buildShipment() {

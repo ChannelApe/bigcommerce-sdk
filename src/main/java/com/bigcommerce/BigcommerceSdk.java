@@ -59,6 +59,7 @@ import com.github.rholder.retry.WaitStrategy;
 
 public class BigcommerceSdk {
 
+	private static final String CANCELLED = "Cancelled";
 	private static final String COMPLETED = "Completed";
 	static final String API_VERSION_V2 = "v2";
 	static final String API_VERSION = "v3";
@@ -197,6 +198,16 @@ public class BigcommerceSdk {
 		Order order = new Order();
 
 		order.setStatusId(getStatus(COMPLETED).getId());
+		return put(webTarget, order, Order.class);
+
+	}
+
+	public Order cancelOrder(final int orderId) {
+		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId));
+
+		Order order = new Order();
+
+		order.setStatusId(getStatus(CANCELLED).getId());
 		return put(webTarget, order, Order.class);
 
 	}
