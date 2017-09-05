@@ -60,8 +60,6 @@ import com.github.restdriver.clientdriver.capture.JsonBodyCapture;
 
 public class BigcommerceSdkTest {
 
-	private static final String CANCELLATION_STATUS = "Cancelled";
-	private static final String COMPLETE_STATUS = "Completed";
 	private static final String SOME_ORDER_ID = "100";
 	private static final String SOME_TRACKING_CARRIER = "123";
 	private static final String SOME_COMMENTS = "This is a fulfillment from channel ape";
@@ -833,7 +831,7 @@ public class BigcommerceSdkTest {
 		orderStatusMarshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
 
 		final OrderStatus completeOrderStatus = new OrderStatus();
-		completeOrderStatus.setName(COMPLETE_STATUS);
+		completeOrderStatus.setName(com.bigcommerce.catalog.models.Status.COMPLETED.toString());
 		completeOrderStatus.setId(10);
 
 		final List<OrderStatus> orderStatuses = Arrays.asList(completeOrderStatus);
@@ -860,7 +858,7 @@ public class BigcommerceSdkTest {
 
 		final Order expectedOrder = new Order();
 		expectedOrder.setId(Integer.valueOf(SOME_ORDER_ID));
-		expectedOrder.setStatus(COMPLETE_STATUS);
+		expectedOrder.setStatus(com.bigcommerce.catalog.models.Status.COMPLETED);
 		expectedOrder.setStatusId(10);
 
 		final StringWriter completeOrderStringWriter = new StringWriter();
@@ -879,7 +877,7 @@ public class BigcommerceSdkTest {
 		Order actualOrder = bigcommerceSdk.completeOrder(Integer.valueOf(SOME_ORDER_ID));
 
 		assertEquals(String.valueOf(actualOrder.getId()), SOME_ORDER_ID);
-		assertEquals(actualOrder.getStatus(), COMPLETE_STATUS);
+		assertEquals(actualOrder.getStatus(), com.bigcommerce.catalog.models.Status.COMPLETED);
 	}
 
 	@Test
@@ -900,7 +898,7 @@ public class BigcommerceSdkTest {
 		orderStatusMarshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
 
 		final OrderStatus cancelledOrderStatus = new OrderStatus();
-		cancelledOrderStatus.setName(CANCELLATION_STATUS);
+		cancelledOrderStatus.setName(com.bigcommerce.catalog.models.Status.CANCELLED.toString());
 		cancelledOrderStatus.setId(10);
 
 		final List<OrderStatus> orderStatuses = Arrays.asList(cancelledOrderStatus);
@@ -927,7 +925,7 @@ public class BigcommerceSdkTest {
 
 		final Order expectedOrder = new Order();
 		expectedOrder.setId(Integer.valueOf(SOME_ORDER_ID));
-		expectedOrder.setStatus(CANCELLATION_STATUS);
+		expectedOrder.setStatus(com.bigcommerce.catalog.models.Status.CANCELLED);
 		expectedOrder.setStatusId(10);
 
 		final StringWriter cancelledOrderStringWriter = new StringWriter();
@@ -946,7 +944,7 @@ public class BigcommerceSdkTest {
 		Order actualOrder = bigcommerceSdk.cancelOrder(Integer.valueOf(SOME_ORDER_ID));
 
 		assertEquals(String.valueOf(actualOrder.getId()), SOME_ORDER_ID);
-		assertEquals(actualOrder.getStatus(), CANCELLATION_STATUS);
+		assertEquals(actualOrder.getStatus(), com.bigcommerce.catalog.models.Status.CANCELLED);
 
 	}
 

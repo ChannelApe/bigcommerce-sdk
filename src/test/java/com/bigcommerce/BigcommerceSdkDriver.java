@@ -23,12 +23,12 @@ import com.bigcommerce.catalog.models.Shipment;
 import com.bigcommerce.catalog.models.ShipmentCreationRequest;
 import com.bigcommerce.catalog.models.ShipmentLineItem;
 import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
+import com.bigcommerce.catalog.models.Status;
 import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 
 public class BigcommerceSdkDriver {
 
-	private static final String COMPLETED = "Completed";
 	private static final String STORE_HASH = System.getenv("BIGCOMMERCE_STORE_HASH");
 	private static final String CLIENT_ID = System.getenv("BIGCOMMERCE_CLIENT_ID");
 	private static final String ACCESS_TOKEN = System.getenv("BIGCOMMERCE_ACCESS_TOKEN");
@@ -183,7 +183,7 @@ public class BigcommerceSdkDriver {
 
 		Order order = bigcommerceSdk.completeOrder(100);
 		assertNotNull(order);
-		assertEquals(order.getStatus(), COMPLETED);
+		assertEquals(order.getStatus(), Status.COMPLETED);
 	}
 
 	@Test
@@ -191,9 +191,9 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		OrderStatus orderStatus = bigcommerceSdk.getStatus(COMPLETED);
+		OrderStatus orderStatus = bigcommerceSdk.getStatus(Status.COMPLETED.toString());
 		assertNotNull(orderStatus);
-		assertEquals(COMPLETED, orderStatus.getName());
+		assertEquals(Status.COMPLETED.toString(), orderStatus.getName());
 
 	}
 

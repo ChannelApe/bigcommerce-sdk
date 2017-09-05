@@ -187,9 +187,8 @@ public class BigcommerceSdk {
 
 	public Order getOrder(int orderId) {
 		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId));
-		final Order order = get(webTarget, Order.class);
+		return get(webTarget, Order.class);
 
-		return order;
 	}
 
 	public Order completeOrder(final int orderId) {
@@ -250,8 +249,8 @@ public class BigcommerceSdk {
 	public Store getStore() {
 		final WebTarget webTarget = baseWebTargetV2.path(STORE);
 
-		final Store store = get(webTarget, Store.class);
-		return store;
+		return get(webTarget, Store.class);
+
 	}
 
 	public Customer getCustomer(final int customerId) {
@@ -269,8 +268,8 @@ public class BigcommerceSdk {
 	public Shipment createShipment(final ShipmentCreationRequest shipmentCreationRequest, final int orderId) {
 		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId)).path(SHIPMENTS);
 
-		final Shipment shipment = post(webTarget, shipmentCreationRequest.getRequest(), Shipment.class);
-		return shipment;
+		return post(webTarget, shipmentCreationRequest.getRequest(), Shipment.class);
+
 	}
 
 	public Shipment updateShipment(final ShipmentUpdateRequest shipmentUpdateRequest, final int orderId,
@@ -278,8 +277,7 @@ public class BigcommerceSdk {
 		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId)).path(SHIPMENTS)
 				.path(String.valueOf(shipmentId));
 
-		final Shipment shipment = put(webTarget, shipmentUpdateRequest.getRequest(), Shipment.class);
-		return shipment;
+		return put(webTarget, shipmentUpdateRequest.getRequest(), Shipment.class);
 	}
 
 	private BigcommerceSdk(final Steps steps) {
