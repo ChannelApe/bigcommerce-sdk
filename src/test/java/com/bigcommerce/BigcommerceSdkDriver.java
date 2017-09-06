@@ -191,7 +191,7 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		OrderStatus orderStatus = bigcommerceSdk.getStatus(Status.COMPLETED.toString());
+		OrderStatus orderStatus = bigcommerceSdk.getStatus(Status.COMPLETED);
 		assertNotNull(orderStatus);
 		assertEquals(Status.COMPLETED.toString(), orderStatus.getName());
 

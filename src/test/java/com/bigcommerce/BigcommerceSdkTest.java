@@ -805,7 +805,7 @@ public class BigcommerceSdkTest {
 						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		OrderStatus actualOrderStatus = bigcommerceSdk.getStatus("Completed");
+		OrderStatus actualOrderStatus = bigcommerceSdk.getStatus(com.bigcommerce.catalog.models.Status.COMPLETED);
 		assertEquals(expectedOrderStatus2.getName(), actualOrderStatus.getName());
 		assertEquals(expectedOrderStatus2.getId(), actualOrderStatus.getId());
 

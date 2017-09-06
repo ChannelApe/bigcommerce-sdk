@@ -4,8 +4,11 @@ public enum Status {
 	PENDING("Pending"), AWAITING_PAYMENT("Awaiting Payment"), DISPUTED("Disputed"), REFUNDED(
 			"Refunded"), VERIFICATION_REQUIRED("Verification Required"), COMPLETED("Completed"), CANCELLED(
 					"Cancelled"), DECLINED("Declined"), AWAITING_FULFILLMENT("Awaiting Fulfillment"), AWAITING_SHIPMENT(
-							"Awaiting Shipment"), AWAITING_PICKUP(
-									"Awaiting Pickup"), PARTIALLY_SHIPPED("Partially Shipped"), SHIPPED("Shipped");
+							"Awaiting Shipment"), AWAITING_PICKUP("Awaiting Pickup"), PARTIALLY_SHIPPED(
+									"Partially Shipped"), SHIPPED("Shipped"), INCOMPLETE(
+											"Incomplete"), MANUAL_VERIFICATION_REQUIRED(
+													"Manual Verification Required"), PARTIALLY_REFUNDED(
+															"Partially Refunded");
 
 	static final String NO_MATCHING_ENUMS_ERROR_MESSAGE = "No matching enum found for %s";
 	private final String value;
@@ -41,7 +44,14 @@ public enum Status {
 			return Status.PARTIALLY_SHIPPED;
 		} else if (SHIPPED.toString().equals(value)) {
 			return Status.SHIPPED;
+		} else if (INCOMPLETE.toString().equals(value)) {
+			return Status.INCOMPLETE;
+		} else if (MANUAL_VERIFICATION_REQUIRED.toString().equals(value)) {
+			return Status.MANUAL_VERIFICATION_REQUIRED;
+		} else if (PARTIALLY_REFUNDED.toString().equals(value)) {
+			return Status.PARTIALLY_REFUNDED;
 		}
+
 		throw new IllegalArgumentException(String.format(NO_MATCHING_ENUMS_ERROR_MESSAGE, value));
 	}
 

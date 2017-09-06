@@ -59,8 +59,6 @@ import com.github.rholder.retry.WaitStrategy;
 
 public class BigcommerceSdk {
 
-	private static final String CANCELLED = "Cancelled";
-	private static final String COMPLETED = "Completed";
 	static final String API_VERSION_V2 = "v2";
 	static final String API_VERSION = "v3";
 	static final String CLIENT_ID_HEADER = "X-Auth-Client";
@@ -196,7 +194,7 @@ public class BigcommerceSdk {
 
 		Order order = new Order();
 
-		order.setStatusId(getStatus(COMPLETED).getId());
+		order.setStatusId(getStatus(com.bigcommerce.catalog.models.Status.COMPLETED).getId());
 		return put(webTarget, order, Order.class);
 
 	}
@@ -206,16 +204,17 @@ public class BigcommerceSdk {
 
 		Order order = new Order();
 
-		order.setStatusId(getStatus(CANCELLED).getId());
+		order.setStatusId(getStatus(com.bigcommerce.catalog.models.Status.CANCELLED).getId());
 		return put(webTarget, order, Order.class);
 
 	}
 
-	public OrderStatus getStatus(final String statusName) {
+	public OrderStatus getStatus(final com.bigcommerce.catalog.models.Status statusName) {
 		final WebTarget webTarget = baseWebTargetV2.path("order_statuses");
 
 		final OrderStatusResponse statusResponse = get(webTarget, OrderStatusResponse.class);
-		return statusResponse.stream().filter(status -> status.getName().equals(statusName)).findFirst().get();
+		return statusResponse.stream().filter(status -> status.getName().equals(statusName.toString())).findFirst()
+				.get();
 	}
 
 	public List<LineItem> getLineItems(final int orderId, final int page) {
