@@ -1,10 +1,10 @@
 # BigCommerce SDK
 
-Java SDK for BigCommerce V3 REST APIs
+Java SDK for BigCommerce REST APIs
 
 | Service   | Develop | Master |
 |-----------|---------|--------|
-| CI Status | [![Build Status](https://travis-ci.org/rjdavis3/bigcommerce-sdk.svg?branch=develop)](https://travis-ci.org/rjdavis3/bigcommerce-sdk) | [![Build Status](https://travis-ci.org/rjdavis3/bigcommerce-sdk.svg?branch=master)](https://travis-ci.org/rjdavis3/bigcommerce-sdk) |
+| CI Status | [![Build Status](https://travis-ci.org/ChannelApe/bigcommerce-sdk.svg?branch=develop)](https://travis-ci.org/ChannelApe/bigcommerce-sdk) | [![Build Status](https://travis-ci.org/ChannelApe/bigcommerce-sdk.svg?branch=master)](https://travis-ci.org/ChannelApe/bigcommerce-sdk) |
 
 ## Maven
 ```xml
