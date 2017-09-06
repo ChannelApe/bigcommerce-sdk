@@ -11,6 +11,6 @@ deploy:
     script: .travis/deploy.sh
     skip_cleanup: true
     on:
-      repo: rjdavis3/bigcommerce-sdk
+      repo: ChannelApe/bigcommerce-sdk
       tags: true
       jdk: oraclejdk8
