@@ -876,8 +876,8 @@ public class BigcommerceSdkTest {
 
 		Order actualOrder = bigcommerceSdk.completeOrder(Integer.valueOf(SOME_ORDER_ID));
 
-		assertEquals(String.valueOf(actualOrder.getId()), SOME_ORDER_ID);
-		assertEquals(actualOrder.getStatus(), com.bigcommerce.catalog.models.Status.COMPLETED);
+		assertEquals(SOME_ORDER_ID, String.valueOf(actualOrder.getId()));
+		assertEquals(com.bigcommerce.catalog.models.Status.COMPLETED, actualOrder.getStatus());
 	}
 
 	@Test
@@ -943,9 +943,8 @@ public class BigcommerceSdkTest {
 
 		Order actualOrder = bigcommerceSdk.cancelOrder(Integer.valueOf(SOME_ORDER_ID));
 
-		assertEquals(String.valueOf(actualOrder.getId()), SOME_ORDER_ID);
-		assertEquals(actualOrder.getStatus(), com.bigcommerce.catalog.models.Status.CANCELLED);
-
+		assertEquals(SOME_ORDER_ID, String.valueOf(actualOrder.getId()));
+		assertEquals(com.bigcommerce.catalog.models.Status.CANCELLED, actualOrder.getStatus());
 	}
 
 	private Shipment buildShipment() {
@@ -996,7 +995,7 @@ public class BigcommerceSdkTest {
 	}
 
 	private void assertEqualDates(final DateTime firstDate, final DateTime secondDate) {
-		assertEquals(firstDate.compareTo(secondDate), 0);
+		assertEquals(0, firstDate.compareTo(secondDate));
 	}
 
 	private BigcommerceSdk buildBigcommerceSdk() {
