@@ -9,9 +9,9 @@ Java SDK for BigCommerce REST APIs
 ## Maven
 ```xml
 	<dependency>
-	    <groupId>com.github.rjdavis3</groupId>
+	    <groupId>com.channelape</groupId>
 	    <artifactId>bigcommerce-sdk</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.1.2</version>
 	</dependency>
 ```
 
