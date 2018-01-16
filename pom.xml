@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.rjdavis3</groupId>
+	<groupId>com.channelape</groupId>
 	<artifactId>bigcommerce-sdk</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.1.1-SNAPSHOT</version>
 
 	<name>BigCommerce SDK</name>
 	<description>Java SDK for BigCommerce REST APIs</description>
@@ -25,6 +25,11 @@
 		<developer>
 			<name>R.J. Davis</name>
 			<email>rjdavis@channelape.com</email>
+			<organizationUrl>https://channelape.com</organizationUrl>
+		</developer>
+		<developer>
+			<name>Ryan Kazokas</name>
+			<email>rkazokas@channelape.com</email>
 			<organizationUrl>https://channelape.com</organizationUrl>
 		</developer>
 	</developers>
@@ -53,6 +58,8 @@
 		<java.version>1.8</java.version>
 		<junit.version>4.12</junit.version>
 		<slf4j.version>1.7.22</slf4j.version>
+		<pitest.version>1.3.1</pitest.version>
+		<jacoco.version>0.8.0</jacoco.version>
 	</properties>
 
 	<dependencies>
@@ -135,7 +142,7 @@
 			<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
-				<version>1.1.11</version>
+				<version>${pitest.version}</version>
 				<executions>
 					<execution>
 						<phase>integration-test</phase>
@@ -143,7 +150,7 @@
 							<goal>mutationCoverage</goal>
 						</goals>
 						<configuration>
-							<mutationThreshold>35</mutationThreshold>
+							<mutationThreshold>41</mutationThreshold>
 							<targetClasses>
 								<param>com.bigcommerce.*</param>
 							</targetClasses>
@@ -163,7 +170,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.2.201409121644</version>
+				<version>${jacoco.version}</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>

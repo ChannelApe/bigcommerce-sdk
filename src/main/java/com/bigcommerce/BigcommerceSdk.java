@@ -386,7 +386,7 @@ public class BigcommerceSdk {
 	}
 
 	private Retryer<Response> buildResponseRetyer() {
-		return RetryerBuilder.<Response>newBuilder().retryIfResult(this::shouldRetryResponse)
+		return RetryerBuilder.<Response> newBuilder().retryIfResult(this::shouldRetryResponse)
 				.withWaitStrategy(new ResponseWaitStrategy())
 				.withStopStrategy(StopStrategies.stopAfterDelay(requestRetryTimeoutDuration, requestRetryTimeoutUnit))
 				.build();
@@ -407,8 +407,8 @@ public class BigcommerceSdk {
 	}
 
 	private class ResponseWaitStrategy implements WaitStrategy {
-		private static final String SLEEPING_BEFORE_RETRY_DUE_TO_RATE_LIMIT_MESSAGE = "Sleeping %s before trying request again. Exceeded rate limit.";
-		private static final String SLEEPING_BEFORE_RETRY_MESSAGE = "Sleeping %s before trying request again. Received unexpected status code of %s and body of:\n%s";
+		private static final String SLEEPING_BEFORE_RETRY_DUE_TO_RATE_LIMIT_MESSAGE = "Sleeping {} before trying request again. Exceeded rate limit.";
+		private static final String SLEEPING_BEFORE_RETRY_MESSAGE = "Sleeping {} before trying request again. Received unexpected status code of {} and body of:\n{}";
 
 		private final WaitStrategy fallbackWaitStrategy = WaitStrategies.fibonacciWait();
 
@@ -419,15 +419,15 @@ public class BigcommerceSdk {
 					final Response response = (Response) failedAttempt.getResult();
 					final String rateLimitTimeResetString = response.getHeaderString(RATE_LIMIT_TIME_RESET_HEADER);
 					if (TOO_MANY_REQUESTS_STATUS_CODE == response.getStatus() && rateLimitTimeResetString != null) {
-						final long sleepTime = Long.valueOf(rateLimitTimeResetString);
-						LOGGER.warn(String.format(SLEEPING_BEFORE_RETRY_DUE_TO_RATE_LIMIT_MESSAGE,
-								Duration.ofMillis(sleepTime).toString()));
+						final long sleepTime = Long.parseLong(rateLimitTimeResetString);
+						LOGGER.warn(SLEEPING_BEFORE_RETRY_DUE_TO_RATE_LIMIT_MESSAGE,
+								Duration.ofMillis(sleepTime).toString());
 						return sleepTime;
 					}
 					response.bufferEntity();
 					final long sleepTime = fallbackWaitStrategy.computeSleepTime(failedAttempt);
-					LOGGER.warn(String.format(SLEEPING_BEFORE_RETRY_MESSAGE, Duration.ofMillis(sleepTime).toString(),
-							response.getStatus(), response.readEntity(String.class)));
+					LOGGER.warn(SLEEPING_BEFORE_RETRY_MESSAGE, Duration.ofMillis(sleepTime).toString(),
+							response.getStatus(), response.readEntity(String.class));
 					return sleepTime;
 				}
 			}
