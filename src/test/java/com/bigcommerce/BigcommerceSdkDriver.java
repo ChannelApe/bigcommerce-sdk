@@ -8,12 +8,15 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bigcommerce.catalog.models.Address;
+import com.bigcommerce.catalog.models.Brand;
+import com.bigcommerce.catalog.models.Brands;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.Order;
@@ -143,11 +146,11 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		ShipmentLineItem lineItem = new ShipmentLineItem();
+		final ShipmentLineItem lineItem = new ShipmentLineItem();
 		lineItem.setOrderProductId(1);
 		lineItem.setQuantity(1);
 
-		ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
+		final ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
 				.withTrackingNumber("1Z0398842038").withComments("This is a fulfillment from channel ape")
 				.withOrderAddressId(1).withShippingProvider("UPS").withTrackingCarrier("")
 				.withShipmentLineItems(Arrays.asList(lineItem)).build();
@@ -165,7 +168,7 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
+		final ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
 				.withTrackingNumber("1Z0398842038").withComments("This is a fulfillment from channel ape")
 				.withOrderAddressId(1).withShippingProvider("upsonline").withTrackingCarrier("").build();
 
@@ -181,7 +184,7 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		Order order = bigcommerceSdk.completeOrder(100);
+		final Order order = bigcommerceSdk.completeOrder(100);
 		assertNotNull(order);
 		assertEquals(order.getStatus(), Status.COMPLETED);
 	}
@@ -191,10 +194,46 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		OrderStatus orderStatus = bigcommerceSdk.getStatus(Status.COMPLETED);
+		final OrderStatus orderStatus = bigcommerceSdk.getStatus(Status.COMPLETED);
 		assertNotNull(orderStatus);
 		assertEquals(Status.COMPLETED.toString(), orderStatus.getName());
 
 	}
 
+	@Test
+	public void givenPage1WhenRetrievingBrandsThenRetrieveBrands() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Brands brands = bigcommerceSdk.getBrands(1, 100);
+		assertNotNull(brands);
+		assertTrue(brands.getBrands().size() > 0);
+		assertEquals(1, brands.getPagination().getCurrentPage());
+
+	}
+
+	@Test
+	public void givenBrandWhenCreateBrandThenCreateBrand() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Brand expectedBrand = new Brand();
+		expectedBrand.setName("CA_" + UUID.randomUUID().toString());
+		expectedBrand.setImageUrl("https://www.channelape.com/wp-content/themes/ChannelApe/images/logo.png");
+		expectedBrand.setMetaDescription("ECommerce Software");
+		expectedBrand.setMetaKeywords(Arrays.asList("Ecommerce", "Channels"));
+		expectedBrand.setSearchKeywords("ECOMMERCE,Channels");
+		expectedBrand.setPageTitle("Channel Ape Ecommerce Software");
+
+		final Brand createdBrand = bigcommerceSdk.createBrand(expectedBrand);
+
+		assertNotNull(createdBrand);
+		assertNotNull(createdBrand.getId());
+		assertNotNull(createdBrand.getImageUrl());
+		assertEquals(expectedBrand.getMetaDescription(), createdBrand.getMetaDescription());
+		assertEquals(expectedBrand.getMetaKeywords(), createdBrand.getMetaKeywords());
+		assertEquals(expectedBrand.getName(), createdBrand.getName());
+		assertEquals(expectedBrand.getPageTitle(), createdBrand.getPageTitle());
+
+	}
 }

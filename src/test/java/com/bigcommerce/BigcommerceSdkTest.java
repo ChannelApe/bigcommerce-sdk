@@ -30,6 +30,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import com.bigcommerce.catalog.models.Address;
+import com.bigcommerce.catalog.models.Brand;
+import com.bigcommerce.catalog.models.BrandResponse;
+import com.bigcommerce.catalog.models.Brands;
+import com.bigcommerce.catalog.models.BrandsResponse;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
 import com.bigcommerce.catalog.models.Customer;
@@ -41,6 +45,9 @@ import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.OrderStatus;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
+import com.bigcommerce.catalog.models.ProductImage;
+import com.bigcommerce.catalog.models.ProductImageResponse;
+import com.bigcommerce.catalog.models.ProductResponse;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.ProductsResponse;
 import com.bigcommerce.catalog.models.Shipment;
@@ -101,7 +108,7 @@ public class BigcommerceSdkTest {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
-				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/summary").toString();
 
 		final CatalogSummaryResponse catalogSummaryResponse = new CatalogSummaryResponse();
@@ -144,7 +151,7 @@ public class BigcommerceSdkTest {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
-				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/summary").toString();
 
 		final Status expectedStatus = Status.UNAUTHORIZED;
@@ -162,7 +169,7 @@ public class BigcommerceSdkTest {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
-				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/products").toString();
 
 		final ProductsResponse productsResponse = new ProductsResponse();
@@ -214,12 +221,142 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedPagination.getTotalPages(), actualProducts.getPagination().getTotalPages());
 	}
 
+	@Test
+	public void givenSomeProductWhenCreatingProductsThenCreateProducts() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/products").toString();
+
+		final ProductResponse productsResponse = new ProductResponse();
+		final Product expectedProduct = new Product();
+		expectedProduct.setId("112");
+		expectedProduct.setName("Quest Nutrition Quest Natural Protein Bar");
+		expectedProduct.setCondition("NEW");
+		expectedProduct.setCustomFields(Collections.emptyList());
+		expectedProduct.setDescription("Quest Nutrition Bar");
+		expectedProduct.setInventoryTracking("variant");
+		expectedProduct.setMetaKeywords(Collections.emptyList());
+		expectedProduct.setBrandId(45);
+		expectedProduct.setCategories(Arrays.asList(1, 3, 55));
+
+		final Variant firstExpectedVariant = new Variant();
+		firstExpectedVariant.setSku("SKU-1234");
+		firstExpectedVariant.setUpc("UPC1");
+		firstExpectedVariant.setPrice(new BigDecimal(99.99));
+		firstExpectedVariant.setWeight(new BigDecimal(4.323));
+		firstExpectedVariant.setImageUrl("https://s3.aws.com/someimage-1.png");
+		firstExpectedVariant.setOptionValues(Collections.emptyList());
+
+		final Variant secondExpectedVariant = new Variant();
+		secondExpectedVariant.setSku("SKU-4568");
+		secondExpectedVariant.setUpc("UPC2");
+		secondExpectedVariant.setPrice(new BigDecimal(47.99));
+		secondExpectedVariant.setWeight(new BigDecimal(2.511));
+		secondExpectedVariant.setImageUrl("https://s3.aws.com/someimage-2.png");
+		secondExpectedVariant.setOptionValues(Collections.emptyList());
+
+		expectedProduct.setVariants(Arrays.asList(firstExpectedVariant, secondExpectedVariant));
+
+		productsResponse.setData(expectedProduct);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { ProductResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(productsResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.POST),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Product actualProduct = bigcommerceSdk.createProduct(expectedProduct);
+
+		assertEquals(expectedProduct.getId(), actualProduct.getId());
+		assertEquals(expectedProduct.getName(), actualProduct.getName());
+		assertEquals(expectedProduct.getCondition(), actualProduct.getCondition());
+		assertEquals(expectedProduct.getCustomFields(), actualProduct.getCustomFields());
+		assertEquals(expectedProduct.getDescription(), actualProduct.getDescription());
+		assertEquals(expectedProduct.getMetaKeywords(), actualProduct.getMetaKeywords());
+		assertEquals(expectedProduct.getBrandId(), actualProduct.getBrandId());
+		assertEquals(expectedProduct.getCategories(), actualProduct.getCategories());
+
+		assertEquals(expectedProduct.getVariants().size(), 2);
+		assertEquals(expectedProduct.getVariants().get(0).getImageUrl(),
+				actualProduct.getVariants().get(0).getImageUrl());
+		assertEquals(expectedProduct.getVariants().get(0).getInventoryLevel(),
+				actualProduct.getVariants().get(0).getInventoryLevel());
+		assertEquals(expectedProduct.getVariants().get(0).getPrice(), actualProduct.getVariants().get(0).getPrice());
+		assertEquals(expectedProduct.getVariants().get(0).getWeight(), actualProduct.getVariants().get(0).getWeight());
+		assertEquals(expectedProduct.getVariants().get(0).getSku(), actualProduct.getVariants().get(0).getSku());
+		assertEquals(expectedProduct.getVariants().get(0).getUpc(), actualProduct.getVariants().get(0).getUpc());
+		assertEquals(expectedProduct.getVariants().get(0).getOptionValues(),
+				actualProduct.getVariants().get(0).getOptionValues());
+
+		assertEquals(expectedProduct.getVariants().get(1).getImageUrl(),
+				actualProduct.getVariants().get(1).getImageUrl());
+		assertEquals(expectedProduct.getVariants().get(1).getInventoryLevel(),
+				actualProduct.getVariants().get(1).getInventoryLevel());
+		assertEquals(expectedProduct.getVariants().get(1).getPrice(), actualProduct.getVariants().get(1).getPrice());
+		assertEquals(expectedProduct.getVariants().get(1).getWeight(), actualProduct.getVariants().get(1).getWeight());
+		assertEquals(expectedProduct.getVariants().get(1).getSku(), actualProduct.getVariants().get(1).getSku());
+		assertEquals(expectedProduct.getVariants().get(1).getUpc(), actualProduct.getVariants().get(1).getUpc());
+		assertEquals(expectedProduct.getVariants().get(1).getOptionValues(),
+				actualProduct.getVariants().get(1).getOptionValues());
+
+	}
+
+	@Test
+	public void givenSomeProductImageWhenCreatingProductImageThenCreateProductImage() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/products/").append(1).append("/images").toString();
+
+		final ProductImageResponse productImageResponse = new ProductImageResponse();
+		final ProductImage expectedProductImage = new ProductImage();
+		expectedProductImage.setImageUrl("https://aws.s3.com/testingimage-1.png");
+		expectedProductImage.setIsThumbnail(true);
+		expectedProductImage.setProductId(1);
+		productImageResponse.setData(expectedProductImage);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { ProductImageResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(productImageResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.POST),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final ProductImage actualProductImage = bigcommerceSdk.createProductImage(expectedProductImage);
+		assertEquals(expectedProductImage.getImageUrl(), actualProductImage.getImageUrl());
+		assertEquals(expectedProductImage.getIsThumbnail(), actualProductImage.getIsThumbnail());
+	}
+
 	@Test(expected = BigcommerceException.class)
 	public void givenSomePageAndBigCommerceReturnsInternalServerErrorWhenRetrievingProductsThenRetryAndEventuallyThrowNewBigcommerceException() {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
-				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/products").toString();
 
 		final Status expectedStatus = Status.INTERNAL_SERVER_ERROR;
@@ -237,7 +374,7 @@ public class BigcommerceSdkTest {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
-				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/products").toString();
 
 		final int expectedStatusCode = BigcommerceSdk.TOO_MANY_REQUESTS_STATUS_CODE;
@@ -273,7 +410,7 @@ public class BigcommerceSdkTest {
 		variantResponse.setData(expectedVariant);
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
-				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/products/").append(productId).append("/variants/").append(variantId).toString();
 
 		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
@@ -319,7 +456,7 @@ public class BigcommerceSdkTest {
 		variant.setSku(sku);
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
-				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION).append(FORWARD_SLASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/products/").append(productId).append("/variants/").append(variantId).toString();
 
 		final Status expectedStatus = Status.NOT_FOUND;
@@ -417,7 +554,7 @@ public class BigcommerceSdkTest {
 				.withParam("limit", 250).withParam("min_date_created", futureDate.toString()).withMethod(Method.GET),
 				giveEmptyResponse().withStatus(expectedStatusCode)).anyTimes();
 
-		List<Order> actualOrders = bigcommerceSdk.getOrders(1, futureDate);
+		final List<Order> actualOrders = bigcommerceSdk.getOrders(1, futureDate);
 		assertEquals(actualOrders, Collections.emptyList());
 	}
 
@@ -516,7 +653,7 @@ public class BigcommerceSdkTest {
 						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		Address actualShippingAddress = bigcommerceSdk.getShippingAddress(100);
+		final Address actualShippingAddress = bigcommerceSdk.getShippingAddress(100);
 		assertEquals(actualShippingAddress.getStreet1(), expectedShippingAddress.getStreet1());
 		assertEquals(actualShippingAddress.getStreet2(), expectedShippingAddress.getStreet2());
 		assertEquals(actualShippingAddress.getCity(), expectedShippingAddress.getCity());
@@ -543,7 +680,7 @@ public class BigcommerceSdkTest {
 		final Shipment secondExpectedShipment = buildShipment();
 		final Shipment thirdExpectedShipment = buildShipment();
 
-		List<Shipment> expectedShipments = Arrays.asList(firstExpectedShipment, secondExpectedShipment,
+		final List<Shipment> expectedShipments = Arrays.asList(firstExpectedShipment, secondExpectedShipment,
 				thirdExpectedShipment);
 
 		final StringWriter stringWriter = new StringWriter();
@@ -559,7 +696,7 @@ public class BigcommerceSdkTest {
 						.withParam("limit", 250).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		List<Shipment> actualShipments = bigcommerceSdk.getShipments(100, 1);
+		final List<Shipment> actualShipments = bigcommerceSdk.getShipments(100, 1);
 		assertEquals(expectedShipments.get(0).getShippingMethod(), actualShipments.get(0).getShippingMethod());
 		assertEquals(expectedShipments.get(0).getShippingProvider(), actualShipments.get(0).getShippingProvider());
 		assertEquals(expectedShipments.get(0).getTrackingNumber(), actualShipments.get(0).getTrackingNumber());
@@ -599,7 +736,7 @@ public class BigcommerceSdkTest {
 		final LineItem lineItem2 = buildLineItem();
 		final LineItem lineItem3 = buildLineItem();
 
-		LineItemsResponse expectedLineItems = new LineItemsResponse();
+		final LineItemsResponse expectedLineItems = new LineItemsResponse();
 		expectedLineItems.add(lineItem1);
 		expectedLineItems.add(lineItem2);
 		expectedLineItems.add(lineItem3);
@@ -616,7 +753,7 @@ public class BigcommerceSdkTest {
 						.withParam("limit", 250).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		List<LineItem> actualLineItems = bigcommerceSdk.getLineItems(100, 1);
+		final List<LineItem> actualLineItems = bigcommerceSdk.getLineItems(100, 1);
 		assertEquals(actualLineItems.size(), expectedLineItems.size());
 		assertNotNull(actualLineItems);
 		assertEquals(SOME_PRICE, actualLineItems.get(0).getBaseCostPrice());
@@ -639,12 +776,12 @@ public class BigcommerceSdkTest {
 	public void givenAShipmentThenCreateAShipment() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		ShipmentLineItem expectedShipmentLineItem1 = new ShipmentLineItem();
+		final ShipmentLineItem expectedShipmentLineItem1 = new ShipmentLineItem();
 		expectedShipmentLineItem1.setOrderProductId(1);
 		expectedShipmentLineItem1.setQuantity(2);
-		List<ShipmentLineItem> expectedShipmentLineItems = Arrays.asList(expectedShipmentLineItem1);
+		final List<ShipmentLineItem> expectedShipmentLineItems = Arrays.asList(expectedShipmentLineItem1);
 
-		ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
+		final ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
 				.withTrackingNumber(SOME_TRACKING_NUMBER).withComments(SOME_COMMENTS).withOrderAddressId(1)
 				.withShippingProvider(SOME_SHIPPING_PROVIDER).withTrackingCarrier(SOME_TRACKING_CARRIER)
 				.withShipmentLineItems(expectedShipmentLineItems).build();
@@ -672,7 +809,7 @@ public class BigcommerceSdkTest {
 						.capturingBodyIn(actualRequestBody),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		Shipment actualShipment = bigcommerceSdk.createShipment(shipmentCreationRequest, 100);
+		final Shipment actualShipment = bigcommerceSdk.createShipment(shipmentCreationRequest, 100);
 		assertEquals(actualShipment.getComments(), shipmentCreationRequest.getRequest().getComments());
 		assertEquals(actualShipment.getTrackingCarrier(), shipmentCreationRequest.getRequest().getTrackingCarrier());
 		assertEquals(actualShipment.getShippingProvider(), shipmentCreationRequest.getRequest().getShippingProvider());
@@ -693,7 +830,7 @@ public class BigcommerceSdkTest {
 	public void givenAShipmentThenUpdateAShipment() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
+		final ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
 				.withTrackingNumber(SOME_TRACKING_NUMBER).withComments(SOME_COMMENTS).withOrderAddressId(1)
 				.withShippingProvider(SOME_SHIPPING_PROVIDER).withTrackingCarrier(SOME_TRACKING_CARRIER).build();
 
@@ -720,7 +857,7 @@ public class BigcommerceSdkTest {
 						.capturingBodyIn(actualRequestBody),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		Shipment actualShipment = bigcommerceSdk.updateShipment(shipmentUpdateRequest, 100, 35);
+		final Shipment actualShipment = bigcommerceSdk.updateShipment(shipmentUpdateRequest, 100, 35);
 		assertEquals(actualShipment.getComments(), shipmentUpdateRequest.getRequest().getComments());
 		assertEquals(actualShipment.getTrackingCarrier(), shipmentUpdateRequest.getRequest().getTrackingCarrier());
 		assertEquals(actualShipment.getShippingProvider(), shipmentUpdateRequest.getRequest().getShippingProvider());
@@ -749,7 +886,7 @@ public class BigcommerceSdkTest {
 		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
 		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
 
-		Store expectedStore = new Store();
+		final Store expectedStore = new Store();
 		expectedStore.setWeightUnits("Ounces");
 
 		final StringWriter stringWriter = new StringWriter();
@@ -764,7 +901,7 @@ public class BigcommerceSdkTest {
 						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		Store actualStore = bigcommerceSdk.getStore();
+		final Store actualStore = bigcommerceSdk.getStore();
 		assertEquals(actualStore.getWeightUnits(), expectedStore.getWeightUnits());
 
 	}
@@ -783,12 +920,12 @@ public class BigcommerceSdkTest {
 		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
 		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
 
-		OrderStatus expectedOrderStatus1 = new OrderStatus();
+		final OrderStatus expectedOrderStatus1 = new OrderStatus();
 		expectedOrderStatus1.setName("Pending");
 		expectedOrderStatus1.setId(1);
 		expectedOrderStatus1.setOrder(1);
 
-		OrderStatus expectedOrderStatus2 = new OrderStatus();
+		final OrderStatus expectedOrderStatus2 = new OrderStatus();
 		expectedOrderStatus2.setName("Completed");
 		expectedOrderStatus2.setId(2);
 		expectedOrderStatus2.setOrder(2);
@@ -805,7 +942,7 @@ public class BigcommerceSdkTest {
 						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
 				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
 
-		OrderStatus actualOrderStatus = bigcommerceSdk.getStatus(com.bigcommerce.catalog.models.Status.COMPLETED);
+		final OrderStatus actualOrderStatus = bigcommerceSdk.getStatus(com.bigcommerce.catalog.models.Status.COMPLETED);
 		assertEquals(expectedOrderStatus2.getName(), actualOrderStatus.getName());
 		assertEquals(expectedOrderStatus2.getId(), actualOrderStatus.getId());
 
@@ -874,7 +1011,7 @@ public class BigcommerceSdkTest {
 				giveResponse(expectedCompleteOrderResponseBodyString, MediaType.APPLICATION_JSON)
 						.withStatus(expectedCompleteStatusCode));
 
-		Order actualOrder = bigcommerceSdk.completeOrder(Integer.valueOf(SOME_ORDER_ID));
+		final Order actualOrder = bigcommerceSdk.completeOrder(Integer.valueOf(SOME_ORDER_ID));
 
 		assertEquals(SOME_ORDER_ID, String.valueOf(actualOrder.getId()));
 		assertEquals(com.bigcommerce.catalog.models.Status.COMPLETED, actualOrder.getStatus());
@@ -941,24 +1078,145 @@ public class BigcommerceSdkTest {
 				giveResponse(expectedCompleteOrderResponseBodyString, MediaType.APPLICATION_JSON)
 						.withStatus(expectedCancelledStatusCode));
 
-		Order actualOrder = bigcommerceSdk.cancelOrder(Integer.valueOf(SOME_ORDER_ID));
+		final Order actualOrder = bigcommerceSdk.cancelOrder(Integer.valueOf(SOME_ORDER_ID));
 
 		assertEquals(SOME_ORDER_ID, String.valueOf(actualOrder.getId()));
 		assertEquals(com.bigcommerce.catalog.models.Status.CANCELLED, actualOrder.getStatus());
 	}
 
+	@Test
+	public void givenCatalogWithBrandsThenReturnBrands() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/brands").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { BrandsResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final Brand firstExpectedBrand = buildBrand(1);
+		final Brand secondExpectedBrand = buildBrand(2);
+		final Brand thirdExpectedBrand = buildBrand(3);
+
+		final List<Brand> expectedBrands = Arrays.asList(firstExpectedBrand, secondExpectedBrand, thirdExpectedBrand);
+		final BrandsResponse response = new BrandsResponse();
+		response.setData(expectedBrands);
+		final Meta meta = new Meta();
+		final Pagination expectedPagination = new Pagination();
+		expectedPagination.setCurrentPage(1);
+		expectedPagination.setPerPage(250);
+		expectedPagination.setTotal(10);
+		expectedPagination.setTotalPages(5);
+		meta.setPagination(expectedPagination);
+		response.setMeta(meta);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(response, stringWriter);
+
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withParam("page", 1)
+						.withParam("limit", 250).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Brands actualBrands = bigcommerceSdk.getBrands(1, 250);
+		assertEquals(expectedBrands.get(0).getName(), actualBrands.getBrands().get(0).getName());
+		assertEquals(expectedBrands.get(0).getId(), actualBrands.getBrands().get(0).getId());
+		assertEquals(expectedBrands.get(0).getImageUrl(), actualBrands.getBrands().get(0).getImageUrl());
+		assertEquals(expectedBrands.get(0).getPageTitle(), actualBrands.getBrands().get(0).getPageTitle());
+		assertEquals(expectedBrands.get(0).getSearchKeywords(), actualBrands.getBrands().get(0).getSearchKeywords());
+		assertEquals(expectedBrands.get(0).getMetaDescription(), actualBrands.getBrands().get(0).getMetaDescription());
+		assertEquals(expectedBrands.get(0).getMetaKeywords(), actualBrands.getBrands().get(0).getMetaKeywords());
+		assertEquals(meta.getPagination().getTotal(), actualBrands.getPagination().getTotal());
+		assertEquals(meta.getPagination().getTotalPages(), actualBrands.getPagination().getTotalPages());
+		assertEquals(meta.getPagination().getCurrentPage(), actualBrands.getPagination().getCurrentPage());
+		assertEquals(meta.getPagination().getPerPage(), actualBrands.getPagination().getPerPage());
+
+	}
+
+	@Test
+	public void givenSomeBrandWhenCreatingBrandThenCreateBrand() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final Brand expectedBrand = new Brand();
+
+		expectedBrand.setId(3);
+		expectedBrand.setImageUrl("https://aws.s3.com/someimage-url.png");
+		expectedBrand.setMetaDescription("Some Brand Description");
+		expectedBrand.setMetaKeywords(Arrays.asList("Shoes", "Apparel"));
+		expectedBrand.setName("Nike");
+		expectedBrand.setPageTitle("Nike Shoes");
+		expectedBrand.setSearchKeywords("Shoes");
+
+		final BrandResponse brandResponse = new BrandResponse();
+
+		brandResponse.setData(expectedBrand);
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/brands").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { BrandResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(brandResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.POST)
+						.capturingBodyIn(actualRequestBody),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Brand actualBrand = bigcommerceSdk.createBrand(expectedBrand);
+
+		assertEquals(expectedBrand.getId(), actualBrand.getId());
+		assertEquals(expectedBrand.getImageUrl(), actualBrand.getImageUrl());
+		assertEquals(expectedBrand.getMetaDescription(), actualBrand.getMetaDescription());
+		assertEquals(expectedBrand.getMetaKeywords(), actualBrand.getMetaKeywords());
+		assertEquals(expectedBrand.getName(), actualBrand.getName());
+		assertEquals(expectedBrand.getPageTitle(), actualBrand.getPageTitle());
+	}
+
+	private Brand buildBrand(final Integer id) {
+		final Brand brand = new Brand();
+		brand.setId(id);
+		brand.setImageUrl("https://aws.s3/image1.png");
+		brand.setMetaKeywords(Collections.emptyList());
+		brand.setMetaDescription("NIKE BRAND DESCRIPTION");
+		brand.setName("NIKE");
+		brand.setPageTitle("Nike Brands");
+		brand.setSearchKeywords("SHOES");
+		return brand;
+	}
+
 	private Shipment buildShipment() {
-		Shipment firstExpectedShipment = new Shipment();
-		ShipmentLineItem shipmentLineItem1 = new ShipmentLineItem();
+		final Shipment shipment = new Shipment();
+		final ShipmentLineItem shipmentLineItem1 = new ShipmentLineItem();
 		shipmentLineItem1.setProductId(SOME_ID);
 		shipmentLineItem1.setQuantity(12);
 		shipmentLineItem1.setOrderProductId(SOME_ID);
 
-		firstExpectedShipment.setItems(Arrays.asList(shipmentLineItem1));
-		return firstExpectedShipment;
+		shipment.setItems(Arrays.asList(shipmentLineItem1));
+		return shipment;
 	}
 
-	private Order buildOrder(DateTimeFormatter formatter) {
+	private Order buildOrder(final DateTimeFormatter formatter) {
 		final Order order = new Order();
 		order.setId(100);
 		order.setDateCreated(formatter.parseDateTime(SOME_DATE_STRING));
@@ -976,7 +1234,7 @@ public class BigcommerceSdkTest {
 	}
 
 	private LineItem buildLineItem() {
-		LineItem lineItem = new LineItem();
+		final LineItem lineItem = new LineItem();
 		lineItem.setName(SOME_NAME);
 		lineItem.setBaseCostPrice(SOME_PRICE);
 		lineItem.setBaseTotal(SOME_PRICE);

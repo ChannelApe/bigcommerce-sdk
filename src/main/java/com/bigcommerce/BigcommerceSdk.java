@@ -25,6 +25,10 @@ import org.slf4j.LoggerFactory;
 
 import com.bigcommerce.catalog.models.Address;
 import com.bigcommerce.catalog.models.AddressResponse;
+import com.bigcommerce.catalog.models.Brand;
+import com.bigcommerce.catalog.models.BrandResponse;
+import com.bigcommerce.catalog.models.Brands;
+import com.bigcommerce.catalog.models.BrandsResponse;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
 import com.bigcommerce.catalog.models.Customer;
@@ -36,6 +40,9 @@ import com.bigcommerce.catalog.models.OrderStatusResponse;
 import com.bigcommerce.catalog.models.OrdersResponse;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
+import com.bigcommerce.catalog.models.ProductImage;
+import com.bigcommerce.catalog.models.ProductImageResponse;
+import com.bigcommerce.catalog.models.ProductResponse;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.ProductsResponse;
 import com.bigcommerce.catalog.models.Shipment;
@@ -59,8 +66,9 @@ import com.github.rholder.retry.WaitStrategy;
 
 public class BigcommerceSdk {
 
+	private static final String IMAGES = "images";
 	static final String API_VERSION_V2 = "v2";
-	static final String API_VERSION = "v3";
+	static final String API_VERSION_V3 = "v3";
 	static final String CLIENT_ID_HEADER = "X-Auth-Client";
 	static final String ACCESS_TOKEN_HEADER = "X-Auth-Token";
 	static final String RATE_LIMIT_TIME_RESET_HEADER = "X-Rate-Limit-Time-Reset-Ms";
@@ -70,6 +78,7 @@ public class BigcommerceSdk {
 	private static final String CATALOG = "catalog";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
+	private static final String BRANDS = "brands";
 	private static final String ORDERS = "orders";
 	private static final String CUSTOMERS = "customers";
 	private static final String LIMIT = "limit";
@@ -90,7 +99,7 @@ public class BigcommerceSdk {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BigcommerceSdk.class);
 
-	private final WebTarget baseWebTarget;
+	private final WebTarget baseWebTargetV3;
 	/*
 	 * Bigcommerce API has some differences between V2 & V3 and currently some
 	 * API endpoints only exist in V2. The SDK uses V2 where applicable.
@@ -148,7 +157,7 @@ public class BigcommerceSdk {
 	}
 
 	public CatalogSummary getCatalogSummary() {
-		final WebTarget webTarget = baseWebTarget.path(CATALOG).path(SUMMARY);
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(SUMMARY);
 		final CatalogSummaryResponse catalogSummaryResponse = get(webTarget, CatalogSummaryResponse.class);
 		return catalogSummaryResponse.getData();
 
@@ -159,7 +168,7 @@ public class BigcommerceSdk {
 	}
 
 	public Products getProducts(final int page, final int limit) {
-		final WebTarget webTarget = baseWebTarget.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
 				.queryParam(LIMIT, limit).queryParam(PAGE, page);
 		final ProductsResponse productsResponse = get(webTarget, ProductsResponse.class);
 		final List<Product> products = productsResponse.getData();
@@ -167,7 +176,20 @@ public class BigcommerceSdk {
 		return new Products(products, pagination);
 	}
 
-	public List<Order> getOrders(final int page, DateTime earliestDate) {
+	public Product createProduct(final Product product) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS);
+		final ProductResponse productResponse = post(webTarget, product, ProductResponse.class);
+		return productResponse.getData();
+	}
+
+	public ProductImage createProductImage(final ProductImage productImage) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
+				.path(String.valueOf(productImage.getProductId())).path(IMAGES);
+		final ProductImageResponse productImageResponse = post(webTarget, productImage, ProductImageResponse.class);
+		return productImageResponse.getData();
+	}
+
+	public List<Order> getOrders(final int page, final DateTime earliestDate) {
 		return getOrders(page, MAX_LIMIT, earliestDate);
 	}
 
@@ -183,7 +205,7 @@ public class BigcommerceSdk {
 		return (ordersResponse == null) ? Collections.emptyList() : ordersResponse;
 	}
 
-	public Order getOrder(int orderId) {
+	public Order getOrder(final int orderId) {
 		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId));
 		return get(webTarget, Order.class);
 
@@ -192,7 +214,7 @@ public class BigcommerceSdk {
 	public Order completeOrder(final int orderId) {
 		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId));
 
-		Order order = new Order();
+		final Order order = new Order();
 
 		order.setStatusId(getStatus(com.bigcommerce.catalog.models.Status.COMPLETED).getId());
 		return put(webTarget, order, Order.class);
@@ -202,7 +224,7 @@ public class BigcommerceSdk {
 	public Order cancelOrder(final int orderId) {
 		final WebTarget webTarget = baseWebTargetV2.path(ORDERS).path(String.valueOf(orderId));
 
-		Order order = new Order();
+		final Order order = new Order();
 
 		order.setStatusId(getStatus(com.bigcommerce.catalog.models.Status.CANCELLED).getId());
 		return put(webTarget, order, Order.class);
@@ -258,10 +280,29 @@ public class BigcommerceSdk {
 	}
 
 	public Variant updateVariant(final Variant variant) {
-		final WebTarget webTarget = baseWebTarget.path(CATALOG).path(PRODUCTS).path(variant.getProductId())
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(variant.getProductId())
 				.path(VARIANTS).path(variant.getId());
 		final VariantResponse variantResponse = put(webTarget, variant, VariantResponse.class);
 		return variantResponse.getData();
+	}
+
+	public Brands getBrands(final int page) {
+		return getBrands(page, MAX_LIMIT);
+	}
+
+	public Brands getBrands(final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(BRANDS).queryParam(LIMIT, limit).queryParam(PAGE,
+				page);
+		final BrandsResponse brandsResponse = get(webTarget, BrandsResponse.class);
+		final List<Brand> brands = brandsResponse.getData();
+		final Pagination pagination = brandsResponse.getMeta().getPagination();
+		return new Brands(brands, pagination);
+	}
+
+	public Brand createBrand(final Brand brand) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(BRANDS);
+		final BrandResponse createdBrand = post(webTarget, brand, BrandResponse.class);
+		return createdBrand.getData();
 	}
 
 	public Shipment createShipment(final ShipmentCreationRequest shipmentCreationRequest, final int orderId) {
@@ -280,7 +321,7 @@ public class BigcommerceSdk {
 	}
 
 	private BigcommerceSdk(final Steps steps) {
-		this.baseWebTarget = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION);
+		this.baseWebTargetV3 = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION_V3);
 		this.baseWebTargetV2 = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION_V2);
 		this.storeHash = steps.storeHash;
 		this.clientId = steps.clientId;
@@ -339,38 +380,27 @@ public class BigcommerceSdk {
 	}
 
 	private <T> T get(final WebTarget webTarget, final Class<T> entityType) {
-		final Callable<Response> responseCallable = new Callable<Response>() {
-			@Override
-			public Response call() throws Exception {
-				return webTarget.request(MediaType.APPLICATION_JSON).header(CLIENT_ID_HEADER, getClientId())
-						.header(ACCESS_TOKEN_HEADER, getAccessToken()).get();
-			}
-		};
+		final Callable<Response> responseCallable = () -> webTarget.request(MediaType.APPLICATION_JSON)
+				.header(CLIENT_ID_HEADER, getClientId()).header(ACCESS_TOKEN_HEADER, getAccessToken()).get();
 		final Response response = invokeResponseCallable(responseCallable);
 		return handleResponse(response, entityType, Status.OK, Status.NO_CONTENT);
 	}
 
 	private <T, V> V put(final WebTarget webTarget, final T object, final Class<V> entityType) {
-		final Callable<Response> responseCallable = new Callable<Response>() {
-			@Override
-			public Response call() throws Exception {
-				final Entity<T> entity = Entity.entity(object, MEDIA_TYPE);
-				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
-						.header(ACCESS_TOKEN_HEADER, getAccessToken()).put(entity);
-			}
+		final Callable<Response> responseCallable = () -> {
+			final Entity<T> entity = Entity.entity(object, MEDIA_TYPE);
+			return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
+					.header(ACCESS_TOKEN_HEADER, getAccessToken()).put(entity);
 		};
 		final Response response = invokeResponseCallable(responseCallable);
 		return handleResponse(response, entityType, Status.OK);
 	}
 
 	private <T, V> V post(final WebTarget webTarget, final T object, final Class<V> entityType) {
-		final Callable<Response> responseCallable = new Callable<Response>() {
-			@Override
-			public Response call() throws Exception {
-				final Entity<T> entity = Entity.entity(object, MEDIA_TYPE);
-				return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
-						.header(ACCESS_TOKEN_HEADER, getAccessToken()).post(entity);
-			}
+		final Callable<Response> responseCallable = () -> {
+			final Entity<T> entity = Entity.entity(object, MEDIA_TYPE);
+			return webTarget.request().header(CLIENT_ID_HEADER, getClientId())
+					.header(ACCESS_TOKEN_HEADER, getAccessToken()).post(entity);
 		};
 		final Response response = invokeResponseCallable(responseCallable);
 		return handleResponse(response, entityType, Status.OK, Status.CREATED);
@@ -386,7 +416,7 @@ public class BigcommerceSdk {
 	}
 
 	private Retryer<Response> buildResponseRetyer() {
-		return RetryerBuilder.<Response> newBuilder().retryIfResult(this::shouldRetryResponse)
+		return RetryerBuilder.<Response>newBuilder().retryIfResult(this::shouldRetryResponse)
 				.withWaitStrategy(new ResponseWaitStrategy())
 				.withStopStrategy(StopStrategies.stopAfterDelay(requestRetryTimeoutDuration, requestRetryTimeoutUnit))
 				.build();

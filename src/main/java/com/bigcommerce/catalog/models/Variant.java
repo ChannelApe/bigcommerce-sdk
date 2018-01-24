@@ -1,6 +1,7 @@
 package com.bigcommerce.catalog.models;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -23,6 +24,9 @@ public class Variant {
 	private String mpn;
 	@XmlElement(name = "inventory_level")
 	private int inventoryLevel;
+	private String imageUrl;
+	private BigDecimal weight;
+	private List<OptionValue> optionValues;
 
 	public String getId() {
 		return id;
@@ -74,6 +78,30 @@ public class Variant {
 
 	public int getInventoryLevel() {
 		return inventoryLevel;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public BigDecimal getWeight() {
+		return weight;
+	}
+
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
+	}
+
+	public List<OptionValue> getOptionValues() {
+		return optionValues;
+	}
+
+	public void setOptionValues(List<OptionValue> optionValues) {
+		this.optionValues = optionValues;
 	}
 
 	public void setInventoryLevel(int inventoryLevel) {
