@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.OrderStatus;
+import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.Shipment;
 import com.bigcommerce.catalog.models.ShipmentCreationRequest;
@@ -160,6 +162,37 @@ public class BigcommerceSdkDriver {
 		assertNotNull(shipment);
 		assertEquals(shipment.getTrackingNumber(), shipmentCreationRequest.getRequest().getTrackingNumber());
 		assertEquals(shipment.getComments(), shipmentCreationRequest.getRequest().getComments());
+
+	}
+
+	@Test
+	public void givenSomeProductWhenCreatingProductsThenCreateProduct() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Product product = new Product();
+		product.setBrandId(0);
+		product.setCategories(Arrays.asList(25));
+		product.setCondition("New");
+		product.setDescription("Custom description");
+		product.setPrice(new BigDecimal(99.00));
+		product.setMetaKeywords(Arrays.asList("Tetsing1", "testing2"));
+		product.setIsConditionKnown(true);
+		product.setInventoryTracking("variant");
+		product.setIsVisible(true);
+		product.setName(UUID.randomUUID().toString());
+		product.setSku(UUID.randomUUID().toString());
+		product.setVariants(Collections.emptyList());
+		product.setWeight(new BigDecimal(34.21));
+		product.setType("physical");
+		product.setCustomFields(Collections.emptyList());
+
+		final Product createdProduct = bigcommerceSdk.createProduct(product);
+
+		assertNotNull(createdProduct);
+		assertNotNull(createdProduct.getId());
+		assertNotNull(createdProduct.getBrandId());
+		assertEquals(product.getCondition(), createdProduct.getCondition());
 
 	}
 

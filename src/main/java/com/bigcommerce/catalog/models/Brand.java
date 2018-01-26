@@ -1,5 +1,6 @@
 package com.bigcommerce.catalog.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -15,19 +16,19 @@ public class Brand {
 	private String name;
 
 	@XmlElement(name = "page_title")
-	private String pageTitle;
+	private String pageTitle = "";
 
 	@XmlElement(name = "meta_keywords")
-	private List<String> metaKeywords;
+	private List<String> metaKeywords = new ArrayList<>();
 
 	@XmlElement(name = "meta_description")
-	private String metaDescription;
+	private String metaDescription = "";
 
 	@XmlElement(name = "search_keywords")
-	private String searchKeywords;
+	private String searchKeywords = "";
 
 	@XmlElement(name = "image_url")
-	private String imageUrl;
+	private String imageUrl = "";
 
 	@XmlElement(name = "id")
 	private Integer id;
@@ -36,7 +37,7 @@ public class Brand {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -44,7 +45,7 @@ public class Brand {
 		return pageTitle;
 	}
 
-	public void setPageTitle(String pageTitle) {
+	public void setPageTitle(final String pageTitle) {
 		this.pageTitle = pageTitle;
 	}
 
@@ -52,7 +53,7 @@ public class Brand {
 		return metaKeywords;
 	}
 
-	public void setMetaKeywords(List<String> metaKeywords) {
+	public void setMetaKeywords(final List<String> metaKeywords) {
 		this.metaKeywords = metaKeywords;
 	}
 
@@ -60,7 +61,7 @@ public class Brand {
 		return metaDescription;
 	}
 
-	public void setMetaDescription(String metaDescription) {
+	public void setMetaDescription(final String metaDescription) {
 		this.metaDescription = metaDescription;
 	}
 
@@ -68,7 +69,7 @@ public class Brand {
 		return searchKeywords;
 	}
 
-	public void setSearchKeywords(String searchKeywords) {
+	public void setSearchKeywords(final String searchKeywords) {
 		this.searchKeywords = searchKeywords;
 	}
 
@@ -76,7 +77,7 @@ public class Brand {
 		return imageUrl;
 	}
 
-	public void setImageUrl(String imageUrl) {
+	public void setImageUrl(final String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
 
@@ -84,7 +85,7 @@ public class Brand {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 

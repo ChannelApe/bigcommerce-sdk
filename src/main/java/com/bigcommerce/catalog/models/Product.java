@@ -4,9 +4,17 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(Include.NON_NULL)
 public class Product {
 
 	private String id;
@@ -16,14 +24,27 @@ public class Product {
 	private String description;
 	private List<Variant> variants = new LinkedList<>();
 	private BigDecimal weight;
-	private Integer isVisible;
+
+	@XmlElement(name = "is_visible")
+	private Boolean isVisible;
+
 	private List<Integer> categories;
+
+	@XmlElement(name = "brand_id")
 	private Integer brandId;
+
+	@XmlElement(name = "is_condition_known")
 	private Boolean isConditionKnown;
+
+	@XmlElement(name = "meta_keywords")
 	private List<String> metaKeywords;
+
+	@XmlElement(name = "inventory_tracking")
 	private String inventoryTracking;
 	private String condition;
 	private BigDecimal price;
+
+	@XmlElement(name = "custom_fields")
 	private List<CustomField> customFields;
 
 	public String getId() {
@@ -82,11 +103,11 @@ public class Product {
 		this.weight = weight;
 	}
 
-	public Integer getIsVisible() {
+	public Boolean getIsVisible() {
 		return isVisible;
 	}
 
-	public void setIsVisible(final Integer isVisible) {
+	public void setIsVisible(final Boolean isVisible) {
 		this.isVisible = isVisible;
 	}
 

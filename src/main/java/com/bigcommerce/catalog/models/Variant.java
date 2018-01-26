@@ -1,6 +1,7 @@
 package com.bigcommerce.catalog.models;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -11,8 +12,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(Include.NON_NULL)
 public class Variant {
 
 	private String id;
@@ -26,13 +31,15 @@ public class Variant {
 	private int inventoryLevel;
 	private String imageUrl;
 	private BigDecimal weight;
-	private List<OptionValue> optionValues;
+
+	@XmlElement(name = "option_values")
+	private List<OptionValue> optionValues = new ArrayList<>();
 
 	public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -40,7 +47,7 @@ public class Variant {
 		return productId;
 	}
 
-	public void setProductId(String productId) {
+	public void setProductId(final String productId) {
 		this.productId = productId;
 	}
 
@@ -48,7 +55,7 @@ public class Variant {
 		return sku;
 	}
 
-	public void setSku(String sku) {
+	public void setSku(final String sku) {
 		this.sku = sku;
 	}
 
@@ -56,7 +63,7 @@ public class Variant {
 		return price;
 	}
 
-	public void setPrice(BigDecimal price) {
+	public void setPrice(final BigDecimal price) {
 		this.price = price;
 	}
 
@@ -64,7 +71,7 @@ public class Variant {
 		return upc;
 	}
 
-	public void setUpc(String upc) {
+	public void setUpc(final String upc) {
 		this.upc = upc;
 	}
 
@@ -72,7 +79,7 @@ public class Variant {
 		return mpn;
 	}
 
-	public void setMpn(String mpn) {
+	public void setMpn(final String mpn) {
 		this.mpn = mpn;
 	}
 
@@ -84,7 +91,7 @@ public class Variant {
 		return imageUrl;
 	}
 
-	public void setImageUrl(String imageUrl) {
+	public void setImageUrl(final String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
 
@@ -92,7 +99,7 @@ public class Variant {
 		return weight;
 	}
 
-	public void setWeight(BigDecimal weight) {
+	public void setWeight(final BigDecimal weight) {
 		this.weight = weight;
 	}
 
@@ -100,11 +107,11 @@ public class Variant {
 		return optionValues;
 	}
 
-	public void setOptionValues(List<OptionValue> optionValues) {
+	public void setOptionValues(final List<OptionValue> optionValues) {
 		this.optionValues = optionValues;
 	}
 
-	public void setInventoryLevel(int inventoryLevel) {
+	public void setInventoryLevel(final int inventoryLevel) {
 		this.inventoryLevel = inventoryLevel;
 	}
 

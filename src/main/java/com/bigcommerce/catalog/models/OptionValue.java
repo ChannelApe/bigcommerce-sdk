@@ -1,19 +1,27 @@
 package com.bigcommerce.catalog.models;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class OptionValue {
+
+	@XmlElement(name = "option_display_name")
 	private String optionDisplayName;
 	private String label;
 	private Integer id;
+
+	@XmlElement(name = "option_id")
 	private Integer optionId;
 
 	public String getOptionDisplayName() {
 		return optionDisplayName;
 	}
 
-	public void setOptionDisplayName(String optionDisplayName) {
+	public void setOptionDisplayName(final String optionDisplayName) {
 		this.optionDisplayName = optionDisplayName;
 	}
 
@@ -21,7 +29,7 @@ public class OptionValue {
 		return label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
@@ -29,7 +37,7 @@ public class OptionValue {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -37,7 +45,7 @@ public class OptionValue {
 		return optionId;
 	}
 
-	public void setOptionId(Integer optionId) {
+	public void setOptionId(final Integer optionId) {
 		this.optionId = optionId;
 	}
 
