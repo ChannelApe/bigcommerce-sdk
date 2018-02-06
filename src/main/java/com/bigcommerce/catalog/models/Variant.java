@@ -124,10 +124,12 @@ public class Variant {
 			return false;
 		}
 		final Variant Variant = (Variant) object;
-		return new EqualsBuilder().append(getId(), Variant.getId()).append(getProductId(), Variant.getProductId())
+		return (new EqualsBuilder().append(getId(), Variant.getId()).append(getProductId(), Variant.getProductId())
 				.append(getSku(), Variant.getSku()).append(getPrice(), Variant.getPrice())
 				.append(getUpc(), Variant.getUpc()).append(getMpn(), Variant.getMpn())
-				.append(getInventoryLevel(), Variant.getInventoryLevel()).isEquals();
+				.append(getInventoryLevel(), Variant.getInventoryLevel()).isEquals())
+				&& ((getWeight() == null && Variant.getWeight() == null)
+						|| getWeight().compareTo(Variant.getWeight()) == 0);
 	}
 
 	@Override

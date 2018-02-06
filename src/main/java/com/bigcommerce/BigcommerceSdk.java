@@ -34,6 +34,10 @@ import com.bigcommerce.catalog.models.CatalogSummaryResponse;
 import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.LineItem;
 import com.bigcommerce.catalog.models.LineItemsResponse;
+import com.bigcommerce.catalog.models.Metafield;
+import com.bigcommerce.catalog.models.MetafieldResponse;
+import com.bigcommerce.catalog.models.Metafields;
+import com.bigcommerce.catalog.models.MetafieldsResponse;
 import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.OrderStatus;
 import com.bigcommerce.catalog.models.OrderStatusResponse;
@@ -42,6 +46,8 @@ import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.ProductImage;
 import com.bigcommerce.catalog.models.ProductImageResponse;
+import com.bigcommerce.catalog.models.ProductImages;
+import com.bigcommerce.catalog.models.ProductImagesResponse;
 import com.bigcommerce.catalog.models.ProductResponse;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.ProductsResponse;
@@ -66,7 +72,6 @@ import com.github.rholder.retry.WaitStrategy;
 
 public class BigcommerceSdk {
 
-	private static final String IMAGES = "images";
 	static final String API_VERSION_V2 = "v2";
 	static final String API_VERSION_V3 = "v3";
 	static final String CLIENT_ID_HEADER = "X-Auth-Client";
@@ -89,6 +94,8 @@ public class BigcommerceSdk {
 	private static final String SHIPMENTS = "shipments";
 	private static final String MIN_DATE_CREATED = "min_date_created";
 	private static final String STORE = "store";
+	private static final String METAFIELDS = "metafields";
+	private static final String IMAGES = "images";
 	private static final int MAX_LIMIT = 250;
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
@@ -100,6 +107,7 @@ public class BigcommerceSdk {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BigcommerceSdk.class);
 
 	private final WebTarget baseWebTargetV3;
+
 	/*
 	 * Bigcommerce API has some differences between V2 & V3 and currently some
 	 * API endpoints only exist in V2. The SDK uses V2 where applicable.
@@ -182,11 +190,45 @@ public class BigcommerceSdk {
 		return productResponse.getData();
 	}
 
+	public Product updateProduct(final Product product) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(product.getId());
+		final ProductResponse productResponse = put(webTarget, product, ProductResponse.class);
+		return productResponse.getData();
+	}
+
 	public ProductImage createProductImage(final ProductImage productImage) {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
 				.path(String.valueOf(productImage.getProductId())).path(IMAGES);
 		final ProductImageResponse productImageResponse = post(webTarget, productImage, ProductImageResponse.class);
 		return productImageResponse.getData();
+	}
+
+	public ProductImage updateProductImage(final ProductImage productImage) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
+				.path(String.valueOf(productImage.getProductId())).path(IMAGES)
+				.path(String.valueOf(productImage.getId()));
+		final ProductImageResponse productImageResponse = put(webTarget, productImage, ProductImageResponse.class);
+
+		return productImageResponse.getData();
+	}
+
+	public ProductImages getProductImages(final String productId, final int page) {
+		return getProductImages(productId, page, MAX_LIMIT);
+	}
+
+	public ProductImages getProductImages(final String productId, final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(IMAGES)
+				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		final ProductImagesResponse productImagesResponse = get(webTarget, ProductImagesResponse.class);
+		final List<ProductImage> productImages = productImagesResponse.getData();
+		final Pagination pagination = productImagesResponse.getMeta().getPagination();
+		return new ProductImages(productImages, pagination);
+	}
+
+	public void deleteProductImage(final String productId, final Integer productImageId) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(IMAGES)
+				.path(String.valueOf(productImageId));
+		delete(webTarget, Object.class);
 	}
 
 	public List<Order> getOrders(final int page, final DateTime earliestDate) {
@@ -320,6 +362,33 @@ public class BigcommerceSdk {
 		return put(webTarget, shipmentUpdateRequest.getRequest(), Shipment.class);
 	}
 
+	public Metafields getProductMetafields(final String productId, final int page) {
+		return getProductMetafields(productId, page, MAX_LIMIT);
+	}
+
+	public Metafields getProductMetafields(final String productId, final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(METAFIELDS)
+				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		final MetafieldsResponse metaFieldsResponse = get(webTarget, MetafieldsResponse.class);
+		final List<Metafield> metafields = metaFieldsResponse.getData();
+		final Pagination pagination = metaFieldsResponse.getMeta().getPagination();
+		return new Metafields(metafields, pagination);
+	}
+
+	public Metafield createProductMetafield(final String productId, final Metafield metafield) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(METAFIELDS);
+		final MetafieldResponse metafieldResponse = post(webTarget, metafield, MetafieldResponse.class);
+		return metafieldResponse.getData();
+	}
+
+	public Metafield updateProductMetafield(final String productId, final Integer productMetafieldId,
+			final Metafield metafield) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(METAFIELDS)
+				.path(String.valueOf(productMetafieldId));
+		final MetafieldResponse metafieldResponse = put(webTarget, metafield, MetafieldResponse.class);
+		return metafieldResponse.getData();
+	}
+
 	private BigcommerceSdk(final Steps steps) {
 		this.baseWebTargetV3 = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION_V3);
 		this.baseWebTargetV2 = CLIENT.target(steps.apiUrl).path(steps.storeHash).path(API_VERSION_V2);
@@ -382,6 +451,13 @@ public class BigcommerceSdk {
 	private <T> T get(final WebTarget webTarget, final Class<T> entityType) {
 		final Callable<Response> responseCallable = () -> webTarget.request(MediaType.APPLICATION_JSON)
 				.header(CLIENT_ID_HEADER, getClientId()).header(ACCESS_TOKEN_HEADER, getAccessToken()).get();
+		final Response response = invokeResponseCallable(responseCallable);
+		return handleResponse(response, entityType, Status.OK, Status.NO_CONTENT);
+	}
+
+	private <T> T delete(final WebTarget webTarget, final Class<T> entityType) {
+		final Callable<Response> responseCallable = () -> webTarget.request(MediaType.APPLICATION_JSON)
+				.header(CLIENT_ID_HEADER, getClientId()).header(ACCESS_TOKEN_HEADER, getAccessToken()).delete();
 		final Response response = invokeResponseCallable(responseCallable);
 		return handleResponse(response, entityType, Status.OK, Status.NO_CONTENT);
 	}

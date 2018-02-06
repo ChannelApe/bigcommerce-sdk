@@ -8,27 +8,31 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(Include.NON_NULL)
 public class Brand {
 
 	@XmlElement(name = "name")
 	private String name;
 
 	@XmlElement(name = "page_title")
-	private String pageTitle = "";
+	private String pageTitle;
 
 	@XmlElement(name = "meta_keywords")
 	private List<String> metaKeywords = new ArrayList<>();
 
 	@XmlElement(name = "meta_description")
-	private String metaDescription = "";
+	private String metaDescription;
 
 	@XmlElement(name = "search_keywords")
-	private String searchKeywords = "";
+	private String searchKeywords;
 
 	@XmlElement(name = "image_url")
-	private String imageUrl = "";
+	private String imageUrl;
 
 	@XmlElement(name = "id")
 	private Integer id;

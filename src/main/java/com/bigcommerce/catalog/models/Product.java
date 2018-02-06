@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)
-public class Product {
+public class Product implements Cloneable {
 
 	private String id;
 	private String name;
@@ -27,7 +27,6 @@ public class Product {
 
 	@XmlElement(name = "is_visible")
 	private Boolean isVisible;
-
 	private List<Integer> categories;
 
 	@XmlElement(name = "brand_id")
@@ -36,7 +35,7 @@ public class Product {
 	@XmlElement(name = "is_condition_known")
 	private Boolean isConditionKnown;
 
-	@XmlElement(name = "meta_keywords")
+	@XmlElement(name = "metaKeywords")
 	private List<String> metaKeywords;
 
 	@XmlElement(name = "inventory_tracking")
@@ -173,6 +172,11 @@ public class Product {
 
 	public void setPrice(final BigDecimal price) {
 		this.price = price;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 }

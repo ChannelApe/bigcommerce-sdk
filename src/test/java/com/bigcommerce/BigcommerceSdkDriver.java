@@ -20,6 +20,8 @@ import com.bigcommerce.catalog.models.Brand;
 import com.bigcommerce.catalog.models.Brands;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.Customer;
+import com.bigcommerce.catalog.models.Metafield;
+import com.bigcommerce.catalog.models.Metafields;
 import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.OrderStatus;
 import com.bigcommerce.catalog.models.Product;
@@ -262,11 +264,49 @@ public class BigcommerceSdkDriver {
 
 		assertNotNull(createdBrand);
 		assertNotNull(createdBrand.getId());
-		assertNotNull(createdBrand.getImageUrl());
-		assertEquals(expectedBrand.getMetaDescription(), createdBrand.getMetaDescription());
-		assertEquals(expectedBrand.getMetaKeywords(), createdBrand.getMetaKeywords());
-		assertEquals(expectedBrand.getName(), createdBrand.getName());
-		assertEquals(expectedBrand.getPageTitle(), createdBrand.getPageTitle());
 
 	}
+
+	@Test
+	public void givenAProductMetafieldAndProductIdWhenCreatingProductMetafieldThenCreateProductMetafield() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Metafield productMetafield = new Metafield();
+
+		productMetafield.setKey(UUID.randomUUID().toString());
+		productMetafield.setValue(UUID.randomUUID().toString());
+		productMetafield.setNamespace("ChannelApe");
+		productMetafield.setPermissionSet("write");
+		productMetafield.setDescription("Testing Description");
+		final Metafield metafield = bigcommerceSdk.createProductMetafield("112", productMetafield);
+		assertNotNull(metafield);
+		System.out.println("---- Created Metafield ----");
+		System.out.println(new JSONObject(metafield).toString());
+
+	}
+
+	@Test
+	public void givenAProductIdAndPage1WhenRetrievingProductMetafieldsThenReturnProductMetafields() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Metafields metafields = bigcommerceSdk.getProductMetafields("112", 1, 250);
+		assertNotNull(metafields);
+		assertTrue(metafields.getMetafields().size() > 0);
+		assertEquals(1, metafields.getPagination().getCurrentPage());
+		System.out.println("---- Metafields 1st Page ----");
+		System.out.println(new JSONObject(metafields).toString());
+
+	}
+
+	@Test
+	public void givenAProductImageIdWhenDeletingProductImages() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		bigcommerceSdk.deleteProductImage("112", 381);
+
+	}
+
 }
