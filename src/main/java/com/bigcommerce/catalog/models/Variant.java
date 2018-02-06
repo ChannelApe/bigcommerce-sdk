@@ -126,10 +126,9 @@ public class Variant {
 		final Variant Variant = (Variant) object;
 		return (new EqualsBuilder().append(getId(), Variant.getId()).append(getProductId(), Variant.getProductId())
 				.append(getSku(), Variant.getSku()).append(getPrice(), Variant.getPrice())
+				.append(getWeight(), Variant.getWeight()).append(getWeight(), Variant.getWeight())
 				.append(getUpc(), Variant.getUpc()).append(getMpn(), Variant.getMpn())
-				.append(getInventoryLevel(), Variant.getInventoryLevel()).isEquals())
-				&& ((getWeight() == null && Variant.getWeight() == null)
-						|| getWeight().compareTo(Variant.getWeight()) == 0);
+				.append(getInventoryLevel(), Variant.getInventoryLevel()).isEquals());
 	}
 
 	@Override
