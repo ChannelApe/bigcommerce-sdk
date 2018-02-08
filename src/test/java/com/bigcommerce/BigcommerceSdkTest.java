@@ -532,14 +532,11 @@ public class BigcommerceSdkTest {
 	}
 
 	@Test
-	public void givenSomeVariantWhenUpdatingVariantThenUpdateVariant() throws JAXBException {
+	public void givenSomeVariantWhenCreatingVariantThenCreateVariant() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final Variant variant = new Variant();
-		final String variantId = "78";
-		variant.setId(variantId);
-		final String productId = "112";
-		variant.setProductId(productId);
+		variant.setProductId(112);
 		final BigDecimal price = BigDecimal.valueOf(22.56);
 		variant.setPrice(price);
 		variant.setInventoryLevel(3);
@@ -547,14 +544,78 @@ public class BigcommerceSdkTest {
 
 		final VariantResponse variantResponse = new VariantResponse();
 		final Variant expectedVariant = new Variant();
-		expectedVariant.setId(variantId);
-		expectedVariant.setProductId(productId);
+
+		expectedVariant.setProductId(112);
+		expectedVariant.setSku("WOOP34");
+		expectedVariant.setImageUrl("https://google.com/images.png");
+		expectedVariant.setMpn("test");
+		expectedVariant.setUpc("SOME_UPC");
+		expectedVariant.setWeight(new BigDecimal(32.99));
+		expectedVariant.setPrice(new BigDecimal(99.00));
+		expectedVariant.setOptionValues(Collections.emptyList());
+		expectedVariant.setInventoryLevel(12);
+		variantResponse.setData(expectedVariant);
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/products/").append(112).append("/variants").toString();
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { VariantResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(variantResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.POST)
+						.capturingBodyIn(actualRequestBody),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Variant actualVariant = bigcommerceSdk.createVariant(variant);
+
+		assertEquals(price, BigDecimal.valueOf(actualRequestBody.getContent().get("price").asDouble()));
+
+		assertEquals(new Integer(112), actualVariant.getProductId());
+		assertEquals("WOOP34", actualVariant.getSku());
+		assertEquals(expectedVariant.getImageUrl(), actualVariant.getImageUrl());
+		assertEquals(expectedVariant.getInventoryLevel(), actualVariant.getInventoryLevel());
+		assertEquals(expectedVariant.getUpc(), actualVariant.getUpc());
+		assertEquals(expectedVariant.getWeight(), actualVariant.getWeight());
+		assertEquals(expectedVariant.getPrice(), actualVariant.getPrice());
+		assertEquals(expectedVariant.getMpn(), actualVariant.getMpn());
+		assertEquals(expectedVariant.getOptionValues(), actualVariant.getOptionValues());
+	}
+
+	@Test
+	public void givenSomeVariantWhenUpdatingVariantThenUpdateVariant() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final Variant variant = new Variant();
+		variant.setId(78);
+		variant.setProductId(112);
+		final BigDecimal price = BigDecimal.valueOf(22.56);
+		variant.setPrice(price);
+		variant.setInventoryLevel(3);
+		variant.setSku("WOOP33");
+
+		final VariantResponse variantResponse = new VariantResponse();
+		final Variant expectedVariant = new Variant();
+		expectedVariant.setId(78);
+		expectedVariant.setProductId(112);
 		expectedVariant.setSku("WOOP34");
 		variantResponse.setData(expectedVariant);
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
-				.append("catalog/products/").append(productId).append("/variants/").append(variantId).toString();
+				.append("catalog/products/").append(112).append("/variants/").append(78).toString();
 
 		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
 				.createContext(new Class[] { VariantResponse.class }, null);
@@ -578,8 +639,8 @@ public class BigcommerceSdkTest {
 		final Variant actualVariant = bigcommerceSdk.updateVariant(variant);
 
 		assertEquals(price, BigDecimal.valueOf(actualRequestBody.getContent().get("price").asDouble()));
-		assertEquals(variantId, actualVariant.getId());
-		assertEquals(productId, actualVariant.getProductId());
+		assertEquals(new Integer(78), actualVariant.getId());
+		assertEquals(new Integer(112), actualVariant.getProductId());
 		assertEquals("WOOP34", actualVariant.getSku());
 	}
 
@@ -588,9 +649,9 @@ public class BigcommerceSdkTest {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
 		final Variant variant = new Variant();
-		final String variantId = "78";
+		final Integer variantId = 78;
 		variant.setId(variantId);
-		final String productId = "112";
+		final Integer productId = 112;
 		variant.setProductId(productId);
 		final BigDecimal price = BigDecimal.valueOf(22.56);
 		variant.setPrice(price);

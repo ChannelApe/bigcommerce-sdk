@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import org.junit.Test;
 
@@ -14,8 +13,8 @@ public class VariantTest {
 	@Test
 	public void givenSameInstanceWhenTestingEqualityThenReturnTrue() {
 		final Variant leftHandVariant = new Variant();
-		leftHandVariant.setId("64");
-		leftHandVariant.setProductId("113");
+		leftHandVariant.setId(64);
+		leftHandVariant.setProductId(113);
 
 		final Variant rightHandVariant = leftHandVariant;
 
@@ -26,8 +25,8 @@ public class VariantTest {
 	@Test
 	public void givenSomeStringWhenTestingEqualityThenReturnFalse() {
 		final Variant leftHandVariant = new Variant();
-		leftHandVariant.setId(UUID.randomUUID().toString());
-		leftHandVariant.setProductId(UUID.randomUUID().toString());
+		leftHandVariant.setId(112);
+		leftHandVariant.setProductId(80);
 
 		final String rightHandVariant = "test123";
 
@@ -38,8 +37,8 @@ public class VariantTest {
 	@Test
 	public void givenSameFieldsWhenTestingEqualityThenReturnTrue() {
 		final Variant leftHandVariant = new Variant();
-		leftHandVariant.setId("64");
-		leftHandVariant.setProductId("113");
+		leftHandVariant.setId(12);
+		leftHandVariant.setProductId(144);
 		leftHandVariant.setSku("ABC030303");
 		leftHandVariant.setPrice(BigDecimal.valueOf(30.45));
 		leftHandVariant.setUpc("9839537238592");
@@ -47,8 +46,8 @@ public class VariantTest {
 		leftHandVariant.setInventoryLevel(76);
 
 		final Variant rightHandVariant = new Variant();
-		rightHandVariant.setId("64");
-		rightHandVariant.setProductId("113");
+		rightHandVariant.setId(12);
+		rightHandVariant.setProductId(144);
 		rightHandVariant.setSku("ABC030303");
 		rightHandVariant.setPrice(BigDecimal.valueOf(30.45));
 		rightHandVariant.setUpc("9839537238592");
@@ -62,8 +61,8 @@ public class VariantTest {
 	@Test
 	public void givenDifferentFieldWhenTestingEqualityThenReturnFalse() {
 		final Variant leftHandVariant = new Variant();
-		leftHandVariant.setId("64");
-		leftHandVariant.setProductId("113");
+		leftHandVariant.setId(12);
+		leftHandVariant.setProductId(144);
 		leftHandVariant.setSku("ABC030303");
 		leftHandVariant.setPrice(BigDecimal.valueOf(30.45));
 		leftHandVariant.setUpc("9839537238592");
@@ -71,8 +70,8 @@ public class VariantTest {
 		leftHandVariant.setInventoryLevel(76);
 
 		final Variant rightHandVariant = new Variant();
-		rightHandVariant.setId("64");
-		rightHandVariant.setProductId("113");
+		rightHandVariant.setId(12);
+		rightHandVariant.setProductId(144);
 		rightHandVariant.setSku("ABC030303");
 		rightHandVariant.setPrice(BigDecimal.valueOf(30.45));
 		rightHandVariant.setUpc("9839537238592");

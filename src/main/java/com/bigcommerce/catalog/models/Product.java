@@ -32,8 +32,8 @@ public class Product implements Cloneable {
 	@XmlElement(name = "brand_id")
 	private Integer brandId;
 
-	@XmlElement(name = "is_condition_known")
-	private Boolean isConditionKnown;
+	@XmlElement(name = "is_condition_shown")
+	private Boolean isConditionShown;
 
 	@XmlElement(name = "metaKeywords")
 	private List<String> metaKeywords;
@@ -126,12 +126,12 @@ public class Product implements Cloneable {
 		this.brandId = brandId;
 	}
 
-	public Boolean getIsConditionKnown() {
-		return isConditionKnown;
+	public Boolean getIsConditionShown() {
+		return isConditionShown;
 	}
 
-	public void setIsConditionKnown(final Boolean isConditionKnown) {
-		this.isConditionKnown = isConditionKnown;
+	public void setIsConditionShown(final Boolean isConditionShown) {
+		this.isConditionShown = isConditionShown;
 	}
 
 	public List<String> getMetaKeywords() {

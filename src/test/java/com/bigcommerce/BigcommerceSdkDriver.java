@@ -74,8 +74,8 @@ public class BigcommerceSdkDriver {
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
 		final Variant variant = new Variant();
-		variant.setId("85");
-		variant.setProductId("113");
+		variant.setId(85);
+		variant.setProductId(113);
 		variant.setInventoryLevel(3);
 		variant.setPrice(BigDecimal.valueOf(12.99));
 
@@ -179,7 +179,7 @@ public class BigcommerceSdkDriver {
 		product.setDescription("Custom description");
 		product.setPrice(new BigDecimal(99.00));
 		product.setMetaKeywords(Arrays.asList("Tetsing1", "testing2"));
-		product.setIsConditionKnown(true);
+		product.setIsConditionShown(true);
 		product.setInventoryTracking("variant");
 		product.setIsVisible(true);
 		product.setName(UUID.randomUUID().toString());

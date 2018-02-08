@@ -100,12 +100,11 @@ public class BigcommerceSdk {
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(BigcommerceSdk.class);
+
 	private static final Client CLIENT = ClientBuilder.newClient().register(JacksonFeature.class)
 			.property(ClientProperties.CONNECT_TIMEOUT, 60000).property(ClientProperties.READ_TIMEOUT, 600000).register(
 					new JacksonJaxbJsonProvider().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(BigcommerceSdk.class);
-
 	private final WebTarget baseWebTargetV3;
 
 	/*
@@ -187,6 +186,7 @@ public class BigcommerceSdk {
 	public Product createProduct(final Product product) {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS);
 		final ProductResponse productResponse = post(webTarget, product, ProductResponse.class);
+
 		return productResponse.getData();
 	}
 
@@ -194,6 +194,13 @@ public class BigcommerceSdk {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(product.getId());
 		final ProductResponse productResponse = put(webTarget, product, ProductResponse.class);
 		return productResponse.getData();
+	}
+
+	public Variant createVariant(final Variant variant) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
+				.path(String.valueOf(variant.getProductId())).path(VARIANTS);
+		final VariantResponse variantResponse = post(webTarget, variant, VariantResponse.class);
+		return variantResponse.getData();
 	}
 
 	public ProductImage createProductImage(final ProductImage productImage) {
@@ -322,8 +329,8 @@ public class BigcommerceSdk {
 	}
 
 	public Variant updateVariant(final Variant variant) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(variant.getProductId())
-				.path(VARIANTS).path(variant.getId());
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
+				.path(String.valueOf(variant.getProductId())).path(VARIANTS).path(String.valueOf(variant.getId()));
 		final VariantResponse variantResponse = put(webTarget, variant, VariantResponse.class);
 		return variantResponse.getData();
 	}

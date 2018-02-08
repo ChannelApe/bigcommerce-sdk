@@ -20,34 +20,36 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class Variant {
 
-	private String id;
+	private Integer id;
 	@XmlElement(name = "product_id")
-	private String productId;
+	private Integer productId;
 	private String sku;
 	private BigDecimal price;
 	private String upc;
 	private String mpn;
 	@XmlElement(name = "inventory_level")
 	private int inventoryLevel;
+
+	@XmlElement(name = "image_url")
 	private String imageUrl;
 	private BigDecimal weight;
 
 	@XmlElement(name = "option_values")
 	private List<OptionValue> optionValues = new ArrayList<>();
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(final String id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
-	public String getProductId() {
+	public Integer getProductId() {
 		return productId;
 	}
 
-	public void setProductId(final String productId) {
+	public void setProductId(final Integer productId) {
 		this.productId = productId;
 	}
 
@@ -124,17 +126,25 @@ public class Variant {
 			return false;
 		}
 		final Variant Variant = (Variant) object;
+		final BigDecimal price = getPrice() != null ? getPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : null;
+		final BigDecimal otherPrice = Variant.getPrice() != null
+				? Variant.getPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : null;
 		return (new EqualsBuilder().append(getId(), Variant.getId()).append(getProductId(), Variant.getProductId())
-				.append(getSku(), Variant.getSku()).append(getPrice(), Variant.getPrice())
-				.append(getWeight(), Variant.getWeight()).append(getWeight(), Variant.getWeight())
-				.append(getUpc(), Variant.getUpc()).append(getMpn(), Variant.getMpn())
-				.append(getInventoryLevel(), Variant.getInventoryLevel()).isEquals());
+				.append(getSku(), Variant.getSku()).append(price, otherPrice).append(getWeight(), Variant.getWeight())
+				.append(getWeight(), Variant.getWeight()).append(getUpc(), Variant.getUpc())
+				.append(getMpn(), Variant.getMpn()).append(getInventoryLevel(), Variant.getInventoryLevel())
+				.isEquals());
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getPrice())
 				.append(getUpc()).append(getMpn()).append(getInventoryLevel()).toHashCode();
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 }
