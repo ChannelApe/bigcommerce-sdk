@@ -125,26 +125,21 @@ public class Variant {
 		if (!(object instanceof Variant)) {
 			return false;
 		}
-		final Variant Variant = (Variant) object;
-		final BigDecimal price = getPrice() != null ? getPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : null;
-		final BigDecimal otherPrice = Variant.getPrice() != null
-				? Variant.getPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : null;
-		return (new EqualsBuilder().append(getId(), Variant.getId()).append(getProductId(), Variant.getProductId())
-				.append(getSku(), Variant.getSku()).append(price, otherPrice).append(getWeight(), Variant.getWeight())
-				.append(getWeight(), Variant.getWeight()).append(getUpc(), Variant.getUpc())
-				.append(getMpn(), Variant.getMpn()).append(getInventoryLevel(), Variant.getInventoryLevel())
-				.isEquals());
+		final Variant variant = (Variant) object;
+		final BigDecimal price = getPrice() != null ? getPrice() : new BigDecimal(0);
+		final BigDecimal otherPrice = variant.getPrice() != null ? variant.getPrice() : new BigDecimal(0);
+		final BigDecimal weight = getWeight() != null ? getWeight() : new BigDecimal(0);
+		final BigDecimal otherWeight = variant.getWeight() != null ? variant.getWeight() : new BigDecimal(0);
+		return (new EqualsBuilder().append(getId(), variant.getId()).append(getProductId(), variant.getProductId())
+				.append(getSku(), variant.getSku()).append(price, otherPrice).append(getWeight(), variant.getWeight())
+				.append(getUpc(), variant.getUpc()).append(getMpn(), variant.getMpn())
+				.append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())
+				&& (price.compareTo(otherPrice) == 0) && (weight.compareTo(otherWeight) == 0);
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getPrice())
-				.append(getUpc()).append(getMpn()).append(getInventoryLevel()).toHashCode();
+				.append(getWeight()).append(getUpc()).append(getMpn()).append(getInventoryLevel()).toHashCode();
 	}
-
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
-
 }

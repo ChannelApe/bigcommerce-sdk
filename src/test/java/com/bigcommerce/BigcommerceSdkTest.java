@@ -391,7 +391,7 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getBrandId(), actualProduct.getBrandId());
 		assertEquals(expectedProduct.getCategories(), actualProduct.getCategories());
 
-		assertEquals(expectedProduct.getVariants().size(), 2);
+		assertEquals(2, expectedProduct.getVariants().size());
 		assertEquals(expectedProduct.getVariants().get(0).getImageUrl(),
 				actualProduct.getVariants().get(0).getImageUrl());
 		assertEquals(expectedProduct.getVariants().get(0).getInventoryLevel(),
@@ -413,6 +413,28 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getVariants().get(1).getUpc(), actualProduct.getVariants().get(1).getUpc());
 		assertEquals(expectedProduct.getVariants().get(1).getOptionValues(),
 				actualProduct.getVariants().get(1).getOptionValues());
+
+	}
+
+	@Test
+	public void givenSomeProductIdWhenDeletingProductThenDeleteProduct() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedProductId = "112";
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/products/").append(expectedProductId).toString();
+
+		final Status expectedStatus = Status.NO_CONTENT;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.DELETE),
+				giveResponse(null, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		bigcommerceSdk.deleteProduct(expectedProductId);
 
 	}
 
@@ -642,6 +664,30 @@ public class BigcommerceSdkTest {
 		assertEquals(new Integer(78), actualVariant.getId());
 		assertEquals(new Integer(112), actualVariant.getProductId());
 		assertEquals("WOOP34", actualVariant.getSku());
+	}
+
+	@Test
+	public void givenSomeProductIdAndSomeVariantIdWhenDeletingVariantThenDeleteVariant() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final Integer expectedProductId = 112;
+		final Integer expectedVariantId = 450;
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/products/").append(expectedProductId).append("/variants/").append(expectedVariantId)
+				.toString();
+
+		final Status expectedStatus = Status.NO_CONTENT;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.DELETE),
+				giveResponse(null, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		bigcommerceSdk.deleteVariant(expectedProductId, expectedVariantId);
+
 	}
 
 	@Test(expected = BigcommerceErrorResponseException.class)

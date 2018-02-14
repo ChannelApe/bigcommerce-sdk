@@ -203,6 +203,12 @@ public class BigcommerceSdk {
 		return variantResponse.getData();
 	}
 
+	public void deleteVariant(final Integer productId, final Integer id) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(VARIANTS).path(String.valueOf(id));
+		delete(webTarget, Object.class);
+	}
+
 	public ProductImage createProductImage(final ProductImage productImage) {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
 				.path(String.valueOf(productImage.getProductId())).path(IMAGES);
@@ -217,6 +223,11 @@ public class BigcommerceSdk {
 		final ProductImageResponse productImageResponse = put(webTarget, productImage, ProductImageResponse.class);
 
 		return productImageResponse.getData();
+	}
+
+	public void deleteProduct(final String productId) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId);
+		delete(webTarget, Object.class);
 	}
 
 	public ProductImages getProductImages(final String productId, final int page) {

@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)
-public class Product implements Cloneable {
+public class Product {
 
 	private String id;
 	private String name;
@@ -172,11 +172,6 @@ public class Product implements Cloneable {
 
 	public void setPrice(final BigDecimal price) {
 		this.price = price;
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 
 }

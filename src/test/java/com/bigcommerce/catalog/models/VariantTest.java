@@ -28,7 +28,7 @@ public class VariantTest {
 		leftHandVariant.setId(112);
 		leftHandVariant.setProductId(80);
 
-		final String rightHandVariant = "test123";
+		final Object rightHandVariant = "test123";
 
 		assertFalse(leftHandVariant.equals(rightHandVariant));
 		assertFalse(leftHandVariant.hashCode() == rightHandVariant.hashCode());
