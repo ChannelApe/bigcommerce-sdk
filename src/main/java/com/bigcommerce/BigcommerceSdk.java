@@ -191,7 +191,7 @@ public class BigcommerceSdk {
 	}
 
 	public Product updateProduct(final Product product) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(product.getId());
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(product.getId()));
 		final ProductResponse productResponse = put(webTarget, product, ProductResponse.class);
 		return productResponse.getData();
 	}
@@ -225,27 +225,27 @@ public class BigcommerceSdk {
 		return productImageResponse.getData();
 	}
 
-	public void deleteProduct(final String productId) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId);
+	public void deleteProduct(final Integer productId) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId));
 		delete(webTarget, Object.class);
 	}
 
-	public ProductImages getProductImages(final String productId, final int page) {
+	public ProductImages getProductImages(final Integer productId, final int page) {
 		return getProductImages(productId, page, MAX_LIMIT);
 	}
 
-	public ProductImages getProductImages(final String productId, final int page, final int limit) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(IMAGES)
-				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+	public ProductImages getProductImages(final Integer productId, final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(IMAGES).queryParam(LIMIT, limit).queryParam(PAGE, page);
 		final ProductImagesResponse productImagesResponse = get(webTarget, ProductImagesResponse.class);
 		final List<ProductImage> productImages = productImagesResponse.getData();
 		final Pagination pagination = productImagesResponse.getMeta().getPagination();
 		return new ProductImages(productImages, pagination);
 	}
 
-	public void deleteProductImage(final String productId, final Integer productImageId) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(IMAGES)
-				.path(String.valueOf(productImageId));
+	public void deleteProductImage(final Integer productId, final Integer productImageId) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(IMAGES).path(String.valueOf(productImageId));
 		delete(webTarget, Object.class);
 	}
 
@@ -380,29 +380,30 @@ public class BigcommerceSdk {
 		return put(webTarget, shipmentUpdateRequest.getRequest(), Shipment.class);
 	}
 
-	public Metafields getProductMetafields(final String productId, final int page) {
+	public Metafields getProductMetafields(final Integer productId, final int page) {
 		return getProductMetafields(productId, page, MAX_LIMIT);
 	}
 
-	public Metafields getProductMetafields(final String productId, final int page, final int limit) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(METAFIELDS)
-				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+	public Metafields getProductMetafields(final Integer productId, final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(METAFIELDS).queryParam(LIMIT, limit).queryParam(PAGE, page);
 		final MetafieldsResponse metaFieldsResponse = get(webTarget, MetafieldsResponse.class);
 		final List<Metafield> metafields = metaFieldsResponse.getData();
 		final Pagination pagination = metaFieldsResponse.getMeta().getPagination();
 		return new Metafields(metafields, pagination);
 	}
 
-	public Metafield createProductMetafield(final String productId, final Metafield metafield) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(METAFIELDS);
+	public Metafield createProductMetafield(final Integer productId, final Metafield metafield) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(METAFIELDS);
 		final MetafieldResponse metafieldResponse = post(webTarget, metafield, MetafieldResponse.class);
 		return metafieldResponse.getData();
 	}
 
-	public Metafield updateProductMetafield(final String productId, final Integer productMetafieldId,
+	public Metafield updateProductMetafield(final Integer productId, final Integer productMetafieldId,
 			final Metafield metafield) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(productId).path(METAFIELDS)
-				.path(String.valueOf(productMetafieldId));
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(METAFIELDS).path(String.valueOf(productMetafieldId));
 		final MetafieldResponse metafieldResponse = put(webTarget, metafield, MetafieldResponse.class);
 		return metafieldResponse.getData();
 	}

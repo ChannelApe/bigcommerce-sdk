@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class Product {
 
-	private String id;
+	private Integer id;
 	private String name;
 	private String type;
 	private String sku;
@@ -46,11 +46,11 @@ public class Product {
 	@XmlElement(name = "custom_fields")
 	private List<CustomField> customFields;
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(final String id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 

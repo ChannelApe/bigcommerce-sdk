@@ -182,10 +182,10 @@ public class BigcommerceSdkTest {
 
 		final ProductsResponse productsResponse = new ProductsResponse();
 		final Product firstExpectedProduct = new Product();
-		firstExpectedProduct.setId("112");
+		firstExpectedProduct.setId(112);
 		firstExpectedProduct.setName("Quest Nutrition Quest Natural Protein Bar");
 		final Product secondExpectedProduct = new Product();
-		secondExpectedProduct.setId("113");
+		secondExpectedProduct.setId(113);
 		secondExpectedProduct.setName("Rubber Duck");
 		final List<Product> expectedProducts = Arrays.asList(firstExpectedProduct, secondExpectedProduct);
 		productsResponse.setData(expectedProducts);
@@ -239,7 +239,7 @@ public class BigcommerceSdkTest {
 
 		final ProductResponse productsResponse = new ProductResponse();
 		final Product expectedProduct = new Product();
-		expectedProduct.setId("112");
+		expectedProduct.setId(112);
 		expectedProduct.setName("Quest Nutrition Quest Natural Protein Bar");
 		expectedProduct.setCondition("NEW");
 		expectedProduct.setCustomFields(Collections.emptyList());
@@ -326,7 +326,7 @@ public class BigcommerceSdkTest {
 	public void givenSomeProductWhenUpdatingProductsThenUpdateProduct() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		final String someProductId = "112";
+		final Integer someProductId = 112;
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/products/").append(someProductId).toString();
@@ -420,7 +420,7 @@ public class BigcommerceSdkTest {
 	public void givenSomeProductIdWhenDeletingProductThenDeleteProduct() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		final String expectedProductId = "112";
+		final Integer expectedProductId = 112;
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
@@ -450,7 +450,7 @@ public class BigcommerceSdkTest {
 		final ProductImage expectedProductImage = new ProductImage();
 		expectedProductImage.setImageUrl("https://aws.s3.com/testingimage-1.png");
 		expectedProductImage.setIsThumbnail(true);
-		expectedProductImage.setProductId("1");
+		expectedProductImage.setProductId(1);
 		productImageResponse.setData(expectedProductImage);
 
 		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
@@ -479,7 +479,7 @@ public class BigcommerceSdkTest {
 	public void givenSomeProductImageWhenUpdatingProductImageThenUpdateProductImage() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		final String someProductId = "1";
+		final Integer someProductId = 1;
 		final Integer someImageId = 1;
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
@@ -1451,7 +1451,7 @@ public class BigcommerceSdkTest {
 		final String expectedKey = UUID.randomUUID().toString();
 		final String expectedValue = UUID.randomUUID().toString();
 		final Metafield expectedProductMetafield = new Metafield();
-		final String expectedProductId = "112";
+		final Integer expectedProductId = 112;
 		final String expectedNamespace = "ChannelApe";
 		final String expectedPermissionSet = "write";
 		final String expectedDescription = "Testing Description";
@@ -1511,7 +1511,7 @@ public class BigcommerceSdkTest {
 		final String expectedKey = UUID.randomUUID().toString();
 		final String expectedValue = UUID.randomUUID().toString();
 		final Metafield expectedProductMetafield = new Metafield();
-		final String expectedProductId = "112";
+		final Integer expectedProductId = 112;
 		final String expectedNamespace = "ChannelApe";
 		final String expectedPermissionSet = "write";
 		final String expectedDescription = "Testing Description";
@@ -1568,7 +1568,7 @@ public class BigcommerceSdkTest {
 	public void givenSomeProductIdWhenRetrievingMetafieldsThenReturnMetafields() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		final String expectedProductId = "112";
+		final Integer expectedProductId = 112;
 
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
@@ -1634,7 +1634,7 @@ public class BigcommerceSdkTest {
 	public void givenSomeProductIdAndSomePageWhenRetrievingProductImagesThenReturnProductImages() throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		final String expectedProductId = "112";
+		final Integer expectedProductId = 112;
 		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
 				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
 				.append("catalog/products/").append(expectedProductId).append("/images").toString();
@@ -1705,7 +1705,7 @@ public class BigcommerceSdkTest {
 			throws JAXBException {
 		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
 
-		final String expectedProductId = "112";
+		final Integer expectedProductId = 112;
 
 		final Integer expectedId = 1;
 
@@ -1726,7 +1726,7 @@ public class BigcommerceSdkTest {
 	}
 
 	private Metafield buildMetafield(final Integer id, final String key, final String value, final String namespace,
-			final String description, final String resourceId) {
+			final String description, final Integer resourceId) {
 		final Metafield metafield = new Metafield();
 		metafield.setId(id);
 		metafield.setKey(key);

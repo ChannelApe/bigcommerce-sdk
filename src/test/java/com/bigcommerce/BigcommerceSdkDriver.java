@@ -279,7 +279,7 @@ public class BigcommerceSdkDriver {
 		productMetafield.setNamespace("ChannelApe");
 		productMetafield.setPermissionSet("write");
 		productMetafield.setDescription("Testing Description");
-		final Metafield metafield = bigcommerceSdk.createProductMetafield("112", productMetafield);
+		final Metafield metafield = bigcommerceSdk.createProductMetafield(112, productMetafield);
 		assertNotNull(metafield);
 		System.out.println("---- Created Metafield ----");
 		System.out.println(new JSONObject(metafield).toString());
@@ -291,7 +291,7 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		final Metafields metafields = bigcommerceSdk.getProductMetafields("112", 1, 250);
+		final Metafields metafields = bigcommerceSdk.getProductMetafields(1960, 1, 250);
 		assertNotNull(metafields);
 		assertTrue(metafields.getMetafields().size() > 0);
 		assertEquals(1, metafields.getPagination().getCurrentPage());
@@ -305,7 +305,7 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		bigcommerceSdk.deleteProductImage("112", 381);
+		bigcommerceSdk.deleteProductImage(112, 381);
 
 	}
 

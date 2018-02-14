@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class Metafield {
 
 	@XmlElement(name = "resource_id")
-	private String resourceId;
+	private Integer resourceId;
 
 	private Integer id;
 	private String namespace;
@@ -74,11 +74,11 @@ public class Metafield {
 		this.description = description;
 	}
 
-	public String getResourceId() {
+	public Integer getResourceId() {
 		return resourceId;
 	}
 
-	public void setResourceId(final String resourceId) {
+	public void setResourceId(final Integer resourceId) {
 		this.resourceId = resourceId;
 	}
 

@@ -22,7 +22,7 @@ public class ProductImage {
 	private Boolean isThumbnail;
 
 	@XmlElement(name = "product_id")
-	private String productId;
+	private Integer productId;
 
 	public Integer getId() {
 		return id;
@@ -48,11 +48,11 @@ public class ProductImage {
 		this.isThumbnail = isThumbnail;
 	}
 
-	public String getProductId() {
+	public Integer getProductId() {
 		return productId;
 	}
 
-	public void setProductId(final String productId) {
+	public void setProductId(final Integer productId) {
 		this.productId = productId;
 	}
 }
