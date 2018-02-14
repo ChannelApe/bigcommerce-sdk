@@ -131,9 +131,8 @@ public class Variant {
 		final BigDecimal weight = getWeight() != null ? getWeight() : new BigDecimal(0);
 		final BigDecimal otherWeight = variant.getWeight() != null ? variant.getWeight() : new BigDecimal(0);
 		return (new EqualsBuilder().append(getId(), variant.getId()).append(getProductId(), variant.getProductId())
-				.append(getSku(), variant.getSku()).append(price, otherPrice).append(getWeight(), variant.getWeight())
-				.append(getUpc(), variant.getUpc()).append(getMpn(), variant.getMpn())
-				.append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())
+				.append(getSku(), variant.getSku()).append(price, otherPrice).append(getUpc(), variant.getUpc())
+				.append(getMpn(), variant.getMpn()).append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())
 				&& (price.compareTo(otherPrice) == 0) && (weight.compareTo(otherWeight) == 0);
 	}
 
