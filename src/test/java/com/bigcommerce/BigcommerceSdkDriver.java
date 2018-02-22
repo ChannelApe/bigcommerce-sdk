@@ -7,17 +7,24 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bigcommerce.catalog.models.Address;
+import com.bigcommerce.catalog.models.Brand;
+import com.bigcommerce.catalog.models.Brands;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.Customer;
+import com.bigcommerce.catalog.models.Metafield;
+import com.bigcommerce.catalog.models.Metafields;
 import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.OrderStatus;
+import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.Products;
 import com.bigcommerce.catalog.models.Shipment;
 import com.bigcommerce.catalog.models.ShipmentCreationRequest;
@@ -67,8 +74,8 @@ public class BigcommerceSdkDriver {
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
 		final Variant variant = new Variant();
-		variant.setId("85");
-		variant.setProductId("113");
+		variant.setId(85);
+		variant.setProductId(113);
 		variant.setInventoryLevel(3);
 		variant.setPrice(BigDecimal.valueOf(12.99));
 
@@ -143,11 +150,11 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		ShipmentLineItem lineItem = new ShipmentLineItem();
+		final ShipmentLineItem lineItem = new ShipmentLineItem();
 		lineItem.setOrderProductId(1);
 		lineItem.setQuantity(1);
 
-		ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
+		final ShipmentCreationRequest shipmentCreationRequest = ShipmentCreationRequest.newBuilder()
 				.withTrackingNumber("1Z0398842038").withComments("This is a fulfillment from channel ape")
 				.withOrderAddressId(1).withShippingProvider("UPS").withTrackingCarrier("")
 				.withShipmentLineItems(Arrays.asList(lineItem)).build();
@@ -161,11 +168,42 @@ public class BigcommerceSdkDriver {
 	}
 
 	@Test
+	public void givenSomeProductWhenCreatingProductsThenCreateProduct() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Product product = new Product();
+		product.setBrandId(0);
+		product.setCategories(Arrays.asList(25));
+		product.setCondition("New");
+		product.setDescription("Custom description");
+		product.setPrice(new BigDecimal(99.00));
+		product.setMetaKeywords(Arrays.asList("Tetsing1", "testing2"));
+		product.setIsConditionShown(true);
+		product.setInventoryTracking("variant");
+		product.setIsVisible(true);
+		product.setName(UUID.randomUUID().toString());
+		product.setSku(UUID.randomUUID().toString());
+		product.setVariants(Collections.emptyList());
+		product.setWeight(new BigDecimal(34.21));
+		product.setType("physical");
+		product.setCustomFields(Collections.emptyList());
+
+		final Product createdProduct = bigcommerceSdk.createProduct(product);
+
+		assertNotNull(createdProduct);
+		assertNotNull(createdProduct.getId());
+		assertNotNull(createdProduct.getBrandId());
+		assertEquals(product.getCondition(), createdProduct.getCondition());
+
+	}
+
+	@Test
 	public void givenShipmentRequestThenUpdateShipment() {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
+		final ShipmentUpdateRequest shipmentUpdateRequest = ShipmentUpdateRequest.newBuilder()
 				.withTrackingNumber("1Z0398842038").withComments("This is a fulfillment from channel ape")
 				.withOrderAddressId(1).withShippingProvider("upsonline").withTrackingCarrier("").build();
 
@@ -181,7 +219,7 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		Order order = bigcommerceSdk.completeOrder(100);
+		final Order order = bigcommerceSdk.completeOrder(100);
 		assertNotNull(order);
 		assertEquals(order.getStatus(), Status.COMPLETED);
 	}
@@ -191,9 +229,83 @@ public class BigcommerceSdkDriver {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
 
-		OrderStatus orderStatus = bigcommerceSdk.getStatus(Status.COMPLETED);
+		final OrderStatus orderStatus = bigcommerceSdk.getStatus(Status.COMPLETED);
 		assertNotNull(orderStatus);
 		assertEquals(Status.COMPLETED.toString(), orderStatus.getName());
+
+	}
+
+	@Test
+	public void givenPage1WhenRetrievingBrandsThenRetrieveBrands() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Brands brands = bigcommerceSdk.getBrands(1, 100);
+		assertNotNull(brands);
+		assertTrue(brands.getBrands().size() > 0);
+		assertEquals(1, brands.getPagination().getCurrentPage());
+
+	}
+
+	@Test
+	public void givenBrandWhenCreateBrandThenCreateBrand() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Brand expectedBrand = new Brand();
+		expectedBrand.setName("CA_" + UUID.randomUUID().toString());
+		expectedBrand.setImageUrl("https://www.channelape.com/wp-content/themes/ChannelApe/images/logo.png");
+		expectedBrand.setMetaDescription("ECommerce Software");
+		expectedBrand.setMetaKeywords(Arrays.asList("Ecommerce", "Channels"));
+		expectedBrand.setSearchKeywords("ECOMMERCE,Channels");
+		expectedBrand.setPageTitle("Channel Ape Ecommerce Software");
+
+		final Brand createdBrand = bigcommerceSdk.createBrand(expectedBrand);
+
+		assertNotNull(createdBrand);
+		assertNotNull(createdBrand.getId());
+
+	}
+
+	@Test
+	public void givenAProductMetafieldAndProductIdWhenCreatingProductMetafieldThenCreateProductMetafield() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Metafield productMetafield = new Metafield();
+
+		productMetafield.setKey(UUID.randomUUID().toString());
+		productMetafield.setValue(UUID.randomUUID().toString());
+		productMetafield.setNamespace("ChannelApe");
+		productMetafield.setPermissionSet("write");
+		productMetafield.setDescription("Testing Description");
+		final Metafield metafield = bigcommerceSdk.createProductMetafield(112, productMetafield);
+		assertNotNull(metafield);
+		System.out.println("---- Created Metafield ----");
+		System.out.println(new JSONObject(metafield).toString());
+
+	}
+
+	@Test
+	public void givenAProductIdAndPage1WhenRetrievingProductMetafieldsThenReturnProductMetafields() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		final Metafields metafields = bigcommerceSdk.getProductMetafields(1960, 1, 250);
+		assertNotNull(metafields);
+		assertTrue(metafields.getMetafields().size() > 0);
+		assertEquals(1, metafields.getPagination().getCurrentPage());
+		System.out.println("---- Metafields 1st Page ----");
+		System.out.println(new JSONObject(metafields).toString());
+
+	}
+
+	@Test
+	public void givenAProductImageIdWhenDeletingProductImages() {
+		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
+				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
+
+		bigcommerceSdk.deleteProductImage(112, 381);
 
 	}
 
