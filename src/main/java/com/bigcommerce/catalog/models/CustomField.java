@@ -2,6 +2,9 @@ package com.bigcommerce.catalog.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 @XmlRootElement
 public class CustomField {
 
@@ -13,7 +16,7 @@ public class CustomField {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -21,7 +24,7 @@ public class CustomField {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -29,8 +32,26 @@ public class CustomField {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(getName()).append(getValue()).toHashCode();
+	}
+
+	@Override
+	public boolean equals(final Object object) {
+		if (object == this) {
+			return true;
+		}
+		if (!(object instanceof Variant)) {
+			return false;
+		}
+		final CustomField customField = (CustomField) object;
+		return new EqualsBuilder().append(getName(), customField.getName()).append(getValue(), customField.getValue())
+				.isEquals();
 	}
 
 }

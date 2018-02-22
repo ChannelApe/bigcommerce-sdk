@@ -126,10 +126,10 @@ public class Variant {
 			return false;
 		}
 		final Variant variant = (Variant) object;
-		final BigDecimal price = getPrice() != null ? getPrice() : new BigDecimal(0);
-		final BigDecimal otherPrice = variant.getPrice() != null ? variant.getPrice() : new BigDecimal(0);
-		final BigDecimal weight = getWeight() != null ? getWeight() : new BigDecimal(0);
-		final BigDecimal otherWeight = variant.getWeight() != null ? variant.getWeight() : new BigDecimal(0);
+		final BigDecimal price = getPrice() != null ? getPrice() : BigDecimal.ZERO;
+		final BigDecimal otherPrice = variant.getPrice() != null ? variant.getPrice() : BigDecimal.ZERO;
+		final BigDecimal weight = getWeight() != null ? getWeight() : BigDecimal.ZERO;
+		final BigDecimal otherWeight = variant.getWeight() != null ? variant.getWeight() : BigDecimal.ZERO;
 		return (new EqualsBuilder().append(getId(), variant.getId()).append(getProductId(), variant.getProductId())
 				.append(getSku(), variant.getSku()).append(price, otherPrice).append(getUpc(), variant.getUpc())
 				.append(getMpn(), variant.getMpn()).append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())

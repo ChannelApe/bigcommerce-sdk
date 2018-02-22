@@ -44,7 +44,7 @@ public class Product {
 	private BigDecimal price;
 
 	@XmlElement(name = "custom_fields")
-	private List<CustomField> customFields;
+	private List<CustomField> customFields = new LinkedList<>();
 
 	public Integer getId() {
 		return id;
