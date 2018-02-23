@@ -36,7 +36,7 @@ public class Product {
 	private Boolean isConditionShown;
 
 	@XmlElement(name = "metaKeywords")
-	private List<String> metaKeywords;
+	private List<String> metaKeywords = new LinkedList<>();
 
 	@XmlElement(name = "inventory_tracking")
 	private String inventoryTracking;
