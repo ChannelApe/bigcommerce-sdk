@@ -3,6 +3,7 @@ package com.bigcommerce.catalog.models;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,6 +25,8 @@ public class Variant {
 	@XmlElement(name = "product_id")
 	private Integer productId;
 	private String sku;
+	@XmlElement(required = false)
+	private String sku_id;
 	private BigDecimal price;
 	private String upc;
 	private String mpn;
@@ -59,6 +62,14 @@ public class Variant {
 
 	public void setSku(final String sku) {
 		this.sku = sku;
+	}
+
+	public String getSku_id() {
+		return sku_id;
+	}
+
+	public void setSku_id(String sku_id) {
+		this.sku_id = sku_id;
 	}
 
 	public BigDecimal getPrice() {
@@ -118,27 +129,27 @@ public class Variant {
 	}
 
 	@Override
-	public boolean equals(final Object object) {
-		if (object == this) {
-			return true;
-		}
-		if (!(object instanceof Variant)) {
-			return false;
-		}
-		final Variant variant = (Variant) object;
-		final BigDecimal price = getPrice() != null ? getPrice() : BigDecimal.ZERO;
-		final BigDecimal otherPrice = variant.getPrice() != null ? variant.getPrice() : BigDecimal.ZERO;
-		final BigDecimal weight = getWeight() != null ? getWeight() : BigDecimal.ZERO;
-		final BigDecimal otherWeight = variant.getWeight() != null ? variant.getWeight() : BigDecimal.ZERO;
-		return (new EqualsBuilder().append(getId(), variant.getId()).append(getProductId(), variant.getProductId())
-				.append(getSku(), variant.getSku()).append(price, otherPrice).append(getUpc(), variant.getUpc())
-				.append(getMpn(), variant.getMpn()).append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())
-				&& (price.compareTo(otherPrice) == 0) && (weight.compareTo(otherWeight) == 0);
+	public boolean equals(Object object) {
+		if (this == object) return true;
+		if (object == null || getClass() != object.getClass()) return false;
+		Variant variant = (Variant) object;
+		return getInventoryLevel() == variant.getInventoryLevel() &&
+				Objects.equals(getId(), variant.getId()) &&
+				Objects.equals(getProductId(), variant.getProductId()) &&
+				Objects.equals(getSku(), variant.getSku()) &&
+				Objects.equals(getSku_id(), variant.getSku_id()) &&
+				Objects.equals(getPrice(), variant.getPrice()) &&
+				Objects.equals(getUpc(), variant.getUpc()) &&
+				Objects.equals(getMpn(), variant.getMpn()) &&
+				Objects.equals(getImageUrl(), variant.getImageUrl()) &&
+				Objects.equals(getWeight(), variant.getWeight()) &&
+				Objects.equals(getOptionValues(), variant.getOptionValues());
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getPrice())
-				.append(getWeight()).append(getUpc()).append(getMpn()).append(getInventoryLevel()).toHashCode();
+		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getSku_id())
+				.append(getPrice()).append(getWeight()).append(getUpc()).append(getMpn()).append(getInventoryLevel())
+				.toHashCode();
 	}
 }
