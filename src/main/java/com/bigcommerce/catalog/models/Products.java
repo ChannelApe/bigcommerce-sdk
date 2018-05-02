@@ -2,7 +2,7 @@ package com.bigcommerce.catalog.models;
 
 import java.util.List;
 
-public class Products {
+public class Products implements PaginatedModel {
 
 	private final List<Product> products;
 	private final Pagination pagination;
