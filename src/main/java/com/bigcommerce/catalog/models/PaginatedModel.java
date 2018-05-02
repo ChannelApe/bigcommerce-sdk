@@ -1,5 +1,9 @@
 package com.bigcommerce.catalog.models;
 
-public interface PaginatedModel {
-	public Pagination getPagination();
+import java.util.List;
+
+public interface PaginatedModel<T> {
+	Pagination getPagination();
+
+	List<T> getItems();
 }

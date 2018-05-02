@@ -2,7 +2,7 @@ package com.bigcommerce.catalog.models;
 
 import java.util.List;
 
-public class Variants implements PaginatedModel {
+public class Variants implements PaginatedModel<Variant> {
 
 	private final List<Variant> variants;
 	private final Pagination pagination;
@@ -19,5 +19,10 @@ public class Variants implements PaginatedModel {
 	public Pagination getPagination() {
 		return pagination;
 	}
+
+    @Override
+    public List<Variant> getItems() {
+        return getVariants();
+    }
 
 }
