@@ -17,47 +17,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.bigcommerce.catalog.models.*;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bigcommerce.catalog.models.Address;
-import com.bigcommerce.catalog.models.AddressResponse;
-import com.bigcommerce.catalog.models.Brand;
-import com.bigcommerce.catalog.models.BrandResponse;
-import com.bigcommerce.catalog.models.Brands;
-import com.bigcommerce.catalog.models.BrandsResponse;
-import com.bigcommerce.catalog.models.CatalogSummary;
-import com.bigcommerce.catalog.models.CatalogSummaryResponse;
-import com.bigcommerce.catalog.models.Customer;
-import com.bigcommerce.catalog.models.LineItem;
-import com.bigcommerce.catalog.models.LineItemsResponse;
-import com.bigcommerce.catalog.models.Metafield;
-import com.bigcommerce.catalog.models.MetafieldResponse;
-import com.bigcommerce.catalog.models.Metafields;
-import com.bigcommerce.catalog.models.MetafieldsResponse;
-import com.bigcommerce.catalog.models.Order;
-import com.bigcommerce.catalog.models.OrderStatus;
-import com.bigcommerce.catalog.models.OrderStatusResponse;
-import com.bigcommerce.catalog.models.OrdersResponse;
-import com.bigcommerce.catalog.models.Pagination;
-import com.bigcommerce.catalog.models.Product;
-import com.bigcommerce.catalog.models.ProductImage;
-import com.bigcommerce.catalog.models.ProductImageResponse;
-import com.bigcommerce.catalog.models.ProductImages;
-import com.bigcommerce.catalog.models.ProductImagesResponse;
-import com.bigcommerce.catalog.models.ProductResponse;
-import com.bigcommerce.catalog.models.Products;
-import com.bigcommerce.catalog.models.ProductsResponse;
-import com.bigcommerce.catalog.models.Shipment;
-import com.bigcommerce.catalog.models.ShipmentCreationRequest;
-import com.bigcommerce.catalog.models.ShipmentResponse;
-import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
-import com.bigcommerce.catalog.models.Store;
-import com.bigcommerce.catalog.models.Variant;
-import com.bigcommerce.catalog.models.VariantResponse;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
 import com.bigcommerce.exceptions.BigcommerceException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -181,6 +147,20 @@ public class BigcommerceSdk {
 		final List<Product> products = productsResponse.getData();
 		final Pagination pagination = productsResponse.getMeta().getPagination();
 		return new Products(products, pagination);
+	}
+
+	public Variants getVariants(final int page) {
+		return getVariants(page, MAX_LIMIT);
+	}
+
+	public Variants getVariants(final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(VARIANTS)
+				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+
+		final VariantsResponse variantsResponse = get(webTarget, VariantsResponse.class);
+		final List<Variant> variants = variantsResponse.getData();
+		final Pagination pagination = variantsResponse.getMeta().getPagination();
+		return new Variants(variants, pagination);
 	}
 
 	public Product createProduct(final Product product) {
