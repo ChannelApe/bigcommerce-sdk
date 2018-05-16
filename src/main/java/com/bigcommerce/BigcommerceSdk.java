@@ -247,13 +247,13 @@ public class BigcommerceSdk {
 		delete(webTarget, Object.class);
 	}
 
-	public void deleteProductCustomField(final Integer productId, final Integer customFieldId) {
+	public void deleteProductCustomField(final Integer productId, final String customFieldId) {
 		final WebTarget webTarget = baseWebTargetV3
 			.path(CATALOG)
 			.path(PRODUCTS)
 			.path(String.valueOf(productId))
 			.path(CUSTOM_FIELDS_PATH)
-			.path(String.valueOf(customFieldId));
+			.path(customFieldId);
 		delete(webTarget, Object.class);
 	}
 
