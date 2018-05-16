@@ -46,6 +46,9 @@ public class BigcommerceSdk {
 
 	static final int TOO_MANY_REQUESTS_STATUS_CODE = 429;
 
+	public static final String VARIANTS = "variants";
+	public static final String INCLUDE_FIELDS = "include_fields";
+
 	private static final String CATALOG = "catalog";
 	private static final String CATEGORIES= "categories";
 	private static final String SUMMARY = "summary";
@@ -57,7 +60,6 @@ public class BigcommerceSdk {
 	private static final String LIMIT = "limit";
 	private static final String PAGE = "page";
 	private static final String INCLUDE = "include";
-	private static final String VARIANTS = "variants";
 	private static final String SHIPPINGADDRESSES = "shipping_addresses";
 	private static final String SHIPMENTS = "shipments";
 	private static final String MIN_DATE_CREATED = "min_date_created";
@@ -138,12 +140,12 @@ public class BigcommerceSdk {
 		return catalogSummaryResponse.getData();
 	}
 
-	public Products getProducts(final int page) {
-		return getProducts(page, MAX_LIMIT);
+	public Products getProducts(final int page, String... includes) {
+		return getProducts(page, MAX_LIMIT, includes);
 	}
 
-	public Products getProducts(final int page, final int limit) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
+	public Products getProducts(final int page, final int limit, String... includes) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, String.join("", includes))
 				.queryParam(LIMIT, limit).queryParam(PAGE, page);
 		final ProductsResponse productsResponse = get(webTarget, ProductsResponse.class);
 		final List<Product> products = productsResponse.getData();
