@@ -6,22 +6,13 @@ import java.util.List;
 
 @XmlRootElement
 public class CustomFieldResponse {
-	private List<CustomField> data = new LinkedList<>();
-	private Meta meta = new Meta();
+	private CustomField data;
 
-	public List<CustomField> getData() {
+	public CustomField getData() {
 		return data;
 	}
 
-	public void setData(List<CustomField> data) {
+	public void setData(CustomField data) {
 		this.data = data;
-	}
-
-	public Meta getMeta() {
-		return meta;
-	}
-
-	public void setMeta(Meta meta) {
-		this.meta = meta;
 	}
 }
