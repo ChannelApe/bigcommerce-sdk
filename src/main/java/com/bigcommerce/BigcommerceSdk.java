@@ -66,7 +66,8 @@ public class BigcommerceSdk {
 	private static final String STORE = "store";
 	private static final String METAFIELDS = "metafields";
 	private static final String IMAGES = "images";
-	private static final int MAX_LIMIT = 250;
+	private static final String PARENT_ID = "parent_id";
+	public static final int MAX_LIMIT = 250;
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
 	private static final String TREE = "tree";
@@ -183,12 +184,26 @@ public class BigcommerceSdk {
 		return getCategories(page, MAX_LIMIT);
 	}
 
-	public Categories getCategories(final int page, final int limit){
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES)
-				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+	public Categories getCategories(final int page, final int limit) {
+		return getCategories(null, page, limit);
+	}
+
+	public Categories getCategories(final Integer parentId, final int page, final int limit) {
+		WebTarget webTarget = baseWebTargetV3
+				.path(CATALOG)
+				.path(CATEGORIES)
+				.queryParam(LIMIT, limit)
+				.queryParam(PAGE, page);
+
+		if (parentId != null) {
+			webTarget = webTarget.queryParam(PARENT_ID, parentId);
+		}
+
 		final CategoriesResponse categoriesResponse = get(webTarget, CategoriesResponse.class);
 		final List<Category> categories= categoriesResponse.getData();
+
 		final Pagination pagination = categoriesResponse.getMeta().getPagination();
+
 		return new Categories(categories, pagination);
 	}
 

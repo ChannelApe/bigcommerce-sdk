@@ -21,6 +21,7 @@ public class Category {
 	private Integer id;
 	private String name;
 	@XmlElement(name = "parent_id")
+	@JsonInclude(Include.ALWAYS)
 	private Integer parentId;
 	@XmlElement(name = "page_title")
 	private String pageTitle;
