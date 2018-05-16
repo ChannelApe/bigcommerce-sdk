@@ -286,6 +286,15 @@ public class BigcommerceSdk {
 		delete(webTarget, Object.class);
 	}
 
+	public CustomFieldResponse createProductCustomField(final Integer productId, final CustomField customField) {
+		final WebTarget webTarget = baseWebTargetV3
+			.path(CATALOG)
+			.path(PRODUCTS)
+			.path(String.valueOf(productId))
+			.path(CUSTOM_FIELDS_PATH);
+		return post(webTarget, customField, CustomFieldResponse.class);
+	}
+
 	public ProductImages getProductImages(final Integer productId, final int page) {
 		return getProductImages(productId, page, MAX_LIMIT);
 	}
