@@ -46,17 +46,20 @@ public class BigcommerceSdk {
 
 	static final int TOO_MANY_REQUESTS_STATUS_CODE = 429;
 
+	public static final String VARIANTS = "variants";
+	public static final String CUSTOM_FIELDS = "custom_fields";
+
 	private static final String CATALOG = "catalog";
 	private static final String CATEGORIES= "categories";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
+	private static final String CUSTOM_FIELDS_PATH = "custom-fields";
 	private static final String BRANDS = "brands";
 	private static final String ORDERS = "orders";
 	private static final String CUSTOMERS = "customers";
 	private static final String LIMIT = "limit";
 	private static final String PAGE = "page";
 	private static final String INCLUDE = "include";
-	private static final String VARIANTS = "variants";
 	private static final String SHIPPINGADDRESSES = "shipping_addresses";
 	private static final String SHIPMENTS = "shipments";
 	private static final String MIN_DATE_CREATED = "min_date_created";
@@ -141,9 +144,21 @@ public class BigcommerceSdk {
 		return getProducts(page, MAX_LIMIT);
 	}
 
+	public Products getProducts(final int page, String... includes) {
+		return getProducts(page, MAX_LIMIT, includes);
+	}
+
 	public Products getProducts(final int page, final int limit) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
-				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		return getProducts(page, limit, VARIANTS);
+	}
+
+	public Products getProducts(final int page, final int limit, String... includes) {
+		WebTarget webTarget = baseWebTargetV3.path(CATALOG)
+			.path(PRODUCTS)
+			.queryParam(LIMIT, limit)
+			.queryParam(PAGE, page)
+			.queryParam(INCLUDE, String.join("", includes));
+
 		final ProductsResponse productsResponse = get(webTarget, ProductsResponse.class);
 		final List<Product> products = productsResponse.getData();
 		final Pagination pagination = productsResponse.getMeta().getPagination();
@@ -229,6 +244,16 @@ public class BigcommerceSdk {
 
 	public void deleteProduct(final Integer productId) {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId));
+		delete(webTarget, Object.class);
+	}
+
+	public void deleteProductCustomField(final Integer productId, final Integer customFieldId) {
+		final WebTarget webTarget = baseWebTargetV3
+			.path(CATALOG)
+			.path(PRODUCTS)
+			.path(String.valueOf(productId))
+			.path(CUSTOM_FIELDS_PATH)
+			.path(String.valueOf(customFieldId));
 		delete(webTarget, Object.class);
 	}
 
