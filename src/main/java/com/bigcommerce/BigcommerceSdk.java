@@ -148,9 +148,17 @@ public class BigcommerceSdk {
 		return getProducts(page, MAX_LIMIT, includes);
 	}
 
+	public Products getProducts(final int page, final int limit) {
+		return getProducts(page, limit, VARIANTS);
+	}
+
 	public Products getProducts(final int page, final int limit, String... includes) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, String.join("", includes))
-				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		WebTarget webTarget = baseWebTargetV3.path(CATALOG)
+			.path(PRODUCTS)
+			.queryParam(LIMIT, limit)
+			.queryParam(PAGE, page)
+			.queryParam(INCLUDE, String.join("", includes));
+
 		final ProductsResponse productsResponse = get(webTarget, ProductsResponse.class);
 		final List<Product> products = productsResponse.getData();
 		final Pagination pagination = productsResponse.getMeta().getPagination();
