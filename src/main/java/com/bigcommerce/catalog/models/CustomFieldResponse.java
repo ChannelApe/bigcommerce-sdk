@@ -7,7 +7,6 @@ import java.util.List;
 @XmlRootElement
 public class CustomFieldResponse {
 	private CustomField data;
-	private Meta meta = new Meta();
 
 	public CustomField getData() {
 		return data;
@@ -15,13 +14,5 @@ public class CustomFieldResponse {
 
 	public void setData(CustomField data) {
 		this.data = data;
-	}
-
-	public Meta getMeta() {
-		return meta;
-	}
-
-	public void setMeta(final Meta meta) {
-		this.meta = meta;
 	}
 }
