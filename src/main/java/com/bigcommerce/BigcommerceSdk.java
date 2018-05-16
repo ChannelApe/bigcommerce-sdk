@@ -257,11 +257,11 @@ public class BigcommerceSdk {
 		delete(webTarget, Object.class);
 	}
 
-	public void createProductCustomField(final Product product, final CustomField customField) {
+	public void createProductCustomField(final Integer productId, final CustomField customField) {
 		final WebTarget webTarget = baseWebTargetV3
 			.path(CATALOG)
 			.path(PRODUCTS)
-			.path(String.valueOf(product.getId()))
+			.path(String.valueOf(productId))
 			.path(CUSTOM_FIELDS_PATH);
 		post(webTarget, customField, CustomField.class);
 	}
