@@ -47,13 +47,13 @@ public class BigcommerceSdk {
 	static final int TOO_MANY_REQUESTS_STATUS_CODE = 429;
 
 	public static final String VARIANTS = "variants";
-	public static final String INCLUDE_FIELDS = "include_fields";
+	public static final String CUSTOM_FIELDS = "custom_fields";
 
 	private static final String CATALOG = "catalog";
 	private static final String CATEGORIES= "categories";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
-	private static final String CUSTOM_FIELDS = "custom-fields";
+	private static final String CUSTOM_FIELDS_PATH = "custom-fields";
 	private static final String BRANDS = "brands";
 	private static final String ORDERS = "orders";
 	private static final String CUSTOMERS = "customers";
@@ -240,7 +240,7 @@ public class BigcommerceSdk {
 			.path(CATALOG)
 			.path(PRODUCTS)
 			.path(String.valueOf(productId))
-			.path(CUSTOM_FIELDS)
+			.path(CUSTOM_FIELDS_PATH)
 			.path(String.valueOf(customFieldId));
 		delete(webTarget, Object.class);
 	}
