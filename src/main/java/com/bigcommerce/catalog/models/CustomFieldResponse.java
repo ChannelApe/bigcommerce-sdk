@@ -1,19 +1,22 @@
 package com.bigcommerce.catalog.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.LinkedList;
 import java.util.List;
 
 @XmlRootElement
 public class CustomFieldResponse {
-	private List<CustomField> data = new LinkedList<>();
+	private CustomField data;
+
+	@XmlTransient
 	private Meta meta = new Meta();
 
-	public List<CustomField> getData() {
+	public CustomField getData() {
 		return data;
 	}
 
-	public void setData(List<CustomField> data) {
+	public void setData(CustomField data) {
 		this.data = data;
 	}
 
