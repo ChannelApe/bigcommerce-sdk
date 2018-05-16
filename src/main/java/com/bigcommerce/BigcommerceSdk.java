@@ -165,6 +165,20 @@ public class BigcommerceSdk {
 		return new Products(products, pagination);
 	}
 
+	public Category createCategory(final Category category) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES);
+		final CategoryResponse categoryResponse = post(webTarget, category, CategoryResponse.class);
+
+		return categoryResponse.getData();
+	}
+
+	public Category updateCategory(final Category category) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES).path(String.valueOf(category.getId()));
+		final CategoryResponse categoryResponse = put(webTarget, category, CategoryResponse.class);
+
+		return categoryResponse.getData();
+	}
+
 	public Categories getCategories(final int page) {
 		return getCategories(page, MAX_LIMIT);
 	}
@@ -178,7 +192,7 @@ public class BigcommerceSdk {
 		return new Categories(categories, pagination);
 	}
 
-	public Categories getCategoriesAsTree(){
+	public Categories getCategoriesAsTree() {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES).path(TREE);
 		final CategoriesResponse categoriesResponse = get(webTarget, CategoriesResponse.class);
 		final List<Category> categories= categoriesResponse.getData();
