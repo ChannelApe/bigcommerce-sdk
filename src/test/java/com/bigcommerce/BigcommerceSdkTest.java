@@ -3,9 +3,7 @@ package com.bigcommerce;
 import static com.github.restdriver.clientdriver.RestClientDriver.giveEmptyResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -22,6 +20,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import com.bigcommerce.catalog.models.*;
 import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -30,41 +29,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.bigcommerce.catalog.models.Address;
-import com.bigcommerce.catalog.models.Brand;
-import com.bigcommerce.catalog.models.BrandResponse;
-import com.bigcommerce.catalog.models.Brands;
-import com.bigcommerce.catalog.models.BrandsResponse;
-import com.bigcommerce.catalog.models.CatalogSummary;
-import com.bigcommerce.catalog.models.CatalogSummaryResponse;
-import com.bigcommerce.catalog.models.Customer;
-import com.bigcommerce.catalog.models.DateTimeAdapter;
-import com.bigcommerce.catalog.models.LineItem;
-import com.bigcommerce.catalog.models.LineItemsResponse;
-import com.bigcommerce.catalog.models.Meta;
-import com.bigcommerce.catalog.models.Metafield;
-import com.bigcommerce.catalog.models.MetafieldResponse;
-import com.bigcommerce.catalog.models.Metafields;
-import com.bigcommerce.catalog.models.MetafieldsResponse;
-import com.bigcommerce.catalog.models.Order;
-import com.bigcommerce.catalog.models.OrderStatus;
-import com.bigcommerce.catalog.models.Pagination;
-import com.bigcommerce.catalog.models.Product;
-import com.bigcommerce.catalog.models.ProductImage;
-import com.bigcommerce.catalog.models.ProductImageResponse;
-import com.bigcommerce.catalog.models.ProductImages;
-import com.bigcommerce.catalog.models.ProductImagesResponse;
-import com.bigcommerce.catalog.models.ProductResponse;
-import com.bigcommerce.catalog.models.Products;
-import com.bigcommerce.catalog.models.ProductsResponse;
-import com.bigcommerce.catalog.models.Shipment;
-import com.bigcommerce.catalog.models.ShipmentCreationRequest;
-import com.bigcommerce.catalog.models.ShipmentLineItem;
-import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
-import com.bigcommerce.catalog.models.Store;
-import com.bigcommerce.catalog.models.Variant;
-import com.bigcommerce.catalog.models.VariantResponse;
-import com.bigcommerce.catalog.models.WeightUnits;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
 import com.bigcommerce.exceptions.BigcommerceException;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -1385,6 +1349,12 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedBrands.get(0).getSearchKeywords(), actualBrands.getBrands().get(0).getSearchKeywords());
 		assertEquals(expectedBrands.get(0).getMetaDescription(), actualBrands.getBrands().get(0).getMetaDescription());
 		assertEquals(expectedBrands.get(0).getMetaKeywords(), actualBrands.getBrands().get(0).getMetaKeywords());
+		assertEquals(expectedBrands.get(0).getCustomUrl().getUrl(), actualBrands.getBrands().get(0).getCustomUrl().getUrl());
+		assertEquals(expectedBrands.get(0).getCustomUrl().isCustomized(), actualBrands.getBrands().get(0).getCustomUrl().isCustomized());
+		assertEquals(expectedBrands.get(0).hashCode(), actualBrands.getBrands().get(0).hashCode());
+		assertEquals(expectedBrands.get(0), actualBrands.getBrands().get(0));
+		assertTrue(expectedBrands.get(0).equals(actualBrands.getBrands().get(0)));
+
 		assertEquals(meta.getPagination().getTotal(), actualBrands.getPagination().getTotal());
 		assertEquals(meta.getPagination().getTotalPages(), actualBrands.getPagination().getTotalPages());
 		assertEquals(meta.getPagination().getCurrentPage(), actualBrands.getPagination().getCurrentPage());
@@ -1747,6 +1717,10 @@ public class BigcommerceSdkTest {
 		brand.setName("NIKE");
 		brand.setPageTitle("Nike Brands");
 		brand.setSearchKeywords("SHOES");
+		CustomUrl customUrl = new CustomUrl();
+		customUrl.setUrl("/url_" + id);
+		customUrl.setCustomized(true);
+		brand.setCustomUrl(customUrl);
 		return brand;
 	}
 

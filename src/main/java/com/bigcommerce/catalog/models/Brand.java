@@ -1,7 +1,9 @@
 package com.bigcommerce.catalog.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -14,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)
-public class Brand {
+public class Brand implements Serializable {
 
 	@XmlElement(name = "name")
 	private String name;
@@ -36,6 +38,17 @@ public class Brand {
 
 	@XmlElement(name = "id")
 	private Integer id;
+
+	@XmlElement(name = "custom_url")
+	private CustomUrl customUrl;
+
+	public CustomUrl getCustomUrl() {
+		return customUrl;
+	}
+
+	public void setCustomUrl(CustomUrl customUrl) {
+		this.customUrl = customUrl;
+	}
 
 	public String getName() {
 		return name;
@@ -93,4 +106,24 @@ public class Brand {
 		this.id = id;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Brand brand = (Brand) o;
+		return Objects.equals(getName(), brand.getName()) &&
+				Objects.equals(getPageTitle(), brand.getPageTitle()) &&
+				Objects.equals(getMetaKeywords(), brand.getMetaKeywords()) &&
+				Objects.equals(getMetaDescription(), brand.getMetaDescription()) &&
+				Objects.equals(getSearchKeywords(), brand.getSearchKeywords()) &&
+				Objects.equals(getImageUrl(), brand.getImageUrl()) &&
+				Objects.equals(getId(), brand.getId()) &&
+				Objects.equals(getCustomUrl(), brand.getCustomUrl());
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(getName(), getPageTitle(), getMetaKeywords(), getMetaDescription(), getSearchKeywords(), getImageUrl(), getId(), getCustomUrl());
+	}
 }
