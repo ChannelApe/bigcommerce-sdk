@@ -140,6 +140,10 @@ public class BigcommerceSdk {
 		return catalogSummaryResponse.getData();
 	}
 
+	public Products getProducts(final int page) {
+		return getProducts(page, MAX_LIMIT);
+	}
+
 	public Products getProducts(final int page, String... includes) {
 		return getProducts(page, MAX_LIMIT, includes);
 	}
