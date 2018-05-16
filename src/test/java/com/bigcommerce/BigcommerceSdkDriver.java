@@ -11,28 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import com.bigcommerce.catalog.models.*;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.bigcommerce.catalog.models.Address;
-import com.bigcommerce.catalog.models.Brand;
-import com.bigcommerce.catalog.models.Brands;
-import com.bigcommerce.catalog.models.CatalogSummary;
-import com.bigcommerce.catalog.models.Customer;
-import com.bigcommerce.catalog.models.Metafield;
-import com.bigcommerce.catalog.models.Metafields;
-import com.bigcommerce.catalog.models.Order;
-import com.bigcommerce.catalog.models.OrderStatus;
-import com.bigcommerce.catalog.models.Product;
-import com.bigcommerce.catalog.models.Products;
-import com.bigcommerce.catalog.models.Shipment;
-import com.bigcommerce.catalog.models.ShipmentCreationRequest;
-import com.bigcommerce.catalog.models.ShipmentLineItem;
-import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
-import com.bigcommerce.catalog.models.Status;
-import com.bigcommerce.catalog.models.Store;
-import com.bigcommerce.catalog.models.Variant;
 
 public class BigcommerceSdkDriver {
 
@@ -259,12 +241,15 @@ public class BigcommerceSdkDriver {
 		expectedBrand.setMetaKeywords(Arrays.asList("Ecommerce", "Channels"));
 		expectedBrand.setSearchKeywords("ECOMMERCE,Channels");
 		expectedBrand.setPageTitle("Channel Ape Ecommerce Software");
+		CustomUrl customUrl = new CustomUrl();
+		customUrl.setCustomized(true);
+		customUrl.setUrl("/ca-foo");
+		expectedBrand.setCustomUrl(customUrl);
 
 		final Brand createdBrand = bigcommerceSdk.createBrand(expectedBrand);
 
 		assertNotNull(createdBrand);
 		assertNotNull(createdBrand.getId());
-
 	}
 
 	@Test
