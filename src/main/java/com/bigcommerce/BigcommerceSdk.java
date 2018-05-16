@@ -49,6 +49,7 @@ public class BigcommerceSdk {
 	private static final String CATALOG = "catalog";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
+	private static final String CUSTOM_FIELDS = "custom-fields";
 	private static final String BRANDS = "brands";
 	private static final String ORDERS = "orders";
 	private static final String CUSTOMERS = "customers";
@@ -207,6 +208,16 @@ public class BigcommerceSdk {
 
 	public void deleteProduct(final Integer productId) {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId));
+		delete(webTarget, Object.class);
+	}
+
+	public void deleteProductCustomField(final Integer productId, final Integer customFieldId) {
+		final WebTarget webTarget = baseWebTargetV3
+			.path(CATALOG)
+			.path(PRODUCTS)
+			.path(String.valueOf(productId))
+			.path(CUSTOM_FIELDS)
+			.path(String.valueOf(customFieldId));
 		delete(webTarget, Object.class);
 	}
 
