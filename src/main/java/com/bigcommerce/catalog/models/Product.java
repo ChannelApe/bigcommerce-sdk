@@ -45,6 +45,12 @@ public class Product {
 	private String condition;
 	private BigDecimal price;
 
+	@XmlElement(name = "page_title")
+	private String pageTitle;
+
+	@XmlElement(name = "meta_description")
+	private String metaDescription;
+
 	@XmlElement(name = "custom_fields")
 	private List<CustomField> customFields = new LinkedList<>();
 
@@ -176,4 +182,35 @@ public class Product {
 		this.price = price;
 	}
 
+	public Boolean getVisible() {
+		return isVisible;
+	}
+
+	public void setVisible(Boolean visible) {
+		isVisible = visible;
+	}
+
+	public Boolean getConditionShown() {
+		return isConditionShown;
+	}
+
+	public void setConditionShown(Boolean conditionShown) {
+		isConditionShown = conditionShown;
+	}
+
+	public String getPageTitle() {
+		return pageTitle;
+	}
+
+	public void setPageTitle(String pageTitle) {
+		this.pageTitle = pageTitle;
+	}
+
+	public String getMetaDescription() {
+		return metaDescription;
+	}
+
+	public void setMetaDescription(String metaDescription) {
+		this.metaDescription = metaDescription;
+	}
 }
