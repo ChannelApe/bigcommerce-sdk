@@ -37,8 +37,11 @@ public class Product {
 	@XmlElement(name = "is_condition_shown")
 	private Boolean isConditionShown;
 
-	@XmlElement(name = "metaKeywords")
+	@XmlElement(name = "meta_keywords")
 	private List<String> metaKeywords = new LinkedList<>();
+
+	@XmlElement(name = "search_keywords ")
+	private String searchKeywords;
 
 	@XmlElement(name = "inventory_tracking")
 	private String inventoryTracking;
@@ -47,6 +50,12 @@ public class Product {
 
 	@XmlElement(name = "custom_fields")
 	private List<CustomField> customFields = new LinkedList<>();
+
+	@XmlElement(name = "sort_order")
+	private Integer sortOrder;
+
+	@XmlElement(name = "custom_url ")
+	private CustomUrl productUrl;
 
 	public Integer getId() {
 		return id;
@@ -176,4 +185,28 @@ public class Product {
 		this.price = price;
 	}
 
+	public Integer getSortOrder() {
+		return sortOrder;
+	}
+
+	public String getSearchKeywords() {
+		return searchKeywords;
+	}
+
+	public void setSearchKeywords(String searchKeywords) {
+		this.searchKeywords = searchKeywords;
+	}
+
+	public void setSortOrder(Integer sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+
+	public CustomUrl getProductUrl() {
+		return productUrl;
+	}
+
+	public void setProductUrl(CustomUrl productUrl) {
+		this.productUrl = productUrl;
+	}
 }
+
