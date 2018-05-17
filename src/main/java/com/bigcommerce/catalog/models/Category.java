@@ -8,8 +8,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.math.BigDecimal;
-import java.util.LinkedList;
 import java.util.List;
 
 @XmlRootElement
@@ -26,8 +24,15 @@ public class Category {
 	@XmlElement(name = "page_title")
 	private String pageTitle;
 	private String keyword;
+	private String description;
+	@XmlElement(name = "meta_keywords")
+	List<String> metaKeywords;
 	@XmlElement(name = "is_visible")
 	private Boolean visible;
+	@XmlElement(name = "custom_url")
+	CustomUrl customUrl;
+	@XmlElement(name = "meta_description")
+	String metaDescription;;
 	private List<Category> children;
 
 	public Integer getId() {
@@ -84,5 +89,37 @@ public class Category {
 
 	public void setChildren(List<Category> children) {
 		this.children = children;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<String> getMetaKeywords() {
+		return metaKeywords;
+	}
+
+	public void setMetaKeywords(List<String> metaKeywords) {
+		this.metaKeywords = metaKeywords;
+	}
+
+	public CustomUrl getCustomUrl() {
+		return customUrl;
+	}
+
+	public void setCustomUrl(CustomUrl customUrl) {
+		this.customUrl = customUrl;
+	}
+
+	public String getMetaDescription() {
+		return metaDescription;
+	}
+
+	public void setMetaDescription(String metaDescription) {
+		this.metaDescription = metaDescription;
 	}
 }
