@@ -237,7 +237,9 @@ public class BigcommerceSdk {
 	}
 
 	public Product updateProduct(final Product product) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(product.getId()));
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG)
+				.path(PRODUCTS)
+				.path(String.valueOf(product.getId()));
 		final ProductResponse productResponse = put(webTarget, product, ProductResponse.class);
 		return productResponse.getData();
 	}
@@ -263,8 +265,10 @@ public class BigcommerceSdk {
 	}
 
 	public ProductImage updateProductImage(final ProductImage productImage) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
-				.path(String.valueOf(productImage.getProductId())).path(IMAGES)
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG)
+				.path(PRODUCTS)
+				.path(String.valueOf(productImage.getProductId()))
+				.path(IMAGES)
 				.path(String.valueOf(productImage.getId()));
 		final ProductImageResponse productImageResponse = put(webTarget, productImage, ProductImageResponse.class);
 
