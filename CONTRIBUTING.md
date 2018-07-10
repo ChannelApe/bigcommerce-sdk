@@ -4,15 +4,15 @@ Thanks for taking the time to contribute to the BigcommerceSDK project!
 The following is a guide for contributing to the project. These are mostly guidelines and not rules. We are open for discussion on changes to this document in a Pull Request.
 
 ## Table of contents
-- [Just have a question?](#Just-have-a-question)
-- [Prerequisites](#Prerequisites)
-- [Getting Started](#Getting-Started)
-- [Building and Testing](#Building-and-Testing)
-- [Reporting a bug](#Reporting-a-bug)
-- [Suggesting a new feature](#Suggesting-a-new-feature)
-- [Pull Request Template](#Pull-Request-Template)
-- [Style Guide](#Style-Guide)
-- [Update README if applicable](#Update-README-if-applicable)
+- [Just have a question?](#just-have-a-question)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Building and Testing](#building-and-testing)
+- [Reporting a bug](#reporting-a-bug)
+- [Suggesting a new feature](#suggesting-a-new-feature)
+- [Pull Request Template](#pull-request-template)
+- [Style Guide](#style-guide)
+- [Update README if applicable](#update-readme-if-applicable)
 
 ## Just have a question?
 If you have a question please refrain from opening a GitHub issue. We have an official message board with a detailed FAQ and where the community chimes in with helpful advice if you have questions.
@@ -79,6 +79,6 @@ If there are known caveats or tradeoffs with the code, please note them here and
 Please review our style guide. ChannelApe will request changes based on this style guide if needed on Pull Requests. The Java style guide can be found [here](https://channelape.github.io/styleguide/java/javaguide.html).
 
 ## Update README if applicable
-If you make any changes that affect the end user, please update the style guide to reflect this.
+If you make any changes that affect the end user, please update the README.md to reflect this.
 
 
