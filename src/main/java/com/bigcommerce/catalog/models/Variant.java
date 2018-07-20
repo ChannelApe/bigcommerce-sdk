@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -27,8 +26,8 @@ public class Variant {
 	@XmlElement(name = "product_id")
 	private Integer productId;
 	private String sku;
-	@XmlElement(required = false)
-	private String sku_id;
+	@XmlElement(required = false, name = "sku_id")
+	private String skuId;
 	private BigDecimal price;
 	private String upc;
 	private String mpn;
@@ -66,12 +65,12 @@ public class Variant {
 		this.sku = sku;
 	}
 
-	public String getSku_id() {
-		return sku_id;
+	public String getSkuId() {
+		return skuId;
 	}
 
-	public void setSku_id(String sku_id) {
-		this.sku_id = sku_id;
+	public void setSkuId(String skuId) {
+		this.skuId = skuId;
 	}
 
 	public BigDecimal getPrice() {
@@ -139,7 +138,7 @@ public class Variant {
 				Objects.equals(getId(), variant.getId()) &&
 				Objects.equals(getProductId(), variant.getProductId()) &&
 				Objects.equals(getSku(), variant.getSku()) &&
-				Objects.equals(getSku_id(), variant.getSku_id()) &&
+				Objects.equals(getSkuId(), variant.getSkuId()) &&
 				Objects.equals(getPrice(), variant.getPrice()) &&
 				Objects.equals(getUpc(), variant.getUpc()) &&
 				Objects.equals(getMpn(), variant.getMpn()) &&
@@ -150,7 +149,7 @@ public class Variant {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getSku_id())
+		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getSkuId())
 				.append(getPrice()).append(getWeight()).append(getUpc()).append(getMpn()).append(getInventoryLevel())
 				.toHashCode();
 	}
