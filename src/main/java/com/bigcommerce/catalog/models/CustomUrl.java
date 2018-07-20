@@ -15,7 +15,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @JsonInclude(NON_NULL)
 public class CustomUrl implements Serializable {
 
-	@XmlElement(name = "url")
+	final static long serialVersionUID = 26372357L;
+
 	private String url;
 
 	@XmlElement(name = "is_customized")

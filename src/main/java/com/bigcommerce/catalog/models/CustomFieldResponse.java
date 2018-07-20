@@ -2,8 +2,6 @@ package com.bigcommerce.catalog.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.LinkedList;
-import java.util.List;
 
 @XmlRootElement
 public class CustomFieldResponse {

@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class Brand implements Serializable {
 
+	final static long serialVersionUID = -1237162763L;
+
 	@XmlElement(name = "name")
 	private String name;
 
