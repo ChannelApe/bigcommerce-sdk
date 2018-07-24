@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
@@ -42,6 +43,7 @@ import com.bigcommerce.catalog.models.Order;
 import com.bigcommerce.catalog.models.OrderStatus;
 import com.bigcommerce.catalog.models.OrderStatusResponse;
 import com.bigcommerce.catalog.models.OrdersResponse;
+import com.bigcommerce.catalog.models.PaginatedModel;
 import com.bigcommerce.catalog.models.Pagination;
 import com.bigcommerce.catalog.models.Product;
 import com.bigcommerce.catalog.models.ProductImage;
@@ -109,7 +111,8 @@ public class BigcommerceSdk {
 	private static final String METAFIELDS = "metafields";
 	private static final String IMAGES = "images";
 	private static final String PARENT_ID = "parent_id";
-	public static final int MAX_LIMIT = 250;
+	private static final int MAX_LIMIT = 250;
+	private static final int START_PAGE = 1;
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
 	private static final String TREE = "tree";
@@ -182,6 +185,17 @@ public class BigcommerceSdk {
 		final CatalogSummaryResponse catalogSummaryResponse = get(webTarget, CatalogSummaryResponse.class);
 		return catalogSummaryResponse.getData();
 	}
+
+	public List<Products> getProducts() {
+        return getProducts(VARIANTS);
+    }
+
+	public List<Products> getProducts(String... includes) {
+        return paginate(
+                (page) -> getProducts(page, includes),
+                START_PAGE
+        );
+    }
 
 	public Products getProducts(final int page) {
 		return getProducts(page, MAX_LIMIT);
@@ -609,6 +623,29 @@ public class BigcommerceSdk {
 		final Response response = invokeResponseCallable(responseCallable);
 		return handleResponse(response, entityType, Status.OK, Status.CREATED);
 	}
+
+    private <Wrapped extends PaginatedModel, Response> List<Response> paginate(
+            Function<Integer, Wrapped> call,
+            int page
+    ) {
+        // I opted for this way of writing, as it was a bit uglier than using
+        // BiFunction.andThen(...), but more readable
+        Wrapped response = call.apply(page);
+        // Unchecked, use only with actually paged resources
+        List<Response> content = response.getItems();
+        if (response.getPagination().getCurrentPage() < response.getPagination().getTotalPages()) {
+            LOGGER.debug("Paginating ... (" + page + ") ...");
+            // recursive part
+            content.addAll(
+                    paginate(
+                            call,
+                            page + 1
+                    )
+            );
+        }
+
+        return content;
+    }
 
 	private Response invokeResponseCallable(final Callable<Response> responseCallable) {
 		final Retryer<Response> retryer = buildResponseRetyer();
