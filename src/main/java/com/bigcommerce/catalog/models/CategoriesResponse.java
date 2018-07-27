@@ -1,19 +1,20 @@
 package com.bigcommerce.catalog.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.LinkedList;
+import java.util.List;
 
 @XmlRootElement
-public class BrandResponse {
+public class CategoriesResponse {
 
-	private Brand data;
-
+	private List<Category> data = new LinkedList<>();
 	private Meta meta = new Meta();
 
-	public Brand getData() {
+	public List<Category> getData() {
 		return data;
 	}
 
-	public void setData(Brand data) {
+	public void setData(List<Category> data) {
 		this.data = data;
 	}
 
@@ -24,4 +25,5 @@ public class BrandResponse {
 	public void setMeta(Meta meta) {
 		this.meta = meta;
 	}
+
 }
