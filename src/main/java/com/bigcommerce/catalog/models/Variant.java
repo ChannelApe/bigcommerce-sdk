@@ -12,18 +12,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Variant {
 
 	private Integer id;
 	@XmlElement(name = "product_id")
 	private Integer productId;
 	private String sku;
+	@XmlElement(required = false, name = "sku_id")
+	private String skuId;
 	private BigDecimal price;
 	private String upc;
 	private String mpn;
@@ -59,6 +63,14 @@ public class Variant {
 
 	public void setSku(final String sku) {
 		this.sku = sku;
+	}
+
+	public String getSkuId() {
+		return skuId;
+	}
+
+	public void setSkuId(final String skuId) {
+		this.skuId = skuId;
 	}
 
 	public BigDecimal getPrice() {
@@ -131,9 +143,10 @@ public class Variant {
 		final BigDecimal weight = getWeight() != null ? getWeight() : BigDecimal.ZERO;
 		final BigDecimal otherWeight = variant.getWeight() != null ? variant.getWeight() : BigDecimal.ZERO;
 		return (new EqualsBuilder().append(getId(), variant.getId()).append(getProductId(), variant.getProductId())
-				.append(getSku(), variant.getSku()).append(price, otherPrice).append(getUpc(), variant.getUpc())
+				.append(getSku(), variant.getSku()).append(getUpc(), variant.getUpc())
 				.append(getMpn(), variant.getMpn()).append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())
 				&& (price.compareTo(otherPrice) == 0) && (weight.compareTo(otherWeight) == 0);
+
 	}
 
 	@Override

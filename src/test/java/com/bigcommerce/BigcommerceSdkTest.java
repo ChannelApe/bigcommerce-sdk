@@ -6,13 +6,16 @@ import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -37,6 +40,13 @@ import com.bigcommerce.catalog.models.Brands;
 import com.bigcommerce.catalog.models.BrandsResponse;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
+import com.bigcommerce.catalog.models.Categories;
+import com.bigcommerce.catalog.models.CategoriesResponse;
+import com.bigcommerce.catalog.models.Category;
+import com.bigcommerce.catalog.models.CategoryResponse;
+import com.bigcommerce.catalog.models.CustomField;
+import com.bigcommerce.catalog.models.CustomFieldResponse;
+import com.bigcommerce.catalog.models.CustomUrl;
 import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.DateTimeAdapter;
 import com.bigcommerce.catalog.models.LineItem;
@@ -1385,6 +1395,14 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedBrands.get(0).getSearchKeywords(), actualBrands.getBrands().get(0).getSearchKeywords());
 		assertEquals(expectedBrands.get(0).getMetaDescription(), actualBrands.getBrands().get(0).getMetaDescription());
 		assertEquals(expectedBrands.get(0).getMetaKeywords(), actualBrands.getBrands().get(0).getMetaKeywords());
+		assertEquals(expectedBrands.get(0).getCustomUrl().getUrl(),
+				actualBrands.getBrands().get(0).getCustomUrl().getUrl());
+		assertEquals(expectedBrands.get(0).getCustomUrl().isCustomized(),
+				actualBrands.getBrands().get(0).getCustomUrl().isCustomized());
+		assertEquals(expectedBrands.get(0).hashCode(), actualBrands.getBrands().get(0).hashCode());
+		assertEquals(expectedBrands.get(0), actualBrands.getBrands().get(0));
+		assertTrue(expectedBrands.get(0).equals(actualBrands.getBrands().get(0)));
+
 		assertEquals(meta.getPagination().getTotal(), actualBrands.getPagination().getTotal());
 		assertEquals(meta.getPagination().getTotalPages(), actualBrands.getPagination().getTotalPages());
 		assertEquals(meta.getPagination().getCurrentPage(), actualBrands.getPagination().getCurrentPage());
@@ -1725,6 +1743,383 @@ public class BigcommerceSdkTest {
 
 	}
 
+	@Test
+	public void givenSomeValidSdkWhenRetrievingCategoriesAsTreeThenRetrieveCategoriesAsTree() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/categories/tree").toString();
+
+		final CategoriesResponse categoriesResponse = new CategoriesResponse();
+		final Category category1ChildCategory1 = buildCategory(3, 1, "Some category 3 description", null);
+		final Category category1ChildCategory2 = buildCategory(4, 1, "Some category 4 description", null);
+		final List<Category> category1ChildCategories = Arrays.asList(category1ChildCategory1, category1ChildCategory2);
+		final Category category1 = buildCategory(1, null, "Some category 1 description", category1ChildCategories);
+
+		final Category category2ChildCategory1 = buildCategory(5, 2, "Some category 5 description", null);
+		final List<Category> category2ChildCategories = Arrays.asList(category2ChildCategory1);
+		final Category category2 = buildCategory(1, null, "Some category 2 description", category2ChildCategories);
+		final List<Category> categories = Arrays.asList(category1, category2);
+
+		categoriesResponse.setData(categories);
+		final Meta meta = new Meta();
+		final Pagination expectedPagination = new Pagination();
+		expectedPagination.setCurrentPage(1);
+		expectedPagination.setPerPage(250);
+		expectedPagination.setTotal(10);
+		expectedPagination.setTotalPages(5);
+		meta.setPagination(expectedPagination);
+		categoriesResponse.setMeta(meta);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { CategoriesResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(categoriesResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Categories actualCategories = bigcommerceSdk.getCategoriesAsTree();
+
+		final Category firstActualCategory = actualCategories.getCategories().get(0);
+		final Category secondActualCategory = actualCategories.getCategories().get(1);
+		assertCategory(category1, firstActualCategory);
+		assertCategory(category2, secondActualCategory);
+
+		assertEquals(expectedPagination.getCount(), actualCategories.getPagination().getCount());
+		assertEquals(expectedPagination.getCurrentPage(), actualCategories.getPagination().getCurrentPage());
+		assertEquals(expectedPagination.getPerPage(), actualCategories.getPagination().getPerPage());
+		assertEquals(expectedPagination.getTotal(), actualCategories.getPagination().getTotal());
+		assertEquals(expectedPagination.getTotalPages(), actualCategories.getPagination().getTotalPages());
+	}
+
+	@Test
+	public void givenSomeValidParentIdWhenRetrievingCategoriesThenRetrieveCategoriesWithParentId()
+			throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/categories").toString();
+
+		final CategoriesResponse categoriesResponse = new CategoriesResponse();
+		final Category category1ChildCategory1 = buildCategory(3, 1, "Some category 3 description", null);
+		final Category category1ChildCategory2 = buildCategory(4, 1, "Some category 4 description", null);
+		final List<Category> category1ChildCategories = Arrays.asList(category1ChildCategory1, category1ChildCategory2);
+		final Category category1 = buildCategory(1, null, "Some category 1 description", category1ChildCategories);
+
+		final List<Category> categories = Arrays.asList(category1);
+
+		categoriesResponse.setData(categories);
+		final Meta meta = new Meta();
+		final Pagination expectedPagination = new Pagination();
+		expectedPagination.setCurrentPage(1);
+		expectedPagination.setPerPage(250);
+		expectedPagination.setTotal(10);
+		expectedPagination.setTotalPages(5);
+		meta.setPagination(expectedPagination);
+		categoriesResponse.setMeta(meta);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { CategoriesResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(categoriesResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET)
+						.withParam("parent_id", 1).withParam("page", 1).withParam("limit", 250),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Categories actualCategories = bigcommerceSdk.getCategories(1, 1, 250);
+
+		final Category firstActualCategory = actualCategories.getCategories().get(0);
+		assertCategory(category1, firstActualCategory);
+
+		assertEquals(expectedPagination.getCount(), actualCategories.getPagination().getCount());
+		assertEquals(expectedPagination.getCurrentPage(), actualCategories.getPagination().getCurrentPage());
+		assertEquals(expectedPagination.getPerPage(), actualCategories.getPagination().getPerPage());
+		assertEquals(expectedPagination.getTotal(), actualCategories.getPagination().getTotal());
+		assertEquals(expectedPagination.getTotalPages(), actualCategories.getPagination().getTotalPages());
+	}
+
+	@Test
+	public void givenSomeValidPageAndNoParentIdWhenRetrievingCategoriesThenRetrieveCategoriesWithParentId()
+			throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/categories").toString();
+
+		final CategoriesResponse categoriesResponse = new CategoriesResponse();
+		final Category category1ChildCategory1 = buildCategory(3, 1, "Some category 3 description", null);
+		final Category category1ChildCategory2 = buildCategory(4, 1, "Some category 4 description", null);
+		final List<Category> category1ChildCategories = Arrays.asList(category1ChildCategory1, category1ChildCategory2);
+		final Category category1 = buildCategory(1, null, "Some category 1 description", category1ChildCategories);
+
+		final List<Category> categories = Arrays.asList(category1);
+
+		categoriesResponse.setData(categories);
+		final Meta meta = new Meta();
+		final Pagination expectedPagination = new Pagination();
+		expectedPagination.setCurrentPage(1);
+		expectedPagination.setPerPage(250);
+		expectedPagination.setTotal(10);
+		expectedPagination.setTotalPages(5);
+		meta.setPagination(expectedPagination);
+		categoriesResponse.setMeta(meta);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { CategoriesResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(categoriesResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.GET)
+						.withParam("page", 1).withParam("limit", 250),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Categories actualCategories = bigcommerceSdk.getCategories(1);
+
+		final Category firstActualCategory = actualCategories.getCategories().get(0);
+		assertCategory(category1, firstActualCategory);
+
+		assertEquals(expectedPagination.getCount(), actualCategories.getPagination().getCount());
+		assertEquals(expectedPagination.getCurrentPage(), actualCategories.getPagination().getCurrentPage());
+		assertEquals(expectedPagination.getPerPage(), actualCategories.getPagination().getPerPage());
+		assertEquals(expectedPagination.getTotal(), actualCategories.getPagination().getTotal());
+		assertEquals(expectedPagination.getTotalPages(), actualCategories.getPagination().getTotalPages());
+	}
+
+	@Test
+	public void givenSomeValidCategoryWhenCreatingCategoryThenCreateCategory() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/categories").toString();
+
+		final CategoryResponse categoryResponse = new CategoryResponse();
+
+		final Category category = buildCategory(1, null, "Some category 1 description", new LinkedList<>());
+		categoryResponse.setData(category);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { CategoryResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(categoryResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.CREATED;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
+
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.POST)
+						.capturingBodyIn(actualRequestBody),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Category actualCategory = bigcommerceSdk.createCategory(category);
+
+		assertCategory(category, actualCategory);
+
+	}
+
+	@Test
+	public void givenSomeValidCategoryIdAndCategoryWhenUpdatingCategoryThenUpdateCategory() throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/categories/1").toString();
+
+		final CategoryResponse categoryResponse = new CategoryResponse();
+
+		final Category category = buildCategory(1, null, "Some category 1 description", new LinkedList<>());
+		categoryResponse.setData(category);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { CategoryResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(categoryResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.OK;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
+
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.PUT)
+						.capturingBodyIn(actualRequestBody),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final Category actualCategory = bigcommerceSdk.updateCategory(category);
+
+		assertCategory(category, actualCategory);
+
+	}
+
+	@Test
+	public void givenSomeValidProductIdAndCustomFieldWhenCreatingCustomFieldThenCreateCustomField()
+			throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/products/1/custom-fields").toString();
+
+		final CustomFieldResponse customFieldResponse = new CustomFieldResponse();
+
+		final CustomField customField = new CustomField();
+		customField.setId("1");
+		customField.setName("Some Custom Field");
+		customField.setValue("Some custom value");
+
+		customFieldResponse.setData(customField);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { CustomFieldResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(customFieldResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.CREATED;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+		final JsonBodyCapture actualRequestBody = new JsonBodyCapture();
+
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.POST)
+						.capturingBodyIn(actualRequestBody),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		final CustomField actualCustomField = bigcommerceSdk.createProductCustomField(1, customField);
+
+		assertEquals(customField.getId(), actualCustomField.getId());
+		assertEquals(customField.getName(), actualCustomField.getName());
+		assertEquals(customField.getValue(), actualCustomField.getValue());
+	}
+
+	@Test
+	public void givenSomeValidProductIdAndCustomFieldWhenUpdatingCustomFieldThenUpdateCustomField()
+			throws JAXBException {
+		final BigcommerceSdk bigcommerceSdk = buildBigcommerceSdk();
+
+		final String expectedPath = new StringBuilder().append(FORWARD_SLASH).append(SOME_STORE_HASH)
+				.append(FORWARD_SLASH).append(BigcommerceSdk.API_VERSION_V3).append(FORWARD_SLASH)
+				.append("catalog/products/1/custom-fields/555").toString();
+
+		final CustomFieldResponse customFieldResponse = new CustomFieldResponse();
+
+		final CustomField customField = new CustomField();
+		customField.setId("555");
+		customField.setName("Some Custom Field");
+		customField.setValue("Some custom value");
+
+		customFieldResponse.setData(customField);
+
+		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
+				.createContext(new Class[] { CustomFieldResponse.class }, null);
+		final Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, MediaType.APPLICATION_JSON);
+
+		final StringWriter stringWriter = new StringWriter();
+		marshaller.marshal(customFieldResponse, stringWriter);
+		final String expectedResponseBodyString = stringWriter.toString();
+
+		final Status expectedStatus = Status.NO_CONTENT;
+		final int expectedStatusCode = expectedStatus.getStatusCode();
+
+		driver.addExpectation(
+				onRequestTo(expectedPath).withHeader(BigcommerceSdk.CLIENT_ID_HEADER, SOME_CLIENT_ID)
+						.withHeader(BigcommerceSdk.ACCESS_TOKEN_HEADER, SOME_ACCESS_TOKEN).withMethod(Method.DELETE),
+				giveResponse(expectedResponseBodyString, MediaType.APPLICATION_JSON).withStatus(expectedStatusCode));
+
+		bigcommerceSdk.deleteProductCustomField(1, 555);
+
+	}
+
+	private void assertCategory(final Category expectedCategory, final Category actualCategory) {
+		assertEquals(expectedCategory.getId(), actualCategory.getId());
+		assertEquals(expectedCategory.getCustomUrl(), actualCategory.getCustomUrl());
+		assertEquals(expectedCategory.getMetaKeywords(), actualCategory.getMetaKeywords());
+		assertEquals(expectedCategory.getDescription(), actualCategory.getDescription());
+		assertEquals(expectedCategory.getName(), actualCategory.getName());
+		assertEquals(expectedCategory.getKeyword(), actualCategory.getKeyword());
+		assertEquals(expectedCategory.getMetaDescription(), actualCategory.getMetaDescription());
+		assertEquals(expectedCategory.getParentId(), actualCategory.getParentId());
+
+		for (final Category expectedChildCategory : expectedCategory.getChildren()) {
+			final Optional<Category> foundChildCategory = actualCategory.getChildren().stream()
+					.filter(actualChildCategory -> expectedChildCategory.getId().equals(actualChildCategory.getId()))
+					.findFirst();
+			assertTrue(foundChildCategory.isPresent());
+			assertEquals(expectedChildCategory.getId(), foundChildCategory.get().getId());
+			assertEquals(expectedChildCategory.getCustomUrl(), foundChildCategory.get().getCustomUrl());
+			assertEquals(expectedChildCategory.getMetaKeywords(), foundChildCategory.get().getMetaKeywords());
+			assertEquals(expectedChildCategory.getDescription(), foundChildCategory.get().getDescription());
+			assertEquals(expectedChildCategory.getName(), foundChildCategory.get().getName());
+			assertEquals(expectedChildCategory.getKeyword(), foundChildCategory.get().getKeyword());
+			assertEquals(expectedChildCategory.getMetaDescription(), foundChildCategory.get().getMetaDescription());
+			assertEquals(expectedChildCategory.getParentId(), foundChildCategory.get().getParentId());
+		}
+	}
+
+	private Category buildCategory(final int id, final Integer parentId, final String description,
+			final List<Category> childCategories) {
+		final Category category = new Category();
+		category.setId(id);
+		category.setParentId(parentId);
+		category.setVisible(true);
+		category.setDescription(description);
+		category.setKeyword("Category");
+		category.setCustomUrl(new CustomUrl());
+		category.setChildren(childCategories);
+		category.setMetaDescription("Category  meta description");
+		return category;
+	}
+
 	private Metafield buildMetafield(final Integer id, final String key, final String value, final String namespace,
 			final String description, final Integer resourceId) {
 		final Metafield metafield = new Metafield();
@@ -1747,6 +2142,10 @@ public class BigcommerceSdkTest {
 		brand.setName("NIKE");
 		brand.setPageTitle("Nike Brands");
 		brand.setSearchKeywords("SHOES");
+		final CustomUrl customUrl = new CustomUrl();
+		customUrl.setUrl("/url_" + id);
+		customUrl.setCustomized(true);
+		brand.setCustomUrl(customUrl);
 		return brand;
 	}
 

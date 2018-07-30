@@ -31,6 +31,12 @@ import com.bigcommerce.catalog.models.Brands;
 import com.bigcommerce.catalog.models.BrandsResponse;
 import com.bigcommerce.catalog.models.CatalogSummary;
 import com.bigcommerce.catalog.models.CatalogSummaryResponse;
+import com.bigcommerce.catalog.models.Categories;
+import com.bigcommerce.catalog.models.CategoriesResponse;
+import com.bigcommerce.catalog.models.Category;
+import com.bigcommerce.catalog.models.CategoryResponse;
+import com.bigcommerce.catalog.models.CustomField;
+import com.bigcommerce.catalog.models.CustomFieldResponse;
 import com.bigcommerce.catalog.models.Customer;
 import com.bigcommerce.catalog.models.LineItem;
 import com.bigcommerce.catalog.models.LineItemsResponse;
@@ -58,6 +64,8 @@ import com.bigcommerce.catalog.models.ShipmentUpdateRequest;
 import com.bigcommerce.catalog.models.Store;
 import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
+import com.bigcommerce.catalog.models.Variants;
+import com.bigcommerce.catalog.models.VariantsResponse;
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
 import com.bigcommerce.exceptions.BigcommerceException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -80,25 +88,30 @@ public class BigcommerceSdk {
 
 	static final int TOO_MANY_REQUESTS_STATUS_CODE = 429;
 
+	public static final String VARIANTS = "variants";
+
 	private static final String CATALOG = "catalog";
+	private static final String CATEGORIES = "categories";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
+	private static final String CUSTOM_FIELDS = "custom-fields";
 	private static final String BRANDS = "brands";
 	private static final String ORDERS = "orders";
 	private static final String CUSTOMERS = "customers";
 	private static final String LIMIT = "limit";
 	private static final String PAGE = "page";
 	private static final String INCLUDE = "include";
-	private static final String VARIANTS = "variants";
 	private static final String SHIPPINGADDRESSES = "shipping_addresses";
 	private static final String SHIPMENTS = "shipments";
 	private static final String MIN_DATE_CREATED = "min_date_created";
 	private static final String STORE = "store";
 	private static final String METAFIELDS = "metafields";
 	private static final String IMAGES = "images";
+	private static final String PARENT_ID = "parent_id";
 	private static final int MAX_LIMIT = 250;
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
+	private static final String TREE = "tree";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BigcommerceSdk.class);
 
@@ -108,8 +121,8 @@ public class BigcommerceSdk {
 	private final WebTarget baseWebTargetV3;
 
 	/*
-	 * Bigcommerce API has some differences between V2 & V3 and currently some
-	 * API endpoints only exist in V2. The SDK uses V2 where applicable.
+	 * Bigcommerce API has some differences between V2 & V3 and currently some API
+	 * endpoints only exist in V2. The SDK uses V2 where applicable.
 	 */
 	private final WebTarget baseWebTargetV2;
 	private final String storeHash;
@@ -167,20 +180,89 @@ public class BigcommerceSdk {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(SUMMARY);
 		final CatalogSummaryResponse catalogSummaryResponse = get(webTarget, CatalogSummaryResponse.class);
 		return catalogSummaryResponse.getData();
-
 	}
 
 	public Products getProducts(final int page) {
 		return getProducts(page, MAX_LIMIT);
 	}
 
+	public Products getProducts(final int page, final String... includes) {
+		return getProducts(page, MAX_LIMIT, includes);
+	}
+
 	public Products getProducts(final int page, final int limit) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(INCLUDE, VARIANTS)
-				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		return getProducts(page, limit, VARIANTS);
+	}
+
+	public Products getProducts(final int page, final int limit, final String... includes) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(LIMIT, limit)
+				.queryParam(PAGE, page).queryParam(INCLUDE, String.join("", includes));
+
 		final ProductsResponse productsResponse = get(webTarget, ProductsResponse.class);
 		final List<Product> products = productsResponse.getData();
 		final Pagination pagination = productsResponse.getMeta().getPagination();
 		return new Products(products, pagination);
+	}
+
+	public Category createCategory(final Category category) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES);
+		final CategoryResponse categoryResponse = post(webTarget, category, CategoryResponse.class);
+
+		return categoryResponse.getData();
+	}
+
+	public Category updateCategory(final Category category) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES)
+				.path(String.valueOf(category.getId()));
+		final CategoryResponse categoryResponse = put(webTarget, category, CategoryResponse.class);
+
+		return categoryResponse.getData();
+	}
+
+	public Categories getCategories(final int page) {
+		return getCategories(page, MAX_LIMIT);
+	}
+
+	public Categories getCategories(final int page, final int limit) {
+		return getCategories(null, page, limit);
+	}
+
+	public Categories getCategories(final Integer parentId, final int page, final int limit) {
+		WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES).queryParam(LIMIT, limit).queryParam(PAGE,
+				page);
+
+		if (parentId != null) {
+			webTarget = webTarget.queryParam(PARENT_ID, parentId);
+		}
+
+		final CategoriesResponse categoriesResponse = get(webTarget, CategoriesResponse.class);
+		final List<Category> categories = categoriesResponse.getData();
+
+		final Pagination pagination = categoriesResponse.getMeta().getPagination();
+
+		return new Categories(categories, pagination);
+	}
+
+	public Categories getCategoriesAsTree() {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES).path(TREE);
+		final CategoriesResponse categoriesResponse = get(webTarget, CategoriesResponse.class);
+		final List<Category> categories = categoriesResponse.getData();
+		final Pagination pagination = categoriesResponse.getMeta().getPagination();
+		return new Categories(categories, pagination);
+	}
+
+	public Variants getVariants(final int page) {
+		return getVariants(page, MAX_LIMIT);
+	}
+
+	public Variants getVariants(final int page, final int limit) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(VARIANTS).queryParam(LIMIT, limit)
+				.queryParam(PAGE, page);
+
+		final VariantsResponse variantsResponse = get(webTarget, VariantsResponse.class);
+		final List<Variant> variants = variantsResponse.getData();
+		final Pagination pagination = variantsResponse.getMeta().getPagination();
+		return new Variants(variants, pagination);
 	}
 
 	public Product createProduct(final Product product) {
@@ -228,6 +310,19 @@ public class BigcommerceSdk {
 	public void deleteProduct(final Integer productId) {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId));
 		delete(webTarget, Object.class);
+	}
+
+	public void deleteProductCustomField(final Integer productId, final Integer customFieldId) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(CUSTOM_FIELDS).path(String.valueOf(customFieldId));
+		delete(webTarget, Object.class);
+	}
+
+	public CustomField createProductCustomField(final Integer productId, final CustomField customField) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(CUSTOM_FIELDS);
+		final CustomFieldResponse customFieldResponse = post(webTarget, customField, CustomFieldResponse.class);
+		return customFieldResponse.getData();
 	}
 
 	public ProductImages getProductImages(final Integer productId, final int page) {
@@ -278,7 +373,6 @@ public class BigcommerceSdk {
 
 		order.setStatusId(getStatus(com.bigcommerce.catalog.models.Status.COMPLETED).getId());
 		return put(webTarget, order, Order.class);
-
 	}
 
 	public Order cancelOrder(final int orderId) {
@@ -288,7 +382,6 @@ public class BigcommerceSdk {
 
 		order.setStatusId(getStatus(com.bigcommerce.catalog.models.Status.CANCELLED).getId());
 		return put(webTarget, order, Order.class);
-
 	}
 
 	public OrderStatus getStatus(final com.bigcommerce.catalog.models.Status statusName) {

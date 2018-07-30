@@ -9,12 +9,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Product {
 
 	private Integer id;
@@ -35,16 +37,31 @@ public class Product {
 	@XmlElement(name = "is_condition_shown")
 	private Boolean isConditionShown;
 
-	@XmlElement(name = "metaKeywords")
+	@XmlElement(name = "meta_keywords")
 	private List<String> metaKeywords = new LinkedList<>();
+
+	@XmlElement(name = "search_keywords ")
+	private String searchKeywords;
 
 	@XmlElement(name = "inventory_tracking")
 	private String inventoryTracking;
 	private String condition;
 	private BigDecimal price;
 
+	@XmlElement(name = "page_title")
+	private String pageTitle;
+
+	@XmlElement(name = "meta_description")
+	private String metaDescription;
+
 	@XmlElement(name = "custom_fields")
 	private List<CustomField> customFields = new LinkedList<>();
+
+	@XmlElement(name = "sort_order")
+	private Integer sortOrder;
+
+	@XmlElement(name = "custom_url ")
+	private CustomUrl productUrl;
 
 	public Integer getId() {
 		return id;
@@ -174,4 +191,60 @@ public class Product {
 		this.price = price;
 	}
 
+	public Integer getSortOrder() {
+		return sortOrder;
+	}
+
+	public String getSearchKeywords() {
+		return searchKeywords;
+	}
+
+	public void setSearchKeywords(String searchKeywords) {
+		this.searchKeywords = searchKeywords;
+	}
+
+	public void setSortOrder(Integer sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+
+	public CustomUrl getProductUrl() {
+		return productUrl;
+	}
+
+	public void setProductUrl(CustomUrl productUrl) {
+		this.productUrl = productUrl;
+  }
+  
+	public Boolean getVisible() {
+		return isVisible;
+	}
+
+	public void setVisible(Boolean visible) {
+		isVisible = visible;
+	}
+
+	public Boolean getConditionShown() {
+		return isConditionShown;
+	}
+
+	public void setConditionShown(Boolean conditionShown) {
+		isConditionShown = conditionShown;
+	}
+
+	public String getPageTitle() {
+		return pageTitle;
+	}
+
+	public void setPageTitle(String pageTitle) {
+		this.pageTitle = pageTitle;
+	}
+
+	public String getMetaDescription() {
+		return metaDescription;
+	}
+
+	public void setMetaDescription(String metaDescription) {
+		this.metaDescription = metaDescription;
+	}
 }
+

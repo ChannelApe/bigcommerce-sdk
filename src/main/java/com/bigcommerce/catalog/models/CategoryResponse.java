@@ -3,17 +3,16 @@ package com.bigcommerce.catalog.models;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class BrandResponse {
+public class CategoryResponse {
+	private Category data;
 
-	private Brand data;
+	private Meta meta;
 
-	private Meta meta = new Meta();
-
-	public Brand getData() {
+	public Category getData() {
 		return data;
 	}
 
-	public void setData(Brand data) {
+	public void setData(final Category data) {
 		this.data = data;
 	}
 

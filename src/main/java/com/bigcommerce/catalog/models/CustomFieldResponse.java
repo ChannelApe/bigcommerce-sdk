@@ -1,19 +1,20 @@
 package com.bigcommerce.catalog.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
-public class BrandResponse {
+public class CustomFieldResponse {
+	private CustomField data;
 
-	private Brand data;
-
+	@XmlTransient
 	private Meta meta = new Meta();
 
-	public Brand getData() {
+	public CustomField getData() {
 		return data;
 	}
 
-	public void setData(Brand data) {
+	public void setData(CustomField data) {
 		this.data = data;
 	}
 
