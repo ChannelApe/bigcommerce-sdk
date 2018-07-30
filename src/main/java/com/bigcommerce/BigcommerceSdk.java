@@ -17,6 +17,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.bigcommerce.catalog.models.Address;
 import com.bigcommerce.catalog.models.AddressResponse;
 import com.bigcommerce.catalog.models.Brand;
@@ -60,12 +66,6 @@ import com.bigcommerce.catalog.models.Variant;
 import com.bigcommerce.catalog.models.VariantResponse;
 import com.bigcommerce.catalog.models.Variants;
 import com.bigcommerce.catalog.models.VariantsResponse;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.jackson.JacksonFeature;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bigcommerce.exceptions.BigcommerceErrorResponseException;
 import com.bigcommerce.exceptions.BigcommerceException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -89,13 +89,12 @@ public class BigcommerceSdk {
 	static final int TOO_MANY_REQUESTS_STATUS_CODE = 429;
 
 	public static final String VARIANTS = "variants";
-	public static final String CUSTOM_FIELDS = "custom_fields";
 
 	private static final String CATALOG = "catalog";
-	private static final String CATEGORIES= "categories";
+	private static final String CATEGORIES = "categories";
 	private static final String SUMMARY = "summary";
 	private static final String PRODUCTS = "products";
-	private static final String CUSTOM_FIELDS_PATH = "custom-fields";
+	private static final String CUSTOM_FIELDS = "custom-fields";
 	private static final String BRANDS = "brands";
 	private static final String ORDERS = "orders";
 	private static final String CUSTOMERS = "customers";
@@ -109,7 +108,7 @@ public class BigcommerceSdk {
 	private static final String METAFIELDS = "metafields";
 	private static final String IMAGES = "images";
 	private static final String PARENT_ID = "parent_id";
-	public static final int MAX_LIMIT = 250;
+	private static final int MAX_LIMIT = 250;
 	private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON + ";charset=UTF-8";
 	private static final String RETRY_FAILED_MESSAGE = "Request retry has failed.";
 	private static final String TREE = "tree";
@@ -122,8 +121,8 @@ public class BigcommerceSdk {
 	private final WebTarget baseWebTargetV3;
 
 	/*
-	 * Bigcommerce API has some differences between V2 & V3 and currently some
-	 * API endpoints only exist in V2. The SDK uses V2 where applicable.
+	 * Bigcommerce API has some differences between V2 & V3 and currently some API
+	 * endpoints only exist in V2. The SDK uses V2 where applicable.
 	 */
 	private final WebTarget baseWebTargetV2;
 	private final String storeHash;
@@ -187,7 +186,7 @@ public class BigcommerceSdk {
 		return getProducts(page, MAX_LIMIT);
 	}
 
-	public Products getProducts(final int page, String... includes) {
+	public Products getProducts(final int page, final String... includes) {
 		return getProducts(page, MAX_LIMIT, includes);
 	}
 
@@ -195,12 +194,9 @@ public class BigcommerceSdk {
 		return getProducts(page, limit, VARIANTS);
 	}
 
-	public Products getProducts(final int page, final int limit, String... includes) {
-		WebTarget webTarget = baseWebTargetV3.path(CATALOG)
-			.path(PRODUCTS)
-			.queryParam(LIMIT, limit)
-			.queryParam(PAGE, page)
-			.queryParam(INCLUDE, String.join("", includes));
+	public Products getProducts(final int page, final int limit, final String... includes) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).queryParam(LIMIT, limit)
+				.queryParam(PAGE, page).queryParam(INCLUDE, String.join("", includes));
 
 		final ProductsResponse productsResponse = get(webTarget, ProductsResponse.class);
 		final List<Product> products = productsResponse.getData();
@@ -216,7 +212,8 @@ public class BigcommerceSdk {
 	}
 
 	public Category updateCategory(final Category category) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES).path(String.valueOf(category.getId()));
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES)
+				.path(String.valueOf(category.getId()));
 		final CategoryResponse categoryResponse = put(webTarget, category, CategoryResponse.class);
 
 		return categoryResponse.getData();
@@ -231,18 +228,15 @@ public class BigcommerceSdk {
 	}
 
 	public Categories getCategories(final Integer parentId, final int page, final int limit) {
-		WebTarget webTarget = baseWebTargetV3
-				.path(CATALOG)
-				.path(CATEGORIES)
-				.queryParam(LIMIT, limit)
-				.queryParam(PAGE, page);
+		WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES).queryParam(LIMIT, limit).queryParam(PAGE,
+				page);
 
 		if (parentId != null) {
 			webTarget = webTarget.queryParam(PARENT_ID, parentId);
 		}
 
 		final CategoriesResponse categoriesResponse = get(webTarget, CategoriesResponse.class);
-		final List<Category> categories= categoriesResponse.getData();
+		final List<Category> categories = categoriesResponse.getData();
 
 		final Pagination pagination = categoriesResponse.getMeta().getPagination();
 
@@ -252,7 +246,7 @@ public class BigcommerceSdk {
 	public Categories getCategoriesAsTree() {
 		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(CATEGORIES).path(TREE);
 		final CategoriesResponse categoriesResponse = get(webTarget, CategoriesResponse.class);
-		final List<Category> categories= categoriesResponse.getData();
+		final List<Category> categories = categoriesResponse.getData();
 		final Pagination pagination = categoriesResponse.getMeta().getPagination();
 		return new Categories(categories, pagination);
 	}
@@ -262,8 +256,8 @@ public class BigcommerceSdk {
 	}
 
 	public Variants getVariants(final int page, final int limit) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(VARIANTS)
-				.queryParam(LIMIT, limit).queryParam(PAGE, page);
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(VARIANTS).queryParam(LIMIT, limit)
+				.queryParam(PAGE, page);
 
 		final VariantsResponse variantsResponse = get(webTarget, VariantsResponse.class);
 		final List<Variant> variants = variantsResponse.getData();
@@ -279,9 +273,7 @@ public class BigcommerceSdk {
 	}
 
 	public Product updateProduct(final Product product) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG)
-				.path(PRODUCTS)
-				.path(String.valueOf(product.getId()));
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(product.getId()));
 		final ProductResponse productResponse = put(webTarget, product, ProductResponse.class);
 		return productResponse.getData();
 	}
@@ -307,10 +299,8 @@ public class BigcommerceSdk {
 	}
 
 	public ProductImage updateProductImage(final ProductImage productImage) {
-		final WebTarget webTarget = baseWebTargetV3.path(CATALOG)
-				.path(PRODUCTS)
-				.path(String.valueOf(productImage.getProductId()))
-				.path(IMAGES)
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS)
+				.path(String.valueOf(productImage.getProductId())).path(IMAGES)
 				.path(String.valueOf(productImage.getId()));
 		final ProductImageResponse productImageResponse = put(webTarget, productImage, ProductImageResponse.class);
 
@@ -323,22 +313,16 @@ public class BigcommerceSdk {
 	}
 
 	public void deleteProductCustomField(final Integer productId, final Integer customFieldId) {
-		final WebTarget webTarget = baseWebTargetV3
-			.path(CATALOG)
-			.path(PRODUCTS)
-			.path(String.valueOf(productId))
-			.path(CUSTOM_FIELDS_PATH)
-			.path(String.valueOf(customFieldId));
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(CUSTOM_FIELDS).path(String.valueOf(customFieldId));
 		delete(webTarget, Object.class);
 	}
 
-	public CustomFieldResponse createProductCustomField(final Integer productId, final CustomField customField) {
-		final WebTarget webTarget = baseWebTargetV3
-			.path(CATALOG)
-			.path(PRODUCTS)
-			.path(String.valueOf(productId))
-			.path(CUSTOM_FIELDS_PATH);
-		return post(webTarget, customField, CustomFieldResponse.class);
+	public CustomField createProductCustomField(final Integer productId, final CustomField customField) {
+		final WebTarget webTarget = baseWebTargetV3.path(CATALOG).path(PRODUCTS).path(String.valueOf(productId))
+				.path(CUSTOM_FIELDS);
+		final CustomFieldResponse customFieldResponse = post(webTarget, customField, CustomFieldResponse.class);
+		return customFieldResponse.getData();
 	}
 
 	public ProductImages getProductImages(final Integer productId, final int page) {

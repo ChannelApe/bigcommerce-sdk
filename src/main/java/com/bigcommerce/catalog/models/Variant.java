@@ -3,16 +3,16 @@ package com.bigcommerce.catalog.models;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -69,7 +69,7 @@ public class Variant {
 		return skuId;
 	}
 
-	public void setSkuId(String skuId) {
+	public void setSkuId(final String skuId) {
 		this.skuId = skuId;
 	}
 
@@ -130,27 +130,28 @@ public class Variant {
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		if (this == object) return true;
-		if (object == null || getClass() != object.getClass()) return false;
-		Variant variant = (Variant) object;
-		return getInventoryLevel() == variant.getInventoryLevel() &&
-				Objects.equals(getId(), variant.getId()) &&
-				Objects.equals(getProductId(), variant.getProductId()) &&
-				Objects.equals(getSku(), variant.getSku()) &&
-				Objects.equals(getSkuId(), variant.getSkuId()) &&
-				Objects.equals(getPrice(), variant.getPrice()) &&
-				Objects.equals(getUpc(), variant.getUpc()) &&
-				Objects.equals(getMpn(), variant.getMpn()) &&
-				Objects.equals(getImageUrl(), variant.getImageUrl()) &&
-				Objects.equals(getWeight(), variant.getWeight()) &&
-				Objects.equals(getOptionValues(), variant.getOptionValues());
+	public boolean equals(final Object object) {
+		if (object == this) {
+			return true;
+		}
+		if (!(object instanceof Variant)) {
+			return false;
+		}
+		final Variant variant = (Variant) object;
+		final BigDecimal price = getPrice() != null ? getPrice() : BigDecimal.ZERO;
+		final BigDecimal otherPrice = variant.getPrice() != null ? variant.getPrice() : BigDecimal.ZERO;
+		final BigDecimal weight = getWeight() != null ? getWeight() : BigDecimal.ZERO;
+		final BigDecimal otherWeight = variant.getWeight() != null ? variant.getWeight() : BigDecimal.ZERO;
+		return (new EqualsBuilder().append(getId(), variant.getId()).append(getProductId(), variant.getProductId())
+				.append(getSku(), variant.getSku()).append(getUpc(), variant.getUpc())
+				.append(getMpn(), variant.getMpn()).append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())
+				&& (price.compareTo(otherPrice) == 0) && (weight.compareTo(otherWeight) == 0);
+
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getSkuId())
-				.append(getPrice()).append(getWeight()).append(getUpc()).append(getMpn()).append(getInventoryLevel())
-				.toHashCode();
+		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getPrice())
+				.append(getWeight()).append(getUpc()).append(getMpn()).append(getInventoryLevel()).toHashCode();
 	}
 }

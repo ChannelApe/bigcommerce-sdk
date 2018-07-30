@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class Brand implements Serializable {
 
-	final static long serialVersionUID = -1237162763L;
+	private static final long serialVersionUID = -1920738497651655007L;
 
 	@XmlElement(name = "name")
 	private String name;
@@ -48,7 +48,7 @@ public class Brand implements Serializable {
 		return customUrl;
 	}
 
-	public void setCustomUrl(CustomUrl customUrl) {
+	public void setCustomUrl(final CustomUrl customUrl) {
 		this.customUrl = customUrl;
 	}
 
@@ -109,23 +109,24 @@ public class Brand implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Brand brand = (Brand) o;
-		return Objects.equals(getName(), brand.getName()) &&
-				Objects.equals(getPageTitle(), brand.getPageTitle()) &&
-				Objects.equals(getMetaKeywords(), brand.getMetaKeywords()) &&
-				Objects.equals(getMetaDescription(), brand.getMetaDescription()) &&
-				Objects.equals(getSearchKeywords(), brand.getSearchKeywords()) &&
-				Objects.equals(getImageUrl(), brand.getImageUrl()) &&
-				Objects.equals(getId(), brand.getId()) &&
-				Objects.equals(getCustomUrl(), brand.getCustomUrl());
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		final Brand brand = (Brand) o;
+		return Objects.equals(getName(), brand.getName()) && Objects.equals(getPageTitle(), brand.getPageTitle())
+				&& Objects.equals(getMetaKeywords(), brand.getMetaKeywords())
+				&& Objects.equals(getMetaDescription(), brand.getMetaDescription())
+				&& Objects.equals(getSearchKeywords(), brand.getSearchKeywords())
+				&& Objects.equals(getImageUrl(), brand.getImageUrl()) && Objects.equals(getId(), brand.getId())
+				&& Objects.equals(getCustomUrl(), brand.getCustomUrl());
 	}
 
 	@Override
 	public int hashCode() {
 
-		return Objects.hash(getName(), getPageTitle(), getMetaKeywords(), getMetaDescription(), getSearchKeywords(), getImageUrl(), getId(), getCustomUrl());
+		return Objects.hash(getName(), getPageTitle(), getMetaKeywords(), getMetaDescription(), getSearchKeywords(),
+				getImageUrl(), getId(), getCustomUrl());
 	}
 }
