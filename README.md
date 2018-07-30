@@ -11,7 +11,7 @@ Java SDK for BigCommerce REST APIs
 	<dependency>
 	    <groupId>com.channelape</groupId>
 	    <artifactId>bigcommerce-sdk</artifactId>
-	    <version>1.3.0-SNAPSHOT</version>
+	    <version>1.3.0</version>
 	</dependency>
 ```
 
