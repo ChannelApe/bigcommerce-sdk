@@ -44,6 +44,7 @@ public class Variant {
 	private BigDecimal height;
 	private BigDecimal width;
 	private BigDecimal depth;
+	private String gtin;
 
 	public Integer getId() {
 		return id;
@@ -157,6 +158,14 @@ public class Variant {
 		this.depth = depth;
 	}
 
+	public String getGtin() {
+		return gtin;
+	}
+
+	public void setGtin(final String gtin) {
+		this.gtin = gtin;
+	}
+
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) {
@@ -169,7 +178,8 @@ public class Variant {
 
 		return (new EqualsBuilder().append(getId(), variant.getId()).append(getProductId(), variant.getProductId())
 				.append(getSku(), variant.getSku()).append(getUpc(), variant.getUpc())
-				.append(getMpn(), variant.getMpn()).append(getInventoryLevel(), variant.getInventoryLevel()).isEquals())
+				.append(getMpn(), variant.getMpn()).append(getInventoryLevel(), variant.getInventoryLevel())
+				.append(getGtin(), variant.getGtin()).isEquals())
 				&& (isScaledDeimalValueSame(getPrice(), variant.getPrice()))
 				&& (isScaledDeimalValueSame(getWeight(), variant.getWeight()))
 				&& (isScaledDeimalValueSame(getWidth(), variant.getWidth()))

@@ -45,7 +45,7 @@ public class VariantTest {
 		leftHandVariant.setUpc("9839537238592");
 		leftHandVariant.setMpn("AFFF332");
 		leftHandVariant.setInventoryLevel(76);
-
+		leftHandVariant.setGtin("someglobaltradeitemnumber");
 		final Variant rightHandVariant = new Variant();
 		rightHandVariant.setId(12);
 		rightHandVariant.setProductId(144);
@@ -53,6 +53,7 @@ public class VariantTest {
 		rightHandVariant.setPrice(BigDecimal.valueOf(30.45));
 		rightHandVariant.setUpc("9839537238592");
 		rightHandVariant.setMpn("AFFF332");
+		rightHandVariant.setGtin("someglobaltradeitemnumber");
 		rightHandVariant.setInventoryLevel(76);
 
 		assertTrue(leftHandVariant.equals(rightHandVariant));
@@ -68,6 +69,7 @@ public class VariantTest {
 		leftHandVariant.setPrice(BigDecimal.valueOf(30.45));
 		leftHandVariant.setUpc("9839537238592");
 		leftHandVariant.setMpn("AFFF332");
+		leftHandVariant.setGtin("someglobaltradeitemnumber");
 		leftHandVariant.setInventoryLevel(76);
 
 		final Variant rightHandVariant = new Variant();
@@ -77,6 +79,7 @@ public class VariantTest {
 		rightHandVariant.setPrice(BigDecimal.valueOf(30.45));
 		rightHandVariant.setUpc("9839537238592");
 		rightHandVariant.setMpn("AFFF332");
+		rightHandVariant.setGtin("someglobaltradeitemnumber");
 		rightHandVariant.setInventoryLevel(75);
 
 		assertFalse(leftHandVariant.equals(rightHandVariant));
@@ -92,6 +95,7 @@ public class VariantTest {
 		leftHandVariant.setPrice(new BigDecimal(30.4500000000000000000).setScale(6, RoundingMode.CEILING));
 		leftHandVariant.setUpc("9839537238592");
 		leftHandVariant.setMpn("AFFF332");
+		leftHandVariant.setGtin("someglobaltradeitemnumber");
 		leftHandVariant.setInventoryLevel(76);
 		final Variant rightHandVariant = new Variant();
 		rightHandVariant.setId(12);
@@ -100,6 +104,7 @@ public class VariantTest {
 		rightHandVariant.setPrice(new BigDecimal(30.4500000000000000000).setScale(7, RoundingMode.CEILING));
 		rightHandVariant.setUpc("9839537238592");
 		rightHandVariant.setMpn("AFFF332");
+		rightHandVariant.setGtin("someglobaltradeitemnumber");
 		rightHandVariant.setInventoryLevel(76);
 
 		assertTrue(leftHandVariant.equals(rightHandVariant));
