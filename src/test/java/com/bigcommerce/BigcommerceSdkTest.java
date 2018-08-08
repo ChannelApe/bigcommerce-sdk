@@ -461,6 +461,7 @@ public class BigcommerceSdkTest {
 		expectedProductImage.setImageUrl("https://aws.s3.com/testingimage-1.png");
 		expectedProductImage.setIsThumbnail(true);
 		expectedProductImage.setProductId(1);
+		expectedProductImage.setDescription("some image description");
 		productImageResponse.setData(expectedProductImage);
 
 		final JAXBContext jaxbContext = org.eclipse.persistence.jaxb.JAXBContextFactory
@@ -483,6 +484,7 @@ public class BigcommerceSdkTest {
 		final ProductImage actualProductImage = bigcommerceSdk.createProductImage(expectedProductImage);
 		assertEquals(expectedProductImage.getImageUrl(), actualProductImage.getImageUrl());
 		assertEquals(expectedProductImage.getIsThumbnail(), actualProductImage.getIsThumbnail());
+		assertEquals(expectedProductImage.getDescription(), actualProductImage.getDescription());
 	}
 
 	@Test
