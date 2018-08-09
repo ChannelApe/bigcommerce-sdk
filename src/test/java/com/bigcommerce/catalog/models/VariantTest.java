@@ -46,6 +46,9 @@ public class VariantTest {
 		leftHandVariant.setMpn("AFFF332");
 		leftHandVariant.setInventoryLevel(76);
 		leftHandVariant.setGtin("someglobaltradeitemnumber");
+		leftHandVariant.setCostPrice(BigDecimal.valueOf(42.12));
+		leftHandVariant.setRetailPrice(BigDecimal.valueOf(442.12));
+		leftHandVariant.setSalePrice(BigDecimal.valueOf(552.12));
 		final Variant rightHandVariant = new Variant();
 		rightHandVariant.setId(12);
 		rightHandVariant.setProductId(144);
@@ -54,6 +57,9 @@ public class VariantTest {
 		rightHandVariant.setUpc("9839537238592");
 		rightHandVariant.setMpn("AFFF332");
 		rightHandVariant.setGtin("someglobaltradeitemnumber");
+		rightHandVariant.setCostPrice(BigDecimal.valueOf(42.12));
+		rightHandVariant.setRetailPrice(BigDecimal.valueOf(442.12));
+		rightHandVariant.setSalePrice(BigDecimal.valueOf(552.12));
 		rightHandVariant.setInventoryLevel(76);
 
 		assertTrue(leftHandVariant.equals(rightHandVariant));
@@ -71,6 +77,9 @@ public class VariantTest {
 		leftHandVariant.setMpn("AFFF332");
 		leftHandVariant.setGtin("someglobaltradeitemnumber");
 		leftHandVariant.setInventoryLevel(76);
+		leftHandVariant.setCostPrice(BigDecimal.valueOf(42.12));
+		leftHandVariant.setRetailPrice(BigDecimal.valueOf(442.12));
+		leftHandVariant.setSalePrice(BigDecimal.valueOf(552.12));
 
 		final Variant rightHandVariant = new Variant();
 		rightHandVariant.setId(12);
@@ -81,6 +90,9 @@ public class VariantTest {
 		rightHandVariant.setMpn("AFFF332");
 		rightHandVariant.setGtin("someglobaltradeitemnumber");
 		rightHandVariant.setInventoryLevel(75);
+		rightHandVariant.setCostPrice(BigDecimal.valueOf(42.12));
+		rightHandVariant.setRetailPrice(BigDecimal.valueOf(442.12));
+		rightHandVariant.setSalePrice(BigDecimal.valueOf(552.12));
 
 		assertFalse(leftHandVariant.equals(rightHandVariant));
 		assertFalse(leftHandVariant.hashCode() == rightHandVariant.hashCode());
@@ -97,6 +109,9 @@ public class VariantTest {
 		leftHandVariant.setMpn("AFFF332");
 		leftHandVariant.setGtin("someglobaltradeitemnumber");
 		leftHandVariant.setInventoryLevel(76);
+		leftHandVariant.setCostPrice(BigDecimal.valueOf(42.12));
+		leftHandVariant.setRetailPrice(BigDecimal.valueOf(442.12));
+		leftHandVariant.setSalePrice(BigDecimal.valueOf(552.12));
 		final Variant rightHandVariant = new Variant();
 		rightHandVariant.setId(12);
 		rightHandVariant.setProductId(144);
@@ -106,6 +121,9 @@ public class VariantTest {
 		rightHandVariant.setMpn("AFFF332");
 		rightHandVariant.setGtin("someglobaltradeitemnumber");
 		rightHandVariant.setInventoryLevel(76);
+		rightHandVariant.setCostPrice(BigDecimal.valueOf(42.12));
+		rightHandVariant.setRetailPrice(BigDecimal.valueOf(442.12));
+		rightHandVariant.setSalePrice(BigDecimal.valueOf(552.12));
 
 		assertTrue(leftHandVariant.equals(rightHandVariant));
 	}

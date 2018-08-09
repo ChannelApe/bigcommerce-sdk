@@ -258,6 +258,11 @@ public class BigcommerceSdkTest {
 		expectedProduct.setMetaKeywords(Collections.emptyList());
 		expectedProduct.setBrandId(45);
 		expectedProduct.setCategories(Arrays.asList(1, 3, 55));
+		expectedProduct.setSku("SKU-1234");
+		expectedProduct.setWidth(new BigDecimal(42.32));
+		expectedProduct.setHeight(new BigDecimal(11.42));
+		expectedProduct.setDepth(new BigDecimal(55.11));
+		expectedProduct.setMpn("123456");
 
 		final Variant firstExpectedVariant = new Variant();
 		firstExpectedVariant.setSku("SKU-1234");
@@ -266,6 +271,10 @@ public class BigcommerceSdkTest {
 		firstExpectedVariant.setWeight(new BigDecimal(4.323));
 		firstExpectedVariant.setImageUrl("https://s3.aws.com/someimage-1.png");
 		firstExpectedVariant.setOptionValues(Collections.emptyList());
+		firstExpectedVariant.setWidth(new BigDecimal(42.32));
+		firstExpectedVariant.setHeight(new BigDecimal(11.42));
+		firstExpectedVariant.setDepth(new BigDecimal(55.11));
+		firstExpectedVariant.setMpn("123456");
 
 		final Variant secondExpectedVariant = new Variant();
 		secondExpectedVariant.setSku("SKU-4568");
@@ -274,6 +283,10 @@ public class BigcommerceSdkTest {
 		secondExpectedVariant.setWeight(new BigDecimal(2.511));
 		secondExpectedVariant.setImageUrl("https://s3.aws.com/someimage-2.png");
 		secondExpectedVariant.setOptionValues(Collections.emptyList());
+		secondExpectedVariant.setWidth(new BigDecimal(92.32));
+		secondExpectedVariant.setHeight(new BigDecimal(51.42));
+		secondExpectedVariant.setDepth(new BigDecimal(15.11));
+		secondExpectedVariant.setMpn("789465");
 
 		expectedProduct.setVariants(Arrays.asList(firstExpectedVariant, secondExpectedVariant));
 
@@ -306,8 +319,14 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getMetaKeywords(), actualProduct.getMetaKeywords());
 		assertEquals(expectedProduct.getBrandId(), actualProduct.getBrandId());
 		assertEquals(expectedProduct.getCategories(), actualProduct.getCategories());
+		assertEquals(expectedProduct.getSku(), actualProduct.getSku());
+		assertEquals(expectedProduct.getMpn(), actualProduct.getMpn());
+		assertEquals(expectedProduct.getGtin(), actualProduct.getGtin());
+		assertEquals(expectedProduct.getHeight(), actualProduct.getHeight());
+		assertEquals(expectedProduct.getWidth(), actualProduct.getWidth());
+		assertEquals(expectedProduct.getDepth(), actualProduct.getDepth());
 
-		assertEquals(expectedProduct.getVariants().size(), actualProduct.getVariants().size());
+		assertEquals(2, expectedProduct.getVariants().size());
 		assertEquals(expectedProduct.getVariants().get(0).getImageUrl(),
 				actualProduct.getVariants().get(0).getImageUrl());
 		assertEquals(expectedProduct.getVariants().get(0).getInventoryLevel(),
@@ -318,6 +337,11 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getVariants().get(0).getUpc(), actualProduct.getVariants().get(0).getUpc());
 		assertEquals(expectedProduct.getVariants().get(0).getOptionValues(),
 				actualProduct.getVariants().get(0).getOptionValues());
+		assertEquals(expectedProduct.getVariants().get(0).getMpn(), actualProduct.getVariants().get(0).getMpn());
+		assertEquals(expectedProduct.getVariants().get(0).getGtin(), actualProduct.getVariants().get(0).getGtin());
+		assertEquals(expectedProduct.getVariants().get(0).getHeight(), actualProduct.getVariants().get(0).getHeight());
+		assertEquals(expectedProduct.getVariants().get(0).getWidth(), actualProduct.getVariants().get(0).getWidth());
+		assertEquals(expectedProduct.getVariants().get(0).getDepth(), actualProduct.getVariants().get(0).getDepth());
 
 		assertEquals(expectedProduct.getVariants().get(1).getImageUrl(),
 				actualProduct.getVariants().get(1).getImageUrl());
@@ -329,6 +353,11 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getVariants().get(1).getUpc(), actualProduct.getVariants().get(1).getUpc());
 		assertEquals(expectedProduct.getVariants().get(1).getOptionValues(),
 				actualProduct.getVariants().get(1).getOptionValues());
+		assertEquals(expectedProduct.getVariants().get(1).getMpn(), actualProduct.getVariants().get(1).getMpn());
+		assertEquals(expectedProduct.getVariants().get(1).getGtin(), actualProduct.getVariants().get(1).getGtin());
+		assertEquals(expectedProduct.getVariants().get(1).getHeight(), actualProduct.getVariants().get(1).getHeight());
+		assertEquals(expectedProduct.getVariants().get(1).getWidth(), actualProduct.getVariants().get(1).getWidth());
+		assertEquals(expectedProduct.getVariants().get(1).getDepth(), actualProduct.getVariants().get(1).getDepth());
 
 	}
 
@@ -352,6 +381,11 @@ public class BigcommerceSdkTest {
 		expectedProduct.setMetaKeywords(Collections.emptyList());
 		expectedProduct.setBrandId(45);
 		expectedProduct.setCategories(Arrays.asList(1, 3, 55));
+		expectedProduct.setSku("SKU-1234");
+		expectedProduct.setWidth(new BigDecimal(42.32));
+		expectedProduct.setHeight(new BigDecimal(11.42));
+		expectedProduct.setDepth(new BigDecimal(55.11));
+		expectedProduct.setMpn("123456");
 
 		final Variant firstExpectedVariant = new Variant();
 		firstExpectedVariant.setSku("SKU-1234");
@@ -360,6 +394,10 @@ public class BigcommerceSdkTest {
 		firstExpectedVariant.setWeight(new BigDecimal(4.323));
 		firstExpectedVariant.setImageUrl("https://s3.aws.com/someimage-1.png");
 		firstExpectedVariant.setOptionValues(Collections.emptyList());
+		firstExpectedVariant.setWidth(new BigDecimal(42.32));
+		firstExpectedVariant.setHeight(new BigDecimal(11.42));
+		firstExpectedVariant.setDepth(new BigDecimal(55.11));
+		firstExpectedVariant.setMpn("123456");
 
 		final Variant secondExpectedVariant = new Variant();
 		secondExpectedVariant.setSku("SKU-4568");
@@ -368,6 +406,10 @@ public class BigcommerceSdkTest {
 		secondExpectedVariant.setWeight(new BigDecimal(2.511));
 		secondExpectedVariant.setImageUrl("https://s3.aws.com/someimage-2.png");
 		secondExpectedVariant.setOptionValues(Collections.emptyList());
+		secondExpectedVariant.setWidth(new BigDecimal(92.32));
+		secondExpectedVariant.setHeight(new BigDecimal(51.42));
+		secondExpectedVariant.setDepth(new BigDecimal(15.11));
+		secondExpectedVariant.setMpn("789465");
 
 		expectedProduct.setVariants(Arrays.asList(firstExpectedVariant, secondExpectedVariant));
 
@@ -400,6 +442,12 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getMetaKeywords(), actualProduct.getMetaKeywords());
 		assertEquals(expectedProduct.getBrandId(), actualProduct.getBrandId());
 		assertEquals(expectedProduct.getCategories(), actualProduct.getCategories());
+		assertEquals(expectedProduct.getSku(), actualProduct.getSku());
+		assertEquals(expectedProduct.getMpn(), actualProduct.getMpn());
+		assertEquals(expectedProduct.getGtin(), actualProduct.getGtin());
+		assertEquals(expectedProduct.getHeight(), actualProduct.getHeight());
+		assertEquals(expectedProduct.getWidth(), actualProduct.getWidth());
+		assertEquals(expectedProduct.getDepth(), actualProduct.getDepth());
 
 		assertEquals(2, expectedProduct.getVariants().size());
 		assertEquals(expectedProduct.getVariants().get(0).getImageUrl(),
@@ -412,6 +460,11 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getVariants().get(0).getUpc(), actualProduct.getVariants().get(0).getUpc());
 		assertEquals(expectedProduct.getVariants().get(0).getOptionValues(),
 				actualProduct.getVariants().get(0).getOptionValues());
+		assertEquals(expectedProduct.getVariants().get(0).getMpn(), actualProduct.getVariants().get(0).getMpn());
+		assertEquals(expectedProduct.getVariants().get(0).getGtin(), actualProduct.getVariants().get(0).getGtin());
+		assertEquals(expectedProduct.getVariants().get(0).getHeight(), actualProduct.getVariants().get(0).getHeight());
+		assertEquals(expectedProduct.getVariants().get(0).getWidth(), actualProduct.getVariants().get(0).getWidth());
+		assertEquals(expectedProduct.getVariants().get(0).getDepth(), actualProduct.getVariants().get(0).getDepth());
 
 		assertEquals(expectedProduct.getVariants().get(1).getImageUrl(),
 				actualProduct.getVariants().get(1).getImageUrl());
@@ -423,6 +476,11 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProduct.getVariants().get(1).getUpc(), actualProduct.getVariants().get(1).getUpc());
 		assertEquals(expectedProduct.getVariants().get(1).getOptionValues(),
 				actualProduct.getVariants().get(1).getOptionValues());
+		assertEquals(expectedProduct.getVariants().get(1).getMpn(), actualProduct.getVariants().get(1).getMpn());
+		assertEquals(expectedProduct.getVariants().get(1).getGtin(), actualProduct.getVariants().get(1).getGtin());
+		assertEquals(expectedProduct.getVariants().get(1).getHeight(), actualProduct.getVariants().get(1).getHeight());
+		assertEquals(expectedProduct.getVariants().get(1).getWidth(), actualProduct.getVariants().get(1).getWidth());
+		assertEquals(expectedProduct.getVariants().get(1).getDepth(), actualProduct.getVariants().get(1).getDepth());
 
 	}
 
