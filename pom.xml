@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.channelape</groupId>
 	<artifactId>bigcommerce-sdk</artifactId>
-	<version>1.3.0</version>
+	<version>1.4.0-ADDITIONAL-FIELDS-SNAPSHOT</version>
 
 	<name>BigCommerce SDK</name>
 	<description>Java SDK for BigCommerce REST APIs</description>

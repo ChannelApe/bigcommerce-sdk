@@ -24,6 +24,8 @@ public class ProductImage {
 	@XmlElement(name = "product_id")
 	private Integer productId;
 
+	private String description;
+
 	public Integer getId() {
 		return id;
 	}
@@ -54,5 +56,13 @@ public class ProductImage {
 
 	public void setProductId(final Integer productId) {
 		this.productId = productId;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 }
