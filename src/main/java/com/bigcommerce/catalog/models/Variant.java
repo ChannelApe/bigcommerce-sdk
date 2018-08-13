@@ -45,13 +45,13 @@ public class Variant {
 	private BigDecimal width;
 	private BigDecimal depth;
 	private String gtin;
-	@XmlElement(name = "cost_price ")
+	@XmlElement(name = "cost_price")
 	private BigDecimal costPrice;
 
-	@XmlElement(name = "retail_price ")
+	@XmlElement(name = "retail_price")
 	private BigDecimal retailPrice;
 
-	@XmlElement(name = "sale_price ")
+	@XmlElement(name = "sale_price")
 	private BigDecimal salePrice;
 
 	public Integer getId() {

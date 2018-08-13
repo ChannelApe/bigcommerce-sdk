@@ -65,16 +65,16 @@ public class Product {
 	@XmlElement(name = "sort_order")
 	private Integer sortOrder;
 
-	@XmlElement(name = "custom_url ")
+	@XmlElement(name = "custom_url")
 	private CustomUrl productUrl;
 
-	@XmlElement(name = "cost_price ")
+	@XmlElement(name = "cost_price")
 	private BigDecimal costPrice;
 
-	@XmlElement(name = "retail_price ")
+	@XmlElement(name = "retail_price")
 	private BigDecimal retailPrice;
 
-	@XmlElement(name = "sale_price ")
+	@XmlElement(name = "sale_price")
 	private BigDecimal salePrice;
 
 	public Integer getId() {
