@@ -1,18 +1,18 @@
-dist: trusty
-sudo: required
+language: java
+sudo: false
+install: true
 addons:
   sonarcloud:
     organization: channelape-github
     token:
     - $SONARCLOUD_TOKEN
-language: java
 jdk:
 - oraclejdk8
 script:
-- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then mvn --settings .travis/settings.xml clean install; fi
+- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then mvn clean build; fi
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn --settings .travis/settings.xml clean deploy; fi
 after_success:
-- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn --settings .travis/settings.xml sonar:sonar; fi
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn sonar:sonar; fi
 cache:
   directories:
   - $HOME/.m2
