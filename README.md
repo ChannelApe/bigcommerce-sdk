@@ -31,3 +31,7 @@ Creating SDK with store hash, client ID, and access token then making a sample c
 	3. Clone the repository.
 	3. Navigate to repository directory and run `mvn install`
 
+## Release Notes
+Please see our release notes here:  [https://github.com/ChannelApe/bigcommerce-sdk/releases](https://github.com/ChannelApe/bigcommerce-sdk/releases)
+
+

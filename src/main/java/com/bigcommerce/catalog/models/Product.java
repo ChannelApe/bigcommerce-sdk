@@ -23,9 +23,14 @@ public class Product {
 	private String name;
 	private String type;
 	private String sku;
+	private String mpn;
+	private String gtin;
 	private String description;
 	private List<Variant> variants = new LinkedList<>();
 	private BigDecimal weight;
+	private BigDecimal width;
+	private BigDecimal height;
+	private BigDecimal depth;
 
 	@XmlElement(name = "is_visible")
 	private Boolean isVisible;
@@ -60,8 +65,17 @@ public class Product {
 	@XmlElement(name = "sort_order")
 	private Integer sortOrder;
 
-	@XmlElement(name = "custom_url ")
+	@XmlElement(name = "custom_url")
 	private CustomUrl productUrl;
+
+	@XmlElement(name = "cost_price")
+	private BigDecimal costPrice;
+
+	@XmlElement(name = "retail_price")
+	private BigDecimal retailPrice;
+
+	@XmlElement(name = "sale_price")
+	private BigDecimal salePrice;
 
 	public Integer getId() {
 		return id;
@@ -199,11 +213,11 @@ public class Product {
 		return searchKeywords;
 	}
 
-	public void setSearchKeywords(String searchKeywords) {
+	public void setSearchKeywords(final String searchKeywords) {
 		this.searchKeywords = searchKeywords;
 	}
 
-	public void setSortOrder(Integer sortOrder) {
+	public void setSortOrder(final Integer sortOrder) {
 		this.sortOrder = sortOrder;
 	}
 
@@ -211,15 +225,15 @@ public class Product {
 		return productUrl;
 	}
 
-	public void setProductUrl(CustomUrl productUrl) {
+	public void setProductUrl(final CustomUrl productUrl) {
 		this.productUrl = productUrl;
-  }
-  
+	}
+
 	public Boolean getVisible() {
 		return isVisible;
 	}
 
-	public void setVisible(Boolean visible) {
+	public void setVisible(final Boolean visible) {
 		isVisible = visible;
 	}
 
@@ -227,7 +241,7 @@ public class Product {
 		return isConditionShown;
 	}
 
-	public void setConditionShown(Boolean conditionShown) {
+	public void setConditionShown(final Boolean conditionShown) {
 		isConditionShown = conditionShown;
 	}
 
@@ -235,7 +249,7 @@ public class Product {
 		return pageTitle;
 	}
 
-	public void setPageTitle(String pageTitle) {
+	public void setPageTitle(final String pageTitle) {
 		this.pageTitle = pageTitle;
 	}
 
@@ -243,8 +257,71 @@ public class Product {
 		return metaDescription;
 	}
 
-	public void setMetaDescription(String metaDescription) {
+	public void setMetaDescription(final String metaDescription) {
 		this.metaDescription = metaDescription;
 	}
-}
 
+	public BigDecimal getWidth() {
+		return width;
+	}
+
+	public void setWidth(final BigDecimal width) {
+		this.width = width;
+	}
+
+	public BigDecimal getHeight() {
+		return height;
+	}
+
+	public void setHeight(final BigDecimal height) {
+		this.height = height;
+	}
+
+	public BigDecimal getDepth() {
+		return depth;
+	}
+
+	public void setDepth(final BigDecimal depth) {
+		this.depth = depth;
+	}
+
+	public String getMpn() {
+		return mpn;
+	}
+
+	public void setMpn(final String mpn) {
+		this.mpn = mpn;
+	}
+
+	public String getGtin() {
+		return gtin;
+	}
+
+	public void setGtin(final String gtin) {
+		this.gtin = gtin;
+	}
+
+	public BigDecimal getCostPrice() {
+		return costPrice;
+	}
+
+	public void setCostPrice(final BigDecimal costPrice) {
+		this.costPrice = costPrice;
+	}
+
+	public BigDecimal getRetailPrice() {
+		return retailPrice;
+	}
+
+	public void setRetailPrice(final BigDecimal retailPrice) {
+		this.retailPrice = retailPrice;
+	}
+
+	public BigDecimal getSalePrice() {
+		return salePrice;
+	}
+
+	public void setSalePrice(final BigDecimal salePrice) {
+		this.salePrice = salePrice;
+	}
+}
