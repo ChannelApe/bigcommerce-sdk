@@ -1,16 +1,27 @@
+dist: trusty
+sudo: required
+addons:
+  sonarcloud:
+    organization: channelape-github
+    token:
+    - $SONARCLOUD_TOKEN
 language: java
-
 jdk:
-  - oraclejdk8
-
-script: mvn --settings .travis/settings.xml clean deploy
-
+- oraclejdk8
+script:
+- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then mvn --settings .travis/settings.xml clean build; fi
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn --settings .travis/settings.xml clean deploy; fi
+after_success:
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sonar-scanner clean deploy; fi
+cache:
+  directories:
+  - $HOME/.m2
+  - $HOME/.sonar/cache
 deploy:
-  -
-    provider: script
-    script: .travis/deploy.sh
-    skip_cleanup: true
-    on:
-      repo: ChannelApe/bigcommerce-sdk
-      tags: true
-      jdk: oraclejdk8
+- provider: script
+  script: .travis/deploy.sh
+  skip_cleanup: true
+  true:
+    repo: ChannelApe/bigcommerce-sdk
+    tags: true
+    jdk: oraclejdk8
