@@ -1,18 +1,18 @@
-dist: trusty
-sudo: required
+language: java
+sudo: false
+install: true
 addons:
   sonarcloud:
     organization: channelape-github
     token:
-    - $SONARCLOUD_TOKEN
-language: java
+      secure: bnz+5hBW7D1jRVYGXMADw/xq+gWaTke4g6cx822bgVWlF1QS9/DrNZUaaFSPZEwU1mk5yK/63b4ohe0BJE4Aih8/R/thPuQcBSgbn48m6cnfIFaTRwwTpgEj0Ge/tWtirrNjxb/usgGXBT87IxqUDWJZRZBEnol0OyS3mq9WwCckblBz2+2p004v6kInFLFhaMJwGiNz1pg5V6rBAjKeJNSP45+Sm5r7MOy2AQO33vWv7t5Fx8ZFo0o97wNVaSmqcmsTRNwQhBxFQ8J5UPkcYbt4LEXbwR0AR3jNflLMlua+iMxX59rNnQwrzx0Ewmz5jaSMKNIzmvOkU9GB4oJSgcKI7X1hKFy2HwQRY1LMx+svK2UkvZbRGUR4gLsZLPXgvyxS/gd7npM4QdHZS1nByWyiyMKEar5dq+QCuyZngaSub4VeCMrZWNXCeM+f/FFq7o7OXxxJtfEN21f978fimdgu0bsiGtsVgvCoS3zEJVdslVhyflrv9QYLOHKWZaYPusvYy/HTfbII8bWW3OC+Cx1Lv/KkYRKnvcJ33bi83Dxr2YggyihnvSrE35Nv/FvSLyTHC452GVptqIiw73H7JR0IJ5UtrVZQMas2/GC+SYsBVBod9PCecLYRuy0aZ7A0572yzS16o3ikmEQvofyISEVHYL5UHTyVe35O0up51vM=
 jdk:
 - oraclejdk8
 script:
-- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then mvn --settings .travis/settings.xml clean install; fi
+- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then mvn clean build; fi
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn --settings .travis/settings.xml clean deploy; fi
 after_success:
-- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn --settings .travis/settings.xml sonar:sonar; fi
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn sonar:sonar; fi
 cache:
   directories:
   - $HOME/.m2

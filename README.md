@@ -6,12 +6,14 @@ Java SDK for BigCommerce REST APIs
 |-----------|---------|--------|
 | CI Status | [![Build Status](https://travis-ci.org/ChannelApe/bigcommerce-sdk.svg?branch=develop)](https://travis-ci.org/ChannelApe/bigcommerce-sdk) | [![Build Status](https://travis-ci.org/ChannelApe/bigcommerce-sdk.svg?branch=master)](https://travis-ci.org/ChannelApe/bigcommerce-sdk) |
 
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=bigcommerce-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=bigcommerce-sdk) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=bigcommerce-sdk&metric=coverage)](https://sonarcloud.io/dashboard?id=bigcommerce-sdk)
+
 ## Maven
 ```xml
 	<dependency>
 	    <groupId>com.channelape</groupId>
 	    <artifactId>bigcommerce-sdk</artifactId>
-	    <version>1.4.2</version>
+	    <version>1.4.3</version>
 	</dependency>
 ```
 
