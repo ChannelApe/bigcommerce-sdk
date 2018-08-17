@@ -1,6 +1,7 @@
 package com.bigcommerce.catalog.models;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,28 +24,31 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class Variant {
 
 	private Integer id;
-	@XmlElement(name = "product_id")
-	private Integer productId;
 	private String sku;
-	@XmlElement(required = false, name = "sku_id")
-	private String skuId;
 	private BigDecimal price;
 	private String upc;
 	private String mpn;
+	private BigDecimal height;
+	private BigDecimal width;
+	private BigDecimal depth;
+	private String gtin;
+	private BigDecimal weight;
+
+	@XmlElement(name = "product_id")
+	private Integer productId;
+
+	@XmlElement(required = false, name = "sku_id")
+	private String skuId;
+
 	@XmlElement(name = "inventory_level")
 	private int inventoryLevel;
 
 	@XmlElement(name = "image_url")
 	private String imageUrl;
-	private BigDecimal weight;
 
 	@XmlElement(name = "option_values")
 	private List<OptionValue> optionValues = new ArrayList<>();
 
-	private BigDecimal height;
-	private BigDecimal width;
-	private BigDecimal depth;
-	private String gtin;
 	@XmlElement(name = "cost_price")
 	private BigDecimal costPrice;
 
@@ -225,20 +229,27 @@ public class Variant {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(getPrice())
-				.append(getWeight()).append(getUpc()).append(getMpn()).append(getInventoryLevel()).append(getHeight())
-				.append(getWidth()).append(getDepth()).append(getRetailPrice()).append(getSalePrice())
-				.append(getCostPrice()).toHashCode();
+		final BigDecimal width = getWidth() == null ? null : getWidth().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal height = getHeight() == null ? null : getHeight().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal depth = getDepth() == null ? null : getDepth().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal weight = getWeight() == null ? null : getWeight().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal price = getPrice() == null ? null : getPrice().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal retailPrice = getRetailPrice() == null ? null
+				: getRetailPrice().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal costPrice = getCostPrice() == null ? null : getCostPrice().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal salePrice = getSalePrice() == null ? null : getSalePrice().setScale(10, RoundingMode.HALF_UP);
+
+		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(price)
+				.append(weight).append(getUpc()).append(getMpn()).append(getInventoryLevel()).append(height)
+				.append(width).append(depth).append(retailPrice).append(salePrice).append(costPrice).toHashCode();
 	}
 
-	private boolean isScaledDeimalValueSame(final BigDecimal bigDecimal1, final BigDecimal bigDecimal2) {
-		if (bigDecimal1 == null && bigDecimal2 != null || bigDecimal1 != null && bigDecimal2 == null) {
+	private boolean isScaledDeimalValueSame(final BigDecimal leftValue, final BigDecimal rightValue) {
+		if (leftValue == null && rightValue == null) {
+			return true;
+		} else if (leftValue == null || rightValue == null) {
 			return false;
 		}
-		if (bigDecimal1 == null && bigDecimal2 == null) {
-			return true;
-		}
-
-		return bigDecimal1.compareTo(bigDecimal2) == 0;
+		return leftValue.compareTo(rightValue) == 0;
 	}
 }

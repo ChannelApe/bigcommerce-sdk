@@ -1,14 +1,15 @@
 package com.bigcommerce.catalog.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -18,28 +19,34 @@ public class Category {
 
 	private Integer id;
 	private String name;
+	private String keyword;
+	private String description;
+	private List<Category> children;
+
 	@XmlElement(name = "parent_id")
 	@JsonInclude(Include.ALWAYS)
 	private Integer parentId;
+
 	@XmlElement(name = "page_title")
 	private String pageTitle;
-	private String keyword;
-	private String description;
+
 	@XmlElement(name = "meta_keywords")
 	List<String> metaKeywords;
+
 	@XmlElement(name = "is_visible")
 	private Boolean visible;
+
 	@XmlElement(name = "custom_url")
 	CustomUrl customUrl;
+
 	@XmlElement(name = "meta_description")
-	String metaDescription;;
-	private List<Category> children;
+	String metaDescription;
 
 	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -47,7 +54,7 @@ public class Category {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -55,7 +62,7 @@ public class Category {
 		return parentId;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(final Integer parentId) {
 		this.parentId = parentId;
 	}
 
@@ -63,7 +70,7 @@ public class Category {
 		return pageTitle;
 	}
 
-	public void setPageTitle(String pageTitle) {
+	public void setPageTitle(final String pageTitle) {
 		this.pageTitle = pageTitle;
 	}
 
@@ -71,7 +78,7 @@ public class Category {
 		return keyword;
 	}
 
-	public void setKeyword(String keyword) {
+	public void setKeyword(final String keyword) {
 		this.keyword = keyword;
 	}
 
@@ -79,7 +86,7 @@ public class Category {
 		return visible;
 	}
 
-	public void setVisible(Boolean visible) {
+	public void setVisible(final Boolean visible) {
 		this.visible = visible;
 	}
 
@@ -87,7 +94,7 @@ public class Category {
 		return children;
 	}
 
-	public void setChildren(List<Category> children) {
+	public void setChildren(final List<Category> children) {
 		this.children = children;
 	}
 
@@ -95,7 +102,7 @@ public class Category {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -103,7 +110,7 @@ public class Category {
 		return metaKeywords;
 	}
 
-	public void setMetaKeywords(List<String> metaKeywords) {
+	public void setMetaKeywords(final List<String> metaKeywords) {
 		this.metaKeywords = metaKeywords;
 	}
 
@@ -111,7 +118,7 @@ public class Category {
 		return customUrl;
 	}
 
-	public void setCustomUrl(CustomUrl customUrl) {
+	public void setCustomUrl(final CustomUrl customUrl) {
 		this.customUrl = customUrl;
 	}
 
@@ -119,7 +126,7 @@ public class Category {
 		return metaDescription;
 	}
 
-	public void setMetaDescription(String metaDescription) {
+	public void setMetaDescription(final String metaDescription) {
 		this.metaDescription = metaDescription;
 	}
 }

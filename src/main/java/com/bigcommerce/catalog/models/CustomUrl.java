@@ -1,15 +1,15 @@
 package com.bigcommerce.catalog.models;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(NON_NULL)
@@ -20,31 +20,32 @@ public class CustomUrl implements Serializable {
 	private String url;
 
 	@XmlElement(name = "is_customized")
-	private boolean isCustomized;
+	private Boolean customized;
 
 	public String getUrl() {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.url = url;
 	}
 
-	public boolean isCustomized() {
-		return isCustomized;
+	public Boolean isCustomized() {
+		return customized;
 	}
 
-	public void setCustomized(boolean customized) {
-		isCustomized = customized;
+	public void setCustomized(final Boolean customized) {
+		this.customized = customized;
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		CustomUrl customUrl = (CustomUrl) o;
-		return isCustomized() == customUrl.isCustomized() &&
-				Objects.equals(getUrl(), customUrl.getUrl());
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		final CustomUrl customUrl = (CustomUrl) o;
+		return isCustomized() == customUrl.isCustomized() && Objects.equals(getUrl(), customUrl.getUrl());
 	}
 
 	@Override

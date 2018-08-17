@@ -19,7 +19,7 @@ public class ProductImage {
 	private String imageUrl;
 
 	@XmlElement(name = "is_thumbnail")
-	private Boolean isThumbnail;
+	private Boolean thumbnail;
 
 	@XmlElement(name = "product_id")
 	private Integer productId;
@@ -42,12 +42,12 @@ public class ProductImage {
 		this.imageUrl = imageUrl;
 	}
 
-	public Boolean getIsThumbnail() {
-		return isThumbnail;
+	public Boolean isThumbnail() {
+		return thumbnail;
 	}
 
-	public void setIsThumbnail(final Boolean isThumbnail) {
-		this.isThumbnail = isThumbnail;
+	public void setThumbnail(final Boolean isThumbnail) {
+		this.thumbnail = isThumbnail;
 	}
 
 	public Integer getProductId() {

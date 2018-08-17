@@ -126,5 +126,6 @@ public class VariantTest {
 		rightHandVariant.setSalePrice(BigDecimal.valueOf(552.12));
 
 		assertTrue(leftHandVariant.equals(rightHandVariant));
+		assertTrue(leftHandVariant.hashCode() == rightHandVariant.hashCode());
 	}
 }
