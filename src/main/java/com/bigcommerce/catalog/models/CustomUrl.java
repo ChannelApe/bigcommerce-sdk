@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(NON_NULL)
 public class CustomUrl implements Serializable {
 
-	final static long serialVersionUID = 26372357L;
+	static final long serialVersionUID = 26372357L;
 
 	private String url;
 

@@ -632,22 +632,21 @@ public class BigcommerceSdk {
 
 		@Override
 		public long computeSleepTime(@SuppressWarnings("rawtypes") final Attempt failedAttempt) {
-			if (failedAttempt.hasResult()) {
-				if (failedAttempt.getResult() instanceof Response) {
-					final Response response = (Response) failedAttempt.getResult();
-					final String rateLimitTimeResetString = response.getHeaderString(RATE_LIMIT_TIME_RESET_HEADER);
-					if (TOO_MANY_REQUESTS_STATUS_CODE == response.getStatus() && rateLimitTimeResetString != null) {
-						final long sleepTime = Long.parseLong(rateLimitTimeResetString);
-						LOGGER.warn(SLEEPING_BEFORE_RETRY_DUE_TO_RATE_LIMIT_MESSAGE,
-								Duration.ofMillis(sleepTime).toString());
-						return sleepTime;
-					}
-					response.bufferEntity();
-					final long sleepTime = fallbackWaitStrategy.computeSleepTime(failedAttempt);
-					LOGGER.warn(SLEEPING_BEFORE_RETRY_MESSAGE, Duration.ofMillis(sleepTime).toString(),
-							response.getStatus(), response.readEntity(String.class));
+			if (failedAttempt.hasResult() && failedAttempt.getResult() instanceof Response) {
+
+				final Response response = (Response) failedAttempt.getResult();
+				final String rateLimitTimeResetString = response.getHeaderString(RATE_LIMIT_TIME_RESET_HEADER);
+				if (TOO_MANY_REQUESTS_STATUS_CODE == response.getStatus() && rateLimitTimeResetString != null) {
+					final long sleepTime = Long.parseLong(rateLimitTimeResetString);
+					LOGGER.warn(SLEEPING_BEFORE_RETRY_DUE_TO_RATE_LIMIT_MESSAGE, Duration.ofMillis(sleepTime));
 					return sleepTime;
 				}
+				response.bufferEntity();
+				final long sleepTime = fallbackWaitStrategy.computeSleepTime(failedAttempt);
+				LOGGER.warn(SLEEPING_BEFORE_RETRY_MESSAGE, Duration.ofMillis(sleepTime), response.getStatus(),
+						response.readEntity(String.class));
+				return sleepTime;
+
 			}
 			return 0;
 		}

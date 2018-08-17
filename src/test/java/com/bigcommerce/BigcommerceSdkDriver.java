@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bigcommerce.catalog.models.Address;
@@ -42,7 +41,6 @@ public class BigcommerceSdkDriver {
 	private static final String ACCESS_TOKEN = System.getenv("BIGCOMMERCE_ACCESS_TOKEN");
 
 	@Test
-	@Ignore
 	public void whenRetrievingCatalogSummaryThenReturnCatalogSummary() {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
@@ -69,7 +67,6 @@ public class BigcommerceSdkDriver {
 	}
 
 	@Test
-	@Ignore
 	public void givenVariantWhenUpdatingVariantThenUpdateVariant() {
 		final BigcommerceSdk bigcommerceSdk = BigcommerceSdk.newBuilder().withStoreHash(STORE_HASH)
 				.withClientId(CLIENT_ID).withAccessToken(ACCESS_TOKEN).build();
@@ -222,7 +219,7 @@ public class BigcommerceSdkDriver {
 
 		final Order order = bigcommerceSdk.completeOrder(100);
 		assertNotNull(order);
-		assertEquals(order.getStatus(), Status.COMPLETED);
+		assertEquals(Status.COMPLETED, order.getStatus());
 	}
 
 	@Test
