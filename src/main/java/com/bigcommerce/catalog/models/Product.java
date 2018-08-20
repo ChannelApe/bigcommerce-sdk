@@ -23,6 +23,7 @@ public class Product {
 	private String name;
 	private String type;
 	private String sku;
+	private String upc;
 	private String mpn;
 	private String gtin;
 	private String description;
@@ -31,16 +32,18 @@ public class Product {
 	private BigDecimal width;
 	private BigDecimal height;
 	private BigDecimal depth;
+	private String condition;
+	private List<Integer> categories;
+	private BigDecimal price;
 
 	@XmlElement(name = "is_visible")
-	private Boolean isVisible;
-	private List<Integer> categories;
+	private Boolean visible;
 
 	@XmlElement(name = "brand_id")
 	private Integer brandId;
 
 	@XmlElement(name = "is_condition_shown")
-	private Boolean isConditionShown;
+	private Boolean conditionShown;
 
 	@XmlElement(name = "meta_keywords")
 	private List<String> metaKeywords = new LinkedList<>();
@@ -50,8 +53,6 @@ public class Product {
 
 	@XmlElement(name = "inventory_tracking")
 	private String inventoryTracking;
-	private String condition;
-	private BigDecimal price;
 
 	@XmlElement(name = "page_title")
 	private String pageTitle;
@@ -133,12 +134,12 @@ public class Product {
 		this.weight = weight;
 	}
 
-	public Boolean getIsVisible() {
-		return isVisible;
+	public Boolean isVisible() {
+		return visible;
 	}
 
-	public void setIsVisible(final Boolean isVisible) {
-		this.isVisible = isVisible;
+	public void setVisible(final Boolean visible) {
+		this.visible = visible;
 	}
 
 	public List<Integer> getCategories() {
@@ -155,14 +156,6 @@ public class Product {
 
 	public void setBrandId(final Integer brandId) {
 		this.brandId = brandId;
-	}
-
-	public Boolean getIsConditionShown() {
-		return isConditionShown;
-	}
-
-	public void setIsConditionShown(final Boolean isConditionShown) {
-		this.isConditionShown = isConditionShown;
 	}
 
 	public List<String> getMetaKeywords() {
@@ -229,20 +222,12 @@ public class Product {
 		this.productUrl = productUrl;
 	}
 
-	public Boolean getVisible() {
-		return isVisible;
-	}
-
-	public void setVisible(final Boolean visible) {
-		isVisible = visible;
-	}
-
-	public Boolean getConditionShown() {
-		return isConditionShown;
+	public Boolean isConditionShown() {
+		return conditionShown;
 	}
 
 	public void setConditionShown(final Boolean conditionShown) {
-		isConditionShown = conditionShown;
+		this.conditionShown = conditionShown;
 	}
 
 	public String getPageTitle() {
@@ -323,5 +308,13 @@ public class Product {
 
 	public void setSalePrice(final BigDecimal salePrice) {
 		this.salePrice = salePrice;
+	}
+
+	public String getUpc() {
+		return upc;
+	}
+
+	public void setUpc(final String upc) {
+		this.upc = upc;
 	}
 }

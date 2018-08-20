@@ -68,7 +68,7 @@ public class LineItem {
 	private BigDecimal costPriceTax;
 
 	@XmlElement(name = "is_refunded")
-	private boolean isRefunded;
+	private Boolean refunded;
 
 	@XmlElement(name = "quantity_refunded")
 	private int quantityRefunded;
@@ -120,7 +120,7 @@ public class LineItem {
 	private int parentOrderProductId;
 
 	@XmlElement(name = "is_bundled_product")
-	private boolean isBundledProduct;
+	private Boolean bundledProduct;
 
 	@XmlElement(name = "bin_picking_number")
 	private String binPickingNumber;
@@ -132,7 +132,7 @@ public class LineItem {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -140,7 +140,7 @@ public class LineItem {
 		return sku;
 	}
 
-	public void setSku(String sku) {
+	public void setSku(final String sku) {
 		this.sku = sku;
 	}
 
@@ -148,7 +148,7 @@ public class LineItem {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
+	public void setQuantity(final int quantity) {
 		this.quantity = quantity;
 	}
 
@@ -156,7 +156,7 @@ public class LineItem {
 		return priceIncTax;
 	}
 
-	public void setPriceIncTax(BigDecimal priceIncTax) {
+	public void setPriceIncTax(final BigDecimal priceIncTax) {
 		this.priceIncTax = priceIncTax;
 	}
 
@@ -164,7 +164,7 @@ public class LineItem {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -172,7 +172,7 @@ public class LineItem {
 		return weight;
 	}
 
-	public void setWeight(BigDecimal weight) {
+	public void setWeight(final BigDecimal weight) {
 		this.weight = weight;
 	}
 
@@ -180,7 +180,7 @@ public class LineItem {
 		return fixedShippingCost;
 	}
 
-	public void setFixedShippingCost(BigDecimal fixedShippingCost) {
+	public void setFixedShippingCost(final BigDecimal fixedShippingCost) {
 		this.fixedShippingCost = fixedShippingCost;
 	}
 
@@ -188,7 +188,7 @@ public class LineItem {
 		return productId;
 	}
 
-	public void setProductId(int productId) {
+	public void setProductId(final int productId) {
 		this.productId = productId;
 	}
 
@@ -196,7 +196,7 @@ public class LineItem {
 		return orderAddressId;
 	}
 
-	public void setOrderAddressId(int orderAddressId) {
+	public void setOrderAddressId(final int orderAddressId) {
 		this.orderAddressId = orderAddressId;
 	}
 
@@ -204,7 +204,7 @@ public class LineItem {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 
@@ -212,7 +212,7 @@ public class LineItem {
 		return basePrice;
 	}
 
-	public void setBasePrice(BigDecimal basePrice) {
+	public void setBasePrice(final BigDecimal basePrice) {
 		this.basePrice = basePrice;
 	}
 
@@ -220,7 +220,7 @@ public class LineItem {
 		return priceExTax;
 	}
 
-	public void setPriceExTax(BigDecimal priceExTax) {
+	public void setPriceExTax(final BigDecimal priceExTax) {
 		this.priceExTax = priceExTax;
 	}
 
@@ -228,7 +228,7 @@ public class LineItem {
 		return baseTotal;
 	}
 
-	public void setBaseTotal(BigDecimal baseTotal) {
+	public void setBaseTotal(final BigDecimal baseTotal) {
 		this.baseTotal = baseTotal;
 	}
 
@@ -236,7 +236,7 @@ public class LineItem {
 		return totalExTax;
 	}
 
-	public void setTotalExTax(BigDecimal totalExTax) {
+	public void setTotalExTax(final BigDecimal totalExTax) {
 		this.totalExTax = totalExTax;
 	}
 
@@ -244,7 +244,7 @@ public class LineItem {
 		return totalIncTax;
 	}
 
-	public void setTotalIncTax(BigDecimal totalIncTax) {
+	public void setTotalIncTax(final BigDecimal totalIncTax) {
 		this.totalIncTax = totalIncTax;
 	}
 
@@ -252,7 +252,7 @@ public class LineItem {
 		return totalTax;
 	}
 
-	public void setTotalTax(BigDecimal totalTax) {
+	public void setTotalTax(final BigDecimal totalTax) {
 		this.totalTax = totalTax;
 	}
 
@@ -260,7 +260,7 @@ public class LineItem {
 		return baseCostPrice;
 	}
 
-	public void setBaseCostPrice(BigDecimal baseCostPrice) {
+	public void setBaseCostPrice(final BigDecimal baseCostPrice) {
 		this.baseCostPrice = baseCostPrice;
 	}
 
@@ -268,7 +268,7 @@ public class LineItem {
 		return costPriceIncTax;
 	}
 
-	public void setCostPriceIncTax(BigDecimal costPriceIncTax) {
+	public void setCostPriceIncTax(final BigDecimal costPriceIncTax) {
 		this.costPriceIncTax = costPriceIncTax;
 	}
 
@@ -276,7 +276,7 @@ public class LineItem {
 		return costPriceExTax;
 	}
 
-	public void setCostPriceExTax(BigDecimal costPriceExTax) {
+	public void setCostPriceExTax(final BigDecimal costPriceExTax) {
 		this.costPriceExTax = costPriceExTax;
 	}
 
@@ -284,23 +284,23 @@ public class LineItem {
 		return costPriceTax;
 	}
 
-	public void setCostPriceTax(BigDecimal costPriceTax) {
+	public void setCostPriceTax(final BigDecimal costPriceTax) {
 		this.costPriceTax = costPriceTax;
 	}
 
-	public boolean isRefunded() {
-		return isRefunded;
+	public Boolean isRefunded() {
+		return refunded;
 	}
 
-	public void setRefunded(boolean isRefunded) {
-		this.isRefunded = isRefunded;
+	public void setRefunded(final Boolean isRefunded) {
+		this.refunded = isRefunded;
 	}
 
 	public int getQuantityRefunded() {
 		return quantityRefunded;
 	}
 
-	public void setQuantityRefunded(int quantityRefunded) {
+	public void setQuantityRefunded(final int quantityRefunded) {
 		this.quantityRefunded = quantityRefunded;
 	}
 
@@ -308,7 +308,7 @@ public class LineItem {
 		return refundAmount;
 	}
 
-	public void setRefundAmount(BigDecimal refundAmount) {
+	public void setRefundAmount(final BigDecimal refundAmount) {
 		this.refundAmount = refundAmount;
 	}
 
@@ -316,7 +316,7 @@ public class LineItem {
 		return returnId;
 	}
 
-	public void setReturnId(int returnId) {
+	public void setReturnId(final int returnId) {
 		this.returnId = returnId;
 	}
 
@@ -324,7 +324,7 @@ public class LineItem {
 		return wrappingName;
 	}
 
-	public void setWrappingName(String wrappingName) {
+	public void setWrappingName(final String wrappingName) {
 		this.wrappingName = wrappingName;
 	}
 
@@ -332,7 +332,7 @@ public class LineItem {
 		return baseWrappingCost;
 	}
 
-	public void setBaseWrappingCost(BigDecimal baseWrappingCost) {
+	public void setBaseWrappingCost(final BigDecimal baseWrappingCost) {
 		this.baseWrappingCost = baseWrappingCost;
 	}
 
@@ -340,7 +340,7 @@ public class LineItem {
 		return wrappingCostExTax;
 	}
 
-	public void setWrappingCostExTax(BigDecimal wrappingCostExTax) {
+	public void setWrappingCostExTax(final BigDecimal wrappingCostExTax) {
 		this.wrappingCostExTax = wrappingCostExTax;
 	}
 
@@ -348,7 +348,7 @@ public class LineItem {
 		return wrappingCostIncTax;
 	}
 
-	public void setWrappingCostIncTax(BigDecimal wrappingCostIncTax) {
+	public void setWrappingCostIncTax(final BigDecimal wrappingCostIncTax) {
 		this.wrappingCostIncTax = wrappingCostIncTax;
 	}
 
@@ -356,7 +356,7 @@ public class LineItem {
 		return wrappingCostTax;
 	}
 
-	public void setWrappingCostTax(BigDecimal wrappingCostTax) {
+	public void setWrappingCostTax(final BigDecimal wrappingCostTax) {
 		this.wrappingCostTax = wrappingCostTax;
 	}
 
@@ -364,7 +364,7 @@ public class LineItem {
 		return wrappingMessage;
 	}
 
-	public void setWrappingMessage(String wrappingMessage) {
+	public void setWrappingMessage(final String wrappingMessage) {
 		this.wrappingMessage = wrappingMessage;
 	}
 
@@ -372,7 +372,7 @@ public class LineItem {
 		return quantityShipped;
 	}
 
-	public void setQuantityShipped(int qualityShipped) {
+	public void setQuantityShipped(final int qualityShipped) {
 		this.quantityShipped = qualityShipped;
 	}
 
@@ -380,7 +380,7 @@ public class LineItem {
 		return eventName;
 	}
 
-	public void setEventName(String eventName) {
+	public void setEventName(final String eventName) {
 		this.eventName = eventName;
 	}
 
@@ -388,7 +388,7 @@ public class LineItem {
 		return eventDate;
 	}
 
-	public void setEventDate(DateTime eventDate) {
+	public void setEventDate(final DateTime eventDate) {
 		this.eventDate = eventDate;
 	}
 
@@ -396,7 +396,7 @@ public class LineItem {
 		return ebayItemId;
 	}
 
-	public void setEbayItemId(String ebayItemId) {
+	public void setEbayItemId(final String ebayItemId) {
 		this.ebayItemId = ebayItemId;
 	}
 
@@ -404,7 +404,7 @@ public class LineItem {
 		return ebayTransactionId;
 	}
 
-	public void setEbayTransactionId(String ebayTransactionId) {
+	public void setEbayTransactionId(final String ebayTransactionId) {
 		this.ebayTransactionId = ebayTransactionId;
 	}
 
@@ -412,7 +412,7 @@ public class LineItem {
 		return optionSetId;
 	}
 
-	public void setOptionSetId(int optionSetId) {
+	public void setOptionSetId(final int optionSetId) {
 		this.optionSetId = optionSetId;
 	}
 
@@ -420,23 +420,23 @@ public class LineItem {
 		return parentOrderProductId;
 	}
 
-	public void setParentOrderProductId(int parentOrderProductId) {
+	public void setParentOrderProductId(final int parentOrderProductId) {
 		this.parentOrderProductId = parentOrderProductId;
 	}
 
-	public boolean isBundledProduct() {
-		return isBundledProduct;
+	public Boolean isBundledProduct() {
+		return bundledProduct;
 	}
 
-	public void setBundledProduct(boolean isBundledProduct) {
-		this.isBundledProduct = isBundledProduct;
+	public void setBundledProduct(final Boolean isBundledProduct) {
+		this.bundledProduct = isBundledProduct;
 	}
 
 	public String getBinPickingNumber() {
 		return binPickingNumber;
 	}
 
-	public void setBinPickingNumber(String binPickingNumber) {
+	public void setBinPickingNumber(final String binPickingNumber) {
 		this.binPickingNumber = binPickingNumber;
 	}
 
@@ -444,7 +444,7 @@ public class LineItem {
 		return externalId;
 	}
 
-	public void setExternalId(String externalId) {
+	public void setExternalId(final String externalId) {
 		this.externalId = externalId;
 	}
 

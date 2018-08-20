@@ -13,38 +13,38 @@ public class DateTimeAdapterTest {
 
 	@Test
 	public void givenRFC822DateFormatStringWhenUnmarshalingThenReturnDateTime() throws Exception {
-		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
-		DateTime actualDateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
+		final DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
+		final DateTime actualDateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
 		assertNotNull(actualDateTime);
 		assertEquals(DateTime.parse("2012-11-20T00:00:00.000Z"), actualDateTime);
 	}
 
 	@Test
 	public void givenDateTimeObjectWhenUnmarshalingThenReturnDateTimeString() throws Exception {
-		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
-		DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeAdapter.RFC_822_DATE_FORMAT);
-		DateTime dateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
-		String dateTimeString = dateTimeAdapter.marshal(dateTime);
+		final DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
+		final DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeAdapter.RFC_822_DATE_FORMAT);
+		final DateTime dateTime = dateTimeAdapter.unmarshal("Tue, 20 Nov 2012 00:00:00 +0000");
+		final String dateTimeString = dateTimeAdapter.marshal(dateTime);
 
-		DateTime dateTimeParsedFromString = DateTime.parse(dateTimeString, formatter);
+		final DateTime dateTimeParsedFromString = DateTime.parse(dateTimeString, formatter);
 
 		assertNotNull(dateTimeString);
-		assertEquals(dateTimeParsedFromString.compareTo(dateTime), 0);
+		assertEquals(0, dateTimeParsedFromString.compareTo(dateTime));
 
 	}
 
 	@Test
 	public void givenNullDateStringWhenUnmarshalingThenReturnNullValue() throws Exception {
-		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
-		DateTime dateTime = dateTimeAdapter.unmarshal(null);
+		final DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
+		final DateTime dateTime = dateTimeAdapter.unmarshal(null);
 		assertNull(dateTime);
 
 	}
 
 	@Test
 	public void givenNullDateWhenMarshalingThenReturnNullValue() throws Exception {
-		DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
-		String dateTime = dateTimeAdapter.marshal(null);
+		final DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
+		final String dateTime = dateTimeAdapter.marshal(null);
 		assertNull(dateTime);
 
 	}
