@@ -229,19 +229,23 @@ public class Variant {
 
 	@Override
 	public int hashCode() {
-		final BigDecimal width = getWidth() == null ? null : getWidth().setScale(10, RoundingMode.HALF_UP);
-		final BigDecimal height = getHeight() == null ? null : getHeight().setScale(10, RoundingMode.HALF_UP);
-		final BigDecimal depth = getDepth() == null ? null : getDepth().setScale(10, RoundingMode.HALF_UP);
-		final BigDecimal weight = getWeight() == null ? null : getWeight().setScale(10, RoundingMode.HALF_UP);
-		final BigDecimal price = getPrice() == null ? null : getPrice().setScale(10, RoundingMode.HALF_UP);
-		final BigDecimal retailPrice = getRetailPrice() == null ? null
+		final BigDecimal determinedWidth = getWidth() == null ? null : getWidth().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal determinedHeight = getHeight() == null ? null : getHeight().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal determinedDepth = getDepth() == null ? null : getDepth().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal determindedWeight = getWeight() == null ? null
+				: getWeight().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal determinedPrice = getPrice() == null ? null : getPrice().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal determinedRetailPrice = getRetailPrice() == null ? null
 				: getRetailPrice().setScale(10, RoundingMode.HALF_UP);
-		final BigDecimal costPrice = getCostPrice() == null ? null : getCostPrice().setScale(10, RoundingMode.HALF_UP);
-		final BigDecimal salePrice = getSalePrice() == null ? null : getSalePrice().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal determinedCostPrice = getCostPrice() == null ? null
+				: getCostPrice().setScale(10, RoundingMode.HALF_UP);
+		final BigDecimal determinedSalePrice = getSalePrice() == null ? null
+				: getSalePrice().setScale(10, RoundingMode.HALF_UP);
 
-		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(price)
-				.append(weight).append(getUpc()).append(getMpn()).append(getInventoryLevel()).append(height)
-				.append(width).append(depth).append(retailPrice).append(salePrice).append(costPrice).toHashCode();
+		return new HashCodeBuilder().append(getId()).append(getProductId()).append(getSku()).append(determinedPrice)
+				.append(determindedWeight).append(getUpc()).append(getMpn()).append(getInventoryLevel())
+				.append(determinedHeight).append(determinedWidth).append(determinedDepth).append(determinedRetailPrice)
+				.append(determinedSalePrice).append(determinedCostPrice).toHashCode();
 	}
 
 	private boolean isScaledDeimalValueSame(final BigDecimal leftValue, final BigDecimal rightValue) {

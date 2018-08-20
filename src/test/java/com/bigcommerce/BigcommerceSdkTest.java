@@ -85,6 +85,7 @@ import com.github.restdriver.clientdriver.capture.JsonBodyCapture;
 
 public class BigcommerceSdkTest {
 
+	private static final DateTime SOME_DATE = new DateTime().withZone(DateTimeZone.UTC);
 	private static final BigDecimal SOME_WEIGHT = new BigDecimal(321.233);
 	private static final String SOME_ORDER_ID = "100";
 	private static final String SOME_TRACKING_CARRIER = "123";
@@ -195,9 +196,41 @@ public class BigcommerceSdkTest {
 		final Product firstExpectedProduct = new Product();
 		firstExpectedProduct.setId(112);
 		firstExpectedProduct.setName("Quest Nutrition Quest Natural Protein Bar");
+		firstExpectedProduct.setType("Product");
+		firstExpectedProduct.setWeight(SOME_WEIGHT);
+		firstExpectedProduct.setVisible(true);
+		firstExpectedProduct.setInventoryTracking("variant");
+		firstExpectedProduct.setSortOrder(1);
+		firstExpectedProduct.setSearchKeywords("cool,awesome");
+		firstExpectedProduct.setPrice(SOME_PRICE);
+		firstExpectedProduct.setConditionShown(true);
+		firstExpectedProduct.setPageTitle("Some Page Title");
+		firstExpectedProduct.setGtin("some Gtin");
+		firstExpectedProduct.setCostPrice(SOME_PRICE);
+		firstExpectedProduct.setRetailPrice(SOME_PRICE);
+		firstExpectedProduct.setSalePrice(SOME_PRICE);
+		firstExpectedProduct.setUpc("123-abc");
+		firstExpectedProduct.setSku("abc-123");
+
 		final Product secondExpectedProduct = new Product();
 		secondExpectedProduct.setId(113);
 		secondExpectedProduct.setName("Rubber Duck");
+		secondExpectedProduct.setType("Product");
+		secondExpectedProduct.setWeight(SOME_WEIGHT);
+		secondExpectedProduct.setVisible(true);
+		secondExpectedProduct.setInventoryTracking("variant");
+		secondExpectedProduct.setSortOrder(1);
+		secondExpectedProduct.setSearchKeywords("cool,awesome");
+		secondExpectedProduct.setPrice(SOME_PRICE);
+		secondExpectedProduct.setConditionShown(true);
+		secondExpectedProduct.setPageTitle("Some Page Title");
+		secondExpectedProduct.setGtin("some Gtin");
+		secondExpectedProduct.setCostPrice(SOME_PRICE);
+		secondExpectedProduct.setRetailPrice(SOME_PRICE);
+		secondExpectedProduct.setSalePrice(SOME_PRICE);
+		secondExpectedProduct.setUpc("123-abc");
+		secondExpectedProduct.setSku("abc-123");
+
 		final List<Product> expectedProducts = Arrays.asList(firstExpectedProduct, secondExpectedProduct);
 		productsResponse.setData(expectedProducts);
 		final Meta meta = new Meta();
@@ -231,8 +264,43 @@ public class BigcommerceSdkTest {
 		assertEquals(expectedProducts.size(), actualProducts.getProducts().size());
 		assertEquals(firstExpectedProduct.getId(), actualProducts.getProducts().get(0).getId());
 		assertEquals(firstExpectedProduct.getName(), actualProducts.getProducts().get(0).getName());
+		assertEquals(firstExpectedProduct.getType(), actualProducts.getProducts().get(0).getType());
+		assertEquals(firstExpectedProduct.getWeight(), actualProducts.getProducts().get(0).getWeight());
+		assertEquals(firstExpectedProduct.isVisible(), actualProducts.getProducts().get(0).isVisible());
+		assertEquals(firstExpectedProduct.getInventoryTracking(),
+				actualProducts.getProducts().get(0).getInventoryTracking());
+		assertEquals(firstExpectedProduct.getSortOrder(), actualProducts.getProducts().get(0).getSortOrder());
+		assertEquals(firstExpectedProduct.getSearchKeywords(), actualProducts.getProducts().get(0).getSearchKeywords());
+		assertEquals(firstExpectedProduct.getPrice(), actualProducts.getProducts().get(0).getPrice());
+		assertEquals(firstExpectedProduct.isConditionShown(), actualProducts.getProducts().get(0).isConditionShown());
+		assertEquals(firstExpectedProduct.getPageTitle(), actualProducts.getProducts().get(0).getPageTitle());
+		assertEquals(firstExpectedProduct.getGtin(), actualProducts.getProducts().get(0).getGtin());
+		assertEquals(firstExpectedProduct.getCostPrice(), actualProducts.getProducts().get(0).getCostPrice());
+		assertEquals(firstExpectedProduct.getRetailPrice(), actualProducts.getProducts().get(0).getRetailPrice());
+		assertEquals(firstExpectedProduct.getSalePrice(), actualProducts.getProducts().get(0).getSalePrice());
+		assertEquals(firstExpectedProduct.getUpc(), actualProducts.getProducts().get(0).getUpc());
+		assertEquals(firstExpectedProduct.getSku(), actualProducts.getProducts().get(0).getSku());
+
 		assertEquals(secondExpectedProduct.getName(), actualProducts.getProducts().get(1).getName());
 		assertEquals(secondExpectedProduct.getId(), actualProducts.getProducts().get(1).getId());
+		assertEquals(secondExpectedProduct.getType(), actualProducts.getProducts().get(1).getType());
+		assertEquals(secondExpectedProduct.getWeight(), actualProducts.getProducts().get(1).getWeight());
+		assertEquals(secondExpectedProduct.isVisible(), actualProducts.getProducts().get(1).isVisible());
+		assertEquals(secondExpectedProduct.getInventoryTracking(),
+				actualProducts.getProducts().get(1).getInventoryTracking());
+		assertEquals(firstExpectedProduct.getSortOrder(), actualProducts.getProducts().get(1).getSortOrder());
+		assertEquals(secondExpectedProduct.getSearchKeywords(),
+				actualProducts.getProducts().get(1).getSearchKeywords());
+		assertEquals(secondExpectedProduct.getPrice(), actualProducts.getProducts().get(1).getPrice());
+		assertEquals(secondExpectedProduct.isConditionShown(), actualProducts.getProducts().get(1).isConditionShown());
+		assertEquals(secondExpectedProduct.getPageTitle(), actualProducts.getProducts().get(1).getPageTitle());
+		assertEquals(secondExpectedProduct.getGtin(), actualProducts.getProducts().get(1).getGtin());
+		assertEquals(secondExpectedProduct.getCostPrice(), actualProducts.getProducts().get(1).getCostPrice());
+		assertEquals(secondExpectedProduct.getRetailPrice(), actualProducts.getProducts().get(1).getRetailPrice());
+		assertEquals(secondExpectedProduct.getSalePrice(), actualProducts.getProducts().get(1).getSalePrice());
+		assertEquals(secondExpectedProduct.getUpc(), actualProducts.getProducts().get(1).getUpc());
+		assertEquals(secondExpectedProduct.getSku(), actualProducts.getProducts().get(1).getSku());
+
 		assertEquals(expectedPagination.getCount(), actualProducts.getPagination().getCount());
 		assertEquals(expectedPagination.getCurrentPage(), actualProducts.getPagination().getCurrentPage());
 		assertEquals(expectedPagination.getPerPage(), actualProducts.getPagination().getPerPage());
@@ -873,6 +941,28 @@ public class BigcommerceSdkTest {
 		assertEquals(firstExpectedOrder.getTotalIncTax(), firstActualOrder.getTotalIncTax());
 		assertEquals(firstExpectedOrder.getTotalTax(), firstActualOrder.getTotalTax());
 		assertEquals(firstExpectedOrder.getCustomerId(), firstActualOrder.getCustomerId());
+		assertEquals(firstExpectedOrder.getCustomStatus(), firstActualOrder.getCustomStatus());
+		assertEquals(firstExpectedOrder.getExternalId(), firstActualOrder.getExternalId());
+		assertEquals(firstExpectedOrder.getExternalSource(), firstActualOrder.getExternalSource());
+		assertEquals(firstExpectedOrder.getEmail(), firstActualOrder.getEmail());
+		assertEquals(firstExpectedOrder.getLastName(), firstActualOrder.getLastName());
+		assertEquals(firstExpectedOrder.getFirstName(), firstActualOrder.getFirstName());
+		assertEquals(firstExpectedOrder.getOrderSource(), firstActualOrder.getOrderSource());
+		assertEquals(firstExpectedOrder.getIsEmailOptIn(), firstActualOrder.getIsEmailOptIn());
+		assertEquals(firstExpectedOrder.getEbayOrderId(), firstActualOrder.getEbayOrderId());
+		assertEquals(firstExpectedOrder.getIsDeleted(), firstActualOrder.getIsDeleted());
+		assertEquals(firstExpectedOrder.getShippingAddressCount(), firstActualOrder.getShippingAddressCount());
+		assertEquals(firstExpectedOrder.getDiscountAmount(), firstActualOrder.getDiscountAmount());
+		assertEquals(firstExpectedOrder.getCustomerMessage(), firstActualOrder.getCustomerMessage());
+		assertEquals(firstExpectedOrder.getStaffNotes(), firstActualOrder.getStaffNotes());
+		assertEquals(firstExpectedOrder.getDefaultCurrencyCode(), firstActualOrder.getDefaultCurrencyCode());
+		assertEquals(firstExpectedOrder.getDefaultCurrencyId(), firstActualOrder.getDefaultCurrencyId());
+		assertEquals(firstExpectedOrder.getGeoipCountry(), firstActualOrder.getGeoipCountry());
+		assertEquals(firstExpectedOrder.getGeoipCountryIso2(), firstActualOrder.getGeoipCountryIso2());
+		assertEquals(firstExpectedOrder.getIpAddress(), firstActualOrder.getIpAddress());
+		assertEquals(firstExpectedOrder.getGiftCertificateAmount(), firstActualOrder.getGiftCertificateAmount());
+		assertEquals(firstExpectedOrder.getWrappingCostTaxClassId(), firstActualOrder.getWrappingCostTaxClassId());
+		assertEquals(firstExpectedOrder.getStatusId(), firstActualOrder.getStatusId());
 
 		final Order secondActualOrder = actualOrders.get(1);
 		assertEquals(secondExpectedOrder.getId(), secondActualOrder.getId());
@@ -916,6 +1006,28 @@ public class BigcommerceSdkTest {
 		assertEquals(secondExpectedOrder.getTotalIncTax(), secondActualOrder.getTotalIncTax());
 		assertEquals(secondExpectedOrder.getTotalTax(), secondActualOrder.getTotalTax());
 		assertEquals(secondExpectedOrder.getCustomerId(), secondActualOrder.getCustomerId());
+		assertEquals(secondExpectedOrder.getCustomStatus(), secondActualOrder.getCustomStatus());
+		assertEquals(secondExpectedOrder.getExternalId(), secondActualOrder.getExternalId());
+		assertEquals(secondExpectedOrder.getExternalSource(), secondActualOrder.getExternalSource());
+		assertEquals(secondExpectedOrder.getEmail(), secondActualOrder.getEmail());
+		assertEquals(secondExpectedOrder.getLastName(), secondActualOrder.getLastName());
+		assertEquals(secondExpectedOrder.getFirstName(), secondActualOrder.getFirstName());
+		assertEquals(secondExpectedOrder.getOrderSource(), secondActualOrder.getOrderSource());
+		assertEquals(secondExpectedOrder.getIsEmailOptIn(), secondActualOrder.getIsEmailOptIn());
+		assertEquals(secondExpectedOrder.getEbayOrderId(), secondActualOrder.getEbayOrderId());
+		assertEquals(secondExpectedOrder.getIsDeleted(), secondActualOrder.getIsDeleted());
+		assertEquals(secondExpectedOrder.getShippingAddressCount(), secondActualOrder.getShippingAddressCount());
+		assertEquals(secondExpectedOrder.getDiscountAmount(), secondActualOrder.getDiscountAmount());
+		assertEquals(secondExpectedOrder.getCustomerMessage(), secondActualOrder.getCustomerMessage());
+		assertEquals(secondExpectedOrder.getStaffNotes(), secondActualOrder.getStaffNotes());
+		assertEquals(secondExpectedOrder.getDefaultCurrencyCode(), secondActualOrder.getDefaultCurrencyCode());
+		assertEquals(secondExpectedOrder.getDefaultCurrencyId(), secondActualOrder.getDefaultCurrencyId());
+		assertEquals(secondExpectedOrder.getGeoipCountry(), secondActualOrder.getGeoipCountry());
+		assertEquals(secondExpectedOrder.getGeoipCountryIso2(), secondActualOrder.getGeoipCountryIso2());
+		assertEquals(secondExpectedOrder.getIpAddress(), secondActualOrder.getIpAddress());
+		assertEquals(secondExpectedOrder.getGiftCertificateAmount(), secondActualOrder.getGiftCertificateAmount());
+		assertEquals(secondExpectedOrder.getWrappingCostTaxClassId(), secondActualOrder.getWrappingCostTaxClassId());
+		assertEquals(secondExpectedOrder.getStatusId(), secondActualOrder.getStatusId());
 
 	}
 
@@ -976,6 +1088,15 @@ public class BigcommerceSdkTest {
 		expectedCustomer.setEmail(SOME_EMAIL);
 		expectedCustomer.setFirstName(SOME_FIRST_NAME);
 		expectedCustomer.setLastName(SOME_LAST_NAME);
+		expectedCustomer.setId(1);
+		expectedCustomer.setCompany("ChannelApe");
+		expectedCustomer.setStoreCredit(SOME_PRICE);
+		expectedCustomer.setNotes("Some Customer NoteS");
+		expectedCustomer.setAcceptsMarketing("Yes");
+		expectedCustomer.setPhone("123123123");
+		expectedCustomer.setCustomerGroupId(2);
+		expectedCustomer.setResetPassOnLogin("yes");
+		expectedCustomer.setTaxExemptCategory("123");
 
 		final StringWriter stringWriter = new StringWriter();
 		marshaller.marshal(expectedCustomer, stringWriter);
@@ -993,6 +1114,16 @@ public class BigcommerceSdkTest {
 		assertEquals(actualCustomer.getFirstName(), expectedCustomer.getFirstName());
 		assertEquals(actualCustomer.getLastName(), expectedCustomer.getLastName());
 		assertEquals(actualCustomer.getEmail(), expectedCustomer.getEmail());
+		assertEquals(actualCustomer.getId(), expectedCustomer.getId());
+		assertEquals(actualCustomer.getCompany(), expectedCustomer.getCompany());
+		assertEquals(actualCustomer.getStoreCredit(), expectedCustomer.getStoreCredit());
+		assertEquals(actualCustomer.getNotes(), expectedCustomer.getNotes());
+		assertEquals(actualCustomer.getAcceptsMarketing(), expectedCustomer.getAcceptsMarketing());
+		assertEquals(actualCustomer.getPhone(), expectedCustomer.getPhone());
+		assertEquals(actualCustomer.getCustomerGroupId(), expectedCustomer.getCustomerGroupId());
+		assertEquals(actualCustomer.getResetPassOnLogin(), expectedCustomer.getResetPassOnLogin());
+		assertEquals(actualCustomer.getTaxExemptCategory(), expectedCustomer.getTaxExemptCategory());
+
 	}
 
 	@Test
@@ -2479,7 +2610,29 @@ public class BigcommerceSdkTest {
 		order.setTotalIncTax(SOME_PRICE);
 		order.setTotalTax(SOME_PRICE);
 		order.setCustomerId(2);
-
+		order.setDateShipped(SOME_DATE);
+		order.setBillingAddress(new Address());
+		order.setCustomStatus("Some Status");
+		order.setExternalId("SOme external Id");
+		order.setExternalSource("Some external source");
+		order.setEmail("rkazokas@channelape.com");
+		order.setLastName("Kazokas");
+		order.setFirstName("Ryan");
+		order.setOrderSource("WEB");
+		order.setIsEmailOptIn("Yes");
+		order.setEbayOrderId("123123123");
+		order.setIsDeleted("Yes");
+		order.setShippingAddressCount("3");
+		order.setDiscountAmount(SOME_PRICE);
+		order.setCustomerMessage("Some Customer Message");
+		order.setStaffNotes("Some notes");
+		order.setDefaultCurrencyCode("USD");
+		order.setDefaultCurrencyId("1");
+		order.setGeoipCountry("USA");
+		order.setGeoipCountryIso2("UNITED STATES");
+		order.setIpAddress("127.0.0.1");
+		order.setGiftCertificateAmount(SOME_PRICE);
+		order.setWrappingCostTaxClassId(1);
 		return order;
 	}
 

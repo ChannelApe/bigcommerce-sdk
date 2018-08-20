@@ -65,7 +65,7 @@ public class Customer {
 		return firstName;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(final String firstName) {
 		this.firstName = firstName;
 	}
 
@@ -73,7 +73,7 @@ public class Customer {
 		return lastName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(final String lastName) {
 		this.lastName = lastName;
 	}
 
@@ -81,7 +81,7 @@ public class Customer {
 		return email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
@@ -89,7 +89,7 @@ public class Customer {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -97,7 +97,7 @@ public class Customer {
 		return company;
 	}
 
-	public void setCompany(String company) {
+	public void setCompany(final String company) {
 		this.company = company;
 	}
 
@@ -105,7 +105,7 @@ public class Customer {
 		return phone;
 	}
 
-	public void setPhone(String phone) {
+	public void setPhone(final String phone) {
 		this.phone = phone;
 	}
 
@@ -113,7 +113,7 @@ public class Customer {
 		return dateCreated;
 	}
 
-	public void setDateCreated(DateTime dateCreated) {
+	public void setDateCreated(final DateTime dateCreated) {
 		this.dateCreated = dateCreated;
 	}
 
@@ -121,7 +121,7 @@ public class Customer {
 		return dateModified;
 	}
 
-	public void setDateModified(DateTime dateModified) {
+	public void setDateModified(final DateTime dateModified) {
 		this.dateModified = dateModified;
 	}
 
@@ -129,7 +129,7 @@ public class Customer {
 		return storeCredit;
 	}
 
-	public void setStoreCredit(BigDecimal storeCredit) {
+	public void setStoreCredit(final BigDecimal storeCredit) {
 		this.storeCredit = storeCredit;
 	}
 
@@ -137,7 +137,7 @@ public class Customer {
 		return customerGroupId;
 	}
 
-	public void setCustomerGroupId(int customerGroupId) {
+	public void setCustomerGroupId(final int customerGroupId) {
 		this.customerGroupId = customerGroupId;
 	}
 
@@ -145,7 +145,7 @@ public class Customer {
 		return notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 
@@ -153,7 +153,7 @@ public class Customer {
 		return taxExemptCategory;
 	}
 
-	public void setTaxExemptCategory(String taxExemptCategory) {
+	public void setTaxExemptCategory(final String taxExemptCategory) {
 		this.taxExemptCategory = taxExemptCategory;
 	}
 
@@ -161,7 +161,7 @@ public class Customer {
 		return resetPassOnLogin;
 	}
 
-	public void setResetPassOnLogin(String resetPassOnLogin) {
+	public void setResetPassOnLogin(final String resetPassOnLogin) {
 		this.resetPassOnLogin = resetPassOnLogin;
 	}
 
@@ -169,7 +169,7 @@ public class Customer {
 		return acceptsMarketing;
 	}
 
-	public void setAcceptsMarketing(String acceptsMarketing) {
+	public void setAcceptsMarketing(final String acceptsMarketing) {
 		this.acceptsMarketing = acceptsMarketing;
 	}
 
@@ -177,7 +177,7 @@ public class Customer {
 		return registrationIpAddress;
 	}
 
-	public void setRegistrationIpAddress(String registrationIpAddress) {
+	public void setRegistrationIpAddress(final String registrationIpAddress) {
 		this.registrationIpAddress = registrationIpAddress;
 	}
 }
