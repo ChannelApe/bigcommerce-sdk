@@ -24,8 +24,18 @@ then
         shred -v ~/.gnupg/*
         rm -rf ~/.gnupg
     fi
+elif [ "$TRAVIS_BRANCH" = "develop" ]
+then
+    echo "on develop branch. Deploying SNAPSHOT to Maven Central"
+
+    mvn clean deploy --settings .travis/settings.xml
+elif [ "$TRAVIS_BRANCH" = "master" ]
+then
+    echo "on master branch. Deploying SNAPSHOT to Maven Central"
+
+    mvn clean deploy --settings .travis/settings.xml
 else
-    echo "not on a tag -> keep snapshot version in pom.xml"
+    echo "not on a tag, develop, or master branch. Not deploying to Maven Central."
 fi
 
 echo "ending deployment script"
