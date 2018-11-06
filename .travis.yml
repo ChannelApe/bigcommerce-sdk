@@ -9,8 +9,8 @@ addons:
 jdk:
 - oraclejdk8
 script:
-- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then mvn clean build; fi
-- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn --settings .travis/settings.xml clean deploy; fi
+- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then mvn clean install; fi
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn --settings .travis/settings.xml clean install; fi
 after_success:
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn sonar:sonar; fi
 cache:
@@ -19,9 +19,23 @@ cache:
   - $HOME/.sonar/cache
 deploy:
 - provider: script
-  script: .travis/deploy.sh
+  script: ".travis/deploy.sh"
   skip_cleanup: true
-  true:
-    repo: ChannelApe/bigcommerce-sdk
+  on:
     tags: true
+    repo: ChannelApe/bigcommerce-sdk
+    jdk: oraclejdk8
+- provider: script
+  script: ".travis/deploy.sh"
+  skip_cleanup: true
+  on:
+    branch: master
+    repo: ChannelApe/bigcommerce-sdk
+    jdk: oraclejdk8
+- provider: script
+  script: ".travis/deploy.sh"
+  skip_cleanup: true
+  on:
+    branch: develop
+    repo: ChannelApe/bigcommerce-sdk
     jdk: oraclejdk8
